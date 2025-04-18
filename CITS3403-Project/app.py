@@ -121,6 +121,7 @@ def init_db():
             VALUES (?, ?, ?, ?, ?)
         ''', book_data)
 
+
     # User 1 owns all 30 books if they don't already own them
     c.execute("SELECT COUNT(*) FROM user_books WHERE user_id = 1")
     if c.fetchone()[0] == 0:
