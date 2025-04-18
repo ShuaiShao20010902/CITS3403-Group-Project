@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang = "en">
+
+<head>
+    <meta charset = "UTF-8">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    <title>Upload Page</title>
+</head>
+
+<body>
+    <h1>Upload a book </h1>
+    <form action = "/upload" method = "POST">
+        <label for = "title">Book Title:</label>
+        <input type = "text" name = "book" id = "title" required><br><br>
+
+        <label for = "author">Author:</label>
+        <input type = "text" name = "author" id = "author" required><br><br>
+
+        <label for = "genre">Genre:</label>
+        <select id = "genre" name = "genre">
+            <option value = "">Select the Genre</option>
+            <option value = "non-fiction">Non-Fiction</option>
+            <option value = "fantasy">Fantasy</option>
+            <option value = "mystery">Mystery</option>
+            <option value = "romance">Romance</option>
+            <option value = "young-adult">Young Adult</option>
+            <option value = "graphic-novel">Graphic Novel</option>
+            <option value = "classic">Classic</option>
+        </select><br><br>
+
+        <label for = "rating">Rating (out of 5):</label>
+        <input type = "number" id = "rating" name = "rating" min = "1" max = "5" step = "0.1"><br><br>
+
+        <label for = "notes">Notes:</label>
+        <textarea id = "notes" name = "notes" rows = "4" cols = "50" placeholder="Optional Notes..."></textarea><br><br>
+
+        <input type = "submit" value = "Upload Book">
+    </form>
+</body>
+</html>
