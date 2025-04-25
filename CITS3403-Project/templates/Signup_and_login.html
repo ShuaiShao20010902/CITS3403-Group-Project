@@ -4,45 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reading Tracker</title>
-    <style>
-        .container 
-        {
-            width: 400px; 
-            height: 500px; 
-            border: 2px solid #333; 
-            padding: 20px;
-            text-align: center;
-            margin: 50px auto;
-        }
-        p 
-        {
-            font-size: 22px; 
-            font-weight: bold; 
-        }
-
-        button 
-        {
-            margin: 10px;
-            padding: 15px 30px; 
-            font-size: 16px;
-            border: 2px solid #333; 
-            margin-top: 60px;
-            background-color: #f0f0f0;
-        }
-
-        button:active {
-            background-color: #ccc; 
-        }
-
-
-
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
 </head>
 <body>
-    <div class="container">
-        <p>Track your reading progress. Analyze your reading habits. Share your favorite books.</p>
-        <button>Sign Up</button>
-        <button>Log In</button>
+    {% include 'nav.html' %}
+    
+    <div class="signup-container">
+        <div class="logo-section">
+            <div class="logo-icon">📚</div>
+            <h1 class="welcome-text">Welcome to BookTracker</h1>
+        </div>
+        
+        <p class="description">Track your reading progress. Analyze your reading habits. Share your favorite books.</p>
+        
+        <div class="button-group">
+            <button class="auth-button signup-btn">Sign Up</button>
+            <button class="auth-button login-btn">Log In</button>
+        </div>
+        
+        <div class="divider">or</div>
+        
+        <p class="footer-text">By signing up, you agree to our <a href="#" class="footer-link">Terms</a> and <a href="#" class="footer-link">Privacy Policy</a>.</p>
     </div>
 </body>
 </html>

@@ -1,0 +1,157 @@
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Main container styles - larger size */
+.signup-container {
+    width: 550px;  /* Increased width */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 50px;  /* Increased padding */
+    text-align: center;
+    margin: 150px auto 50px;
+    transition: transform 0.3s;
+}
+
+.signup-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Logo and title - larger font */
+.logo-section {
+    margin-bottom: 35px;  /* Increased spacing */
+}
+
+.logo-icon {
+    font-size: 60px;  /* Larger icon */
+    margin-bottom: 15px;
+}
+
+.welcome-text {
+    font-size: 30px;  /* Larger title */
+    font-weight: 600;
+    color: #1e1e2f;
+    margin-bottom: 25px;
+}
+
+/* Description text - larger font */
+.description {
+    font-size: 18px;  /* Larger font */
+    color: #666;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+/* Button group - larger buttons */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 30px;  /* Increased spacing */
+    margin-top: 40px;
+}
+
+/* Common button styles - larger buttons */
+.auth-button {
+    padding: 18px 40px;  /* Larger buttons */
+    font-size: 18px;  /* Larger font */
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    max-width: 200px;  /* Increased max width */
+}
+
+/* Sign up button */
+.signup-btn {
+    background-color: #1e1e2f;
+    color: white;
+}
+
+.signup-btn:hover {
+    background-color: #2a2a46;
+    transform: translateY(-2px);
+}
+
+/* Login button */
+.login-btn {
+    background-color: #ffffff;
+    color: #1e1e2f;
+    border: 2px solid #1e1e2f;
+}
+
+.login-btn:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 40px 0;  /* Increased spacing */
+    color: #999;
+    font-size: 16px;  /* Larger font */
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.divider::before {
+    margin-right: 15px;
+}
+
+.divider::after {
+    margin-left: 15px;
+}
+
+/* Footer text */
+.footer-text {
+    font-size: 16px;  /* Larger font */
+    color: #888;
+    margin-top: 40px;
+}
+
+.footer-link {
+    color: #1e1e2f;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {  /* Adjusted breakpoint */
+    .signup-container {
+        width: 90%;
+        padding: 40px 30px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .auth-button {
+        width: 100%;
+        max-width: 100%;
+    }
+}

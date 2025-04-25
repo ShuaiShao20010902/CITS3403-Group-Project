@@ -1,42 +1,75 @@
-<section id="public-sharing" style="border-top: 1px solid #ccc; margin-top: 2rem; padding-top: 1rem;">
-  <h2>📢 Public Sharing</h2>
-  <p>This section is visible to anyone with the shared link.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Sharing</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; }
 
-  <div style="margin-bottom: 2rem;">
-    <h3>📊 Reading Statistics</h3>
-    <ul>
-      <li>Total Books Read: <strong>XX</strong></li>
-      <li>Average Rating: <strong>4.2</strong></li>
-      <li>Favourite Genre: <strong>Fantasy</strong></li>
-    </ul>
+.content {
+  padding: 20px 10%;
+}
 
-    <!-- Placeholder for future chart/graph -->
-    <div style="width: 100%; height: 200px; background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; color: #888;">
-      [Chart or Graph Placeholder]
+h2, h3, h4 {
+  margin-bottom: 1rem;
+}
+
+ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  margin-bottom: 0.8rem;
+}
+</style>
+</head>
+<body>
+{% include 'nav.html' %}
+
+<div class="content">
+  <section id="public-sharing" style="border-top: 1px solid #ccc; margin-top: 2rem; padding-top: 1rem;">
+    <h2>📢 Public Sharing</h2>
+    <p>This section is visible to anyone with the shared link.</p>
+
+    <div style="margin-bottom: 2rem;">
+      <h3>📊 Reading Statistics</h3>
+      <ul>
+        <li>Total Books Read: <strong>XX</strong></li>
+        <li>Average Rating: <strong>4.2</strong></li>
+        <li>Favourite Genre: <strong>Fantasy</strong></li>
+      </ul>
+
+      <!-- Placeholder for future chart/graph -->
+      <div style="width: 100%; height: 200px; background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; color: #888;">
+        [Chart or Graph Placeholder]
+      </div>
     </div>
-  </div>
 
-  <div>
-    <h3>🌟 Top 3 Books</h3>
-    
-    <div style="margin-bottom: 1rem; padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
-      <h4>📘 Book Title One</h4>
-      <p><strong>Rating:</strong> ★★★★☆</p>
-      <p><em>Notes:</em> This book really stood out to me for its world-building and emotional depth.</p>
+    <div>
+      <h3>🌟 Top 3 Books</h3>
+      
+      <div style="margin-bottom: 1rem; padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
+        <h4>📘 Book Title One</h4>
+        <p><strong>Rating:</strong> ★★★★☆</p>
+        <p><em>Notes:</em> This book really stood out to me for its world-building and emotional depth.</p>
+      </div>
+
+      <div style="margin-bottom: 1rem; padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
+        <h4>📙 Book Title Two</h4>
+        <p><strong>Rating:</strong> ★★★★★</p>
+        <p><em>Notes:</em> A must-read for sci-fi fans. The ending blew my mind.</p>
+      </div>
+
+      <div style="padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
+        <h4>📗 Book Title Three</h4>
+        <p><strong>Rating:</strong> ★★★★☆</p>
+        <p><em>Notes:</em> A comforting read with lots of heart and relatable characters.</p>
+      </div>
     </div>
-
-    <div style="margin-bottom: 1rem; padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
-      <h4>📙 Book Title Two</h4>
-      <p><strong>Rating:</strong> ★★★★★</p>
-      <p><em>Notes:</em> A must-read for sci-fi fans. The ending blew my mind.</p>
-    </div>
-
-    <div style="padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
-      <h4>📗 Book Title Three</h4>
-      <p><strong>Rating:</strong> ★★★★☆</p>
-      <p><em>Notes:</em> A comforting read with lots of heart and relatable characters.</p>
-    </div>
-  </div>
-</section>
-
-
+  </section>
+</div>
+</body>
+</html>
