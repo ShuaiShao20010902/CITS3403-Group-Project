@@ -5,56 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Specific Page</title>
 
+  <link rel="stylesheet" href="{{ url_for('static', filename='bookspecificpage.css') }}">
 </head>
+
 <body>
-    <h1>{{ book.title }}Page</h1>
+    {% include "header.html" %}
+    <div class = "book-container">
+        <div class = "book-details">
+            <h1>{{ book.title }}</h1>
+            <h2>{{ book.author or "Author name unavailable" }}</h2>
+            <div class="genre-tags">
+                {% for genre in book.genres[:5] %}
+                    <span class="genre-tag">{{ genre }}</span>
+                {% endfor %}
+            </div>
+            <p><strong>Description:</strong> {{ book.description or "No description available. " }}</p>
+            <div class = "metadata">
+                <span><strong>Pages:</strong> {{ book.pages or "Pages unavailable" }}</span>
+                <span><strong>ISBN:</strong> {{ book.isbn or "ISBN unavailable" }}</span>
+                <span><strong>Year:</strong> {{ book.year or "Publish year unavailable" }}</span>
+            </div>
+        </div>
 
-    <!-- Unchangeable information -->
-    <p><strong>Title:</strong> {{ book.title }}</p>
-    <p><strong>Author:</strong> {{ book.author or "Author name unavailable }}</p>
-    <p><strong>Page:</strong> {{book.pages or "Pages unavailable"}}</p>
-    <p><strong>ISBN:</strong> {{ book.isbn or "ISBN unavailable"}}</p>
-    <p><strong>Year:</strong> {{ book.year or "Publish year unavailable" }}</p>
-    <p><strong>Description:</strong> {{ book.description or "No description available." }}</p>
-
-    <!-- Changeable information -->
-    <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
-    <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
-    <p><strong>Your Notes:</strong></p>
-    <p>{{ user_data.notes or "No notes yet." }}</p>
-
-    <!-- Book Cover Image -->
-    <div>
-        <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}" style="max-width:200px;"/>
+        <!-- Book Cover Image -->
+         <div class = "book-right"></div>
+            <div class = "book-cover">
+                <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}" style="max-width:200px;"/>
+            <div class = "user-stats">
+                <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
+                <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
+                <!-- TEMP TEST BUTTON -->
+                <button type="button" onclick="openModal()">Edit User Information</button>
+            </div>
+        </div>
     </div>
 
-    <!-- User Fields -->
-     <form method = "POST" action = "{{ url_for('book_specific_page', book_id=book.id) }}">
-        <label for="rating">Your Rating (0 - 5):</label>
-        <input type = "number" name = "rating" min = "1" max = "5" step = "0.1"><br><br>
+    <div class = "note-container">
+        <p><strong>Your Notes:</strong></p>
+        <p>{{ user_data.notes or "No notes yet." }}</p>
+    </div>
 
-        <label for = "page_read">What page are you up to?</label> <!-- Show a progress bar or percentage-->
-        <input type="number" name="page_read" id="page_read" min="0" max="{{ book.pages }}" step="1" oninput="updateProgress()">
+    <div id="editModal" class="edit-modal">
+        <div class = "modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Edit Book Information</h2>
+            <p>Update your progress and notes below:</p>
+            <form method = "POST" action = "{{ url_for('book_specific_page', book_id=book_id) }}">
+                <label for="rating">Your Rating (0 - 5):</label>
+                <input type = "number" name = "rating" min = "1" max = "5" step = "0.1">
 
-        <label for="notes">Your Notes:</label>
-        <textarea name="notes" rows="4" cols="50"></textarea><br><br>
+                <label for = "page_read">Add your progress:</label> 
+                <input type="number" name="page_read" id="page_read" min="0" max="{{ book.pages }}" step="1" oninput="updateProgress()">
 
+                <label for="notes">Edit your Notes:</label>
+                <textarea name="notes" rows="4" cols="50"></textarea>
+
+                <button type="submit">Save</button>
+                <button type="button" onclick="closeModal()">Cancel</button>
+            </form>
+    </div>
+    
     <!-- Buttons -->
-       <button type="submit">Save</button>
-       <button type="button" onclick="confirmBack()">Back</button>
-       <button type="button" onclick="confirmDelete()">Delete</button>
-    </form>
+    <button type="button" onclick="confirmBack()">Back</button>
 
-    <!-- <script>
-        function updateProgress() {
-            const pageRead = document.getElementById('page_read').value;
-            const progressBar = document.createElementById('progressBar');
-            const progressPrecent = (pageRead / {{ book.pages }}) * 100;
-
-            const totalPages = {{ book.pages }};
-            progressBar.value = pageRead;
-            document.body.appendChild(progressBar);
+    <script>
+        function openModal() {
+            document.getElementById("editModal").style.display = "block";
         }
-    </script> -->
+        
+        function closeModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById("editModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 
 </body>
