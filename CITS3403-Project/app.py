@@ -139,6 +139,15 @@ def init_db():
 def home():
     return render_template('index.html')
 
+@app.route('/Signup_and_login.html')
+def signup_login():
+    return render_template('Signup_and_login.html')
+
+
+@app.route('/publicshare.html')
+def public_share():
+    return render_template('publicshare.html')
+
 @app.route('/api/user_books')
 def api_user_books():
     user_id = request.args.get('user_id', 1)
