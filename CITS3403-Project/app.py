@@ -215,15 +215,29 @@ def book_specific_page(book_id):
         'isbn': '1234567890',
         'year': 2020,
         'description': 'One Ring to rule them all, One Ring to find them, One Ring to bring them all and in the darkness bind them. In ancient times the Rings of Power were crafted by the Elven-smiths, and Sauron, the Dark Lord, forged the One Ring, filling it with his own power so that he could rule all others. But the One Ring was taken from him, and though he sought it throughout Middle-earth, it remained lost to him. After many ages it fell into the hands of Bilbo Baggins, as told in The Hobbit.',
-        'cover_url': 'https://covers.openlibrary.org/b/id/255844-L.jpg',
+        'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
         'genres': ['Fantasy', 'Adventure']
+        
     }
     user_data = {
         'rating': 4.5,
         'page_read': 150,
         'notes': 'I love this'
     }
-    return render_template('bookspecificpage.html', book=book, user_data=user_data, book_id = book_id)
+
+    community_notes = [
+        {
+            'username': 'user1',
+            'note': 'I love this book!',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        {
+            'username': 'user2',
+            'note': 'It was okay, got bored at the middle section.',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    ]
+    return render_template('bookspecificpage.html', book=book, user_data=user_data, book_id = book_id, community_notes=community_notes)
 
 if __name__ == '__main__':
     init_db()

@@ -10,7 +10,7 @@
 
 <body>
     {% include "header.html" %}
-    <div class = "book-container">
+    <div class = "book-container card">
         <div class = "book-details">
             <h1>{{ book.title }}</h1>
             <h2>{{ book.author or "Author name unavailable" }}</h2>
@@ -27,23 +27,39 @@
             </div>
         </div>
 
-        <!-- Book Cover Image -->
-         <div class = "book-right"></div>
+        <div class = "book-right"></div>
             <div class = "book-cover">
-                <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}" style="max-width:200px;"/>
+                <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
             <div class = "user-stats">
                 <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
                 <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
-                <!-- TEMP TEST BUTTON -->
-                <button type="button" onclick="openModal()">Edit User Information</button>
+                <button type="button" class = "edit-user-btn" onclick="openModal()">Edit User Information</button>
             </div>
         </div>
     </div>
 
-    <div class = "note-container">
+    <div class = "note-container card">
         <p><strong>Your Notes:</strong></p>
         <p>{{ user_data.notes or "No notes yet." }}</p>
     </div>
+
+    <div class = "community-notes card">
+        <h2>Community Notes:</h2>
+
+        {% if community_notes %}
+            <ul class="community-notes-list">
+                {% for note in community_notes %}
+                    <li class="community-note">
+                        <strong>{{ note.username }}</strong> ({{ note.timestamp }}):
+                        <p>{{ note.note }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-notes">No notes yet. Be the first to add one!</p>
+        {% endif %}
+    </div>
+
 
     <div id="editModal" class="edit-modal">
         <div class = "modal-content">
@@ -64,9 +80,6 @@
                 <button type="button" onclick="closeModal()">Cancel</button>
             </form>
     </div>
-    
-    <!-- Buttons -->
-    <button type="button" onclick="confirmBack()">Back</button>
 
     <script>
         function openModal() {
