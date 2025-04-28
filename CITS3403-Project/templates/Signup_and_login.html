@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reading Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup_and_login.css') }}">
 </head>
 <body>
     {% include 'nav.html' %}
@@ -18,8 +18,8 @@
         <p class="description">Track your reading progress. Analyze your reading habits. Share your favorite books.</p>
         
         <div class="button-group">
-            <button class="auth-button signup-btn">Sign Up</button>
-            <button class="auth-button login-btn">Log In</button>
+            <a href="signup.html"><button class="auth-button signup-btn">Sign Up</button></a>
+            <a href="login.html"><button class="auth-button login-btn">Log In</button></a>
         </div>
         
         <div class="divider">or</div>
