@@ -178,3 +178,22 @@ body {
 .toggle-password.active .eye-closed {
     display: block;
 }
+
+/* For Error Messages */
+.flashes {
+    margin-bottom: 1em;
+  }
+  .flash {
+    padding: 0.75em;
+    border-radius: 4px;
+    margin-bottom: 0.5em;
+    font-size: 0.95em;
+  }
+  .flash-error {
+    background: #fdd;
+    color: #900;
+  }
+  .flash-success {
+    background: #dfd;
+    color: #090;
+  }

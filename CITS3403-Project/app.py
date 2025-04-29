@@ -1,12 +1,18 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import os
 from datetime import datetime
+import requests
+import random
+from werkzeug.security import generate_password_hash, check_password_hash
 
+#region Security Risk
+# I am aware this is bad practice but this will be a problem for the future - Enat
 app = Flask(__name__)
 DB_FILE = 'books.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this-is-the-super-secret-key')
 
-# Initialize the database
+#region Database setup
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
@@ -16,19 +22,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
-        )
-    ''')
-
-    # Create books table
-    c.execute(''' 
-        CREATE TABLE IF NOT EXISTS books (
-            book_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            author TEXT NOT NULL,
-            genre TEXT,
-            synopsis TEXT,
-            cover_url TEXT
         )
     ''')
 
@@ -38,10 +33,11 @@ def init_db():
             user_id INTEGER,
             book_id INTEGER,
             read_percent INTEGER DEFAULT 0,
+            rating REAL DEFAULT FALSE,
             notes TEXT,
+            completed BOOLEAN DEFAULT 0,
             PRIMARY KEY (user_id, book_id),
-            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-            FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         )
     ''')
 
@@ -75,93 +71,129 @@ def init_db():
     c.execute("SELECT COUNT(*) FROM users")
     if c.fetchone()[0] == 0:
         c.executemany(''' 
-            INSERT INTO users (username, password) VALUES (?, ?)
+            INSERT INTO users (username, password, email) VALUES (?, ?, ?)
         ''', [
-            ('john_doe', 'password123'),
-            ('jane_doe', 'password456')
+            ('john_doe', 'password123', 'johndoe@gmail.com'),
+            ('jane_doe', 'password456', 'janedoe@outlook.com')
         ])
-
-    # Check if there are any books in the books table before inserting
-    c.execute("SELECT COUNT(*) FROM books")
-    if c.fetchone()[0] == 0:
-        book_data = [
-            ('The Hobbit', 'J.R.R. Tolkien', 'Fantasy', 'A hobbit goes on an adventure with dwarves.', 'https://example.com/covers/hobbit.jpg'),
-            ('1984', 'George Orwell', 'Dystopian', 'A man struggles in a totalitarian society.', 'https://example.com/covers/1984.jpg'),
-            ('Sapiens', 'Yuval Noah Harari', 'Non-Fiction', 'A history of the human species.', 'https://example.com/covers/sapiens.jpg'),
-            ('Atomic Habits', 'James Clear', 'Self-Help', 'A guide to building better habits.', 'https://example.com/covers/atomichabits.jpg'),
-            ('Dune', 'Frank Herbert', 'Sci-Fi', 'A sci-fi saga on a desert planet.', 'https://example.com/covers/dune.jpg'),
-            ('Project Hail Mary', 'Andy Weir', 'Sci-Fi', 'A man wakes up on a spaceship with amnesia.', 'https://example.com/covers/hailmary.jpg'),
-            ('Educated', 'Tara Westover', 'Memoir', 'A memoir of escaping a survivalist family.', 'https://example.com/covers/educated.jpg'),
-            ('The Alchemist', 'Paulo Coelho', 'Fiction', 'A boy travels in search of treasure.', 'https://example.com/covers/alchemist.jpg'),
-            ('Becoming', 'Michelle Obama', 'Biography', 'The story of Michelle Obama\'s life.', 'https://example.com/covers/becoming.jpg'),
-            ('Thinking, Fast and Slow', 'Daniel Kahneman', 'Psychology', 'Insights into how we think.', 'https://example.com/covers/thinking.jpg'),
-            ('The Martian', 'Andy Weir', 'Sci-Fi', 'An astronaut stranded on Mars.', 'https://example.com/covers/martian.jpg'),
-            ('The Catcher in the Rye', 'J.D. Salinger', 'Fiction', 'A teen\'s angst and rebellion.', 'https://example.com/covers/catcher.jpg'),
-            ('To Kill a Mockingbird', 'Harper Lee', 'Fiction', 'A story of racial injustice.', 'https://example.com/covers/mockingbird.jpg'),
-            ('Rich Dad Poor Dad', 'Robert Kiyosaki', 'Finance', 'Lessons on money and investing.', 'https://example.com/covers/richdad.jpg'),
-            ('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction', 'A man pursues his lost love.', 'https://example.com/covers/gatsby.jpg'),
-            ('Meditations', 'Marcus Aurelius', 'Philosophy', 'Stoic reflections of an emperor.', 'https://example.com/covers/meditations.jpg'),
-            ('The Power of Habit', 'Charles Duhigg', 'Self-Help', 'Understanding habit formation.', 'https://example.com/covers/habit.jpg'),
-            ('Man\'s Search for Meaning', 'Viktor Frankl', 'Psychology', 'A Holocaust survivor\'s insights.', 'https://example.com/covers/meaning.jpg'),
-            ('Brave New World', 'Aldous Huxley', 'Dystopian', 'A futuristic society of engineered happiness.', 'https://example.com/covers/bravenewworld.jpg'),
-            ('The Subtle Art of Not Giving a F*ck', 'Mark Manson', 'Self-Help', 'A counterintuitive approach to living well.', 'https://example.com/covers/subtleart.jpg'),
-            ('Crime and Punishment', 'Fyodor Dostoevsky', 'Fiction', 'A man battles guilt after a crime.', 'https://example.com/covers/crime.jpg'),
-            ('The Name of the Wind', 'Patrick Rothfuss', 'Fantasy', 'A gifted young man becomes a legend.', 'https://example.com/covers/nameofthewind.jpg'),
-            ('The Silent Patient', 'Alex Michaelides', 'Thriller', 'A woman stops speaking after a crime.', 'https://example.com/covers/silentpatient.jpg'),
-            ('A Brief History of Time', 'Stephen Hawking', 'Science', 'Understanding the universe.', 'https://example.com/covers/briefhistory.jpg'),
-            ('Normal People', 'Sally Rooney', 'Fiction', 'Two people navigate a complex relationship.', 'https://example.com/covers/normalpeople.jpg'),
-            ('The Midnight Library', 'Matt Haig', 'Fiction', 'A library of lives you could have lived.', 'https://example.com/covers/midnightlibrary.jpg'),
-            ('Outliers', 'Malcolm Gladwell', 'Non-Fiction', 'What makes high-achievers different?', 'https://example.com/covers/outliers.jpg'),
-            ('The Road', 'Cormac McCarthy', 'Post-Apocalyptic', 'A father and son travel through a desolate world.', 'https://example.com/covers/theroad.jpg'),
-            ('Can’t Hurt Me', 'David Goggins', 'Memoir', 'The story of pushing beyond limits.', 'https://example.com/covers/canthurtme.jpg'),
-            ('The Four Agreements', 'Don Miguel Ruiz', 'Self-Help', 'A practical guide to personal freedom.', 'https://example.com/covers/fouragreements.jpg')
-        ]
-        c.executemany(''' 
-            INSERT INTO books (title, author, genre, synopsis, cover_url)
-            VALUES (?, ?, ?, ?, ?)
-        ''', book_data)
-
-
-    # User 1 owns all 30 books if they don't already own them
-    c.execute("SELECT COUNT(*) FROM user_books WHERE user_id = 1")
-    if c.fetchone()[0] == 0:
-        user_books_data = [(1, book_id + 1, (book_id + 1) * 5 % 101, f'Note for book {book_id + 1}') for book_id in range(30)]
-        c.executemany(''' 
-            INSERT INTO user_books (user_id, book_id, read_percent, notes)
-            VALUES (?, ?, ?, ?)
-        ''', user_books_data)
 
     conn.commit()
     conn.close()
 
-# Routes
+#region Routes for Pages
 @app.route('/')
+def landing():
+    if 'user_id' in session:
+        return redirect(url_for('home'))  # Redirect logged-in users to the home
+    return render_template('landing.html')  # Show landing page if not logged in
+
+@app.route('/home.html')
 def home():
-    return render_template('index.html')
-
-@app.route('/Signup_and_login.html')
-def signup_login():
-    return render_template('Signup_and_login.html')
-
-@app.route('/signup.html')
-def signup():
-    return render_template('signup.html')
-
-@app.route('/login.html')
-def login():
-    return render_template('login.html')
-
-@app.route('/forgot-password')
-def forgot_password():
-    return render_template('forgot_password.html')
-
+    username = session.get('username')   # will be None if not logged in
+    return render_template('home.html', username=username)
 
 @app.route('/publicshare.html')
 def public_share():
     return render_template('publicshare.html')
 
-@app.route('/api/user_books')
-def api_user_books():
+@app.route('/uploadbook.html')
+def public_uploadbook():
+    return render_template('uploadbook.html')
+
+@app.route('/forgot-password')
+def forgot_password():
+    return render_template('forgot_password.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        email    = request.form['email'].strip()
+        password = request.form['password']
+
+        hashed = generate_password_hash(password)
+
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+
+        # Check for existing username
+        cursor.execute('SELECT 1 FROM users WHERE username = ?', (username,))
+        if cursor.fetchone():
+            conn.close()
+            flash('Username already in use', 'error')
+            return redirect(url_for('signup'))
+
+        # Check for existing email
+        cursor.execute('SELECT 1 FROM users WHERE email = ?', (email,))
+        if cursor.fetchone():
+            conn.close()
+            flash('Email already in use', 'error')
+            return redirect(url_for('signup'))
+
+        # If we reach here, both are unique—insert new user
+        try:
+            cursor.execute(
+                'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+                (username, email, hashed)
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+        flash('Account created successfully', 'success')
+        return redirect(url_for('home'))
+
+    # GET
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email    = request.form['email'].strip()
+        password = request.form['password']
+
+        conn = sqlite3.connect(DB_FILE)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM users WHERE email = ?', (email,))
+        user = cur.fetchone()
+        conn.close()
+
+        # validate & redirect on error
+        if not email:
+            flash('Email is required', 'error')
+            return redirect(url_for('login'))
+        if not password:
+            flash('Password is required', 'error')
+            return redirect(url_for('login'))
+        if user is None:
+            flash('No account with that email', 'error')
+            return redirect(url_for('login'))
+        if not check_password_hash(user['password'], password):
+            flash('Password does not match', 'error')
+            return redirect(url_for('login'))
+
+        # success
+        session.clear()
+        session['user_id'] = user['user_id']
+        session['username']  = user['username']
+        flash('Logged in successfully', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)  
+    return redirect(url_for('landing'))  
+
+@app.route('/test.html')
+def test():
+    return render_template('test.html')
+
+#region Routes for API
+#@app.route('/api/user_books')
+#def api_user_books():
     user_id = request.args.get('user_id', 1)
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
@@ -175,15 +207,33 @@ def api_user_books():
     conn.close()
     return jsonify(books)
 
-
 @app.route('/api/books')
 def api_books():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT book_id, title, synopsis, cover_url FROM books")
-    recs = [{"book_id": row[0], "title": row[1], "synopsis": row[2], "cover_url": row[3]} for row in c.fetchall()]
-    conn.close()
-    return jsonify(recs)
+    # 1. Fetch a pool of works via Open Library’s search API
+    resp = requests.get(
+        'https://openlibrary.org/search.json',
+        params={'q': 'the', 'limit': 100}  # a broad query to get a sizeable pool
+    )
+    data = resp.json().get('docs', [])
+
+    # 2. 10 books from the api
+    sample = random.sample(data, min(10, len(data)))
+
+    # 3. Shape each work into only the fields we need
+    books = []
+    for w in sample:
+        ol_key = w.get('key', '')             # e.g. "/works/OL82563W"
+        cover_id = w.get('cover_i')           # numeric cover ID
+        books.append({
+            "id": ol_key.split('/')[-1],      # "OL82563W"
+            "title": w.get('title'),
+            "authors": w.get('author_name', []),
+            "year": w.get('first_publish_year'),
+            "cover_url": cover_id and f"https://covers.openlibrary.org/b/id/{cover_id}-L.jpg",
+            "subjects": w.get('subject', [])[:5]   # top 5 subjects
+        })
+
+    return jsonify(books)
 
 @app.route('/api/user_chat')
 def api_user_chat():
@@ -210,22 +260,10 @@ def api_user_chat():
     conn.close()
     return jsonify(messages)
 
-@app.route('/api/user_books_by_genre')
-def user_books_by_genre():
-    user_id = request.args.get('user_id')
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('''
-        SELECT b.genre, COUNT(*) 
-        FROM user_books ub
-        JOIN books b ON ub.book_id = b.book_id
-        WHERE ub.user_id = ?
-        GROUP BY b.genre
-    ''', (user_id,))
-    rows = c.fetchall()
-    conn.close()
-    return jsonify({genre: count for genre, count in rows})
-
+# Removed for now, I will do the statistics later - enat
+#@app.route('/api/user_books_by_genre')
+#def user_books_by_genre():
+    
 @app.route('/book/<int:book_id>')
 def book_specific_page(book_id):
     # Random data for testing
