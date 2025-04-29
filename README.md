@@ -10,4 +10,4 @@ Run: python3 app.py
 - 23701834 Shuai Shao
 - 23994848 Jonathan Clyde
 
-[View Changelog](./Changelogs.md)
+[View Changelog](./CHANGELOGS.md)

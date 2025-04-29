@@ -27,7 +27,6 @@
 ---
 
 ## Change Logs
-
 _Track everything merged into `main`._
 
 ### 29th April
