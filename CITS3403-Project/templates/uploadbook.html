@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Book</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/uploadbook.css') }}">
+</head>
+<body>
+  {% include "nav.html" %}
+
+  <form action="/upload" method="POST" style="max-width: 600px; margin: 120px auto 0;">
+    <h1>Upload a Book</h1>
+
+    <!-- Autocomplete wrapper: positions suggestions relative to input -->
+    <div class="autocomplete-wrapper" style="position: relative; margin-bottom: 16px;">
+      <label for="title">Book Title:</label>
+      <input type="text" name="book" id="title" required autocomplete="off" style="width: 100%; padding: 8px;">
+      <ul id="book-suggestions" style="
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        max-height: 240px;
+        overflow-y: auto;
+        z-index: 2000;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: none;
+      "></ul>
+    </div>
+
+    <label for="author">Author:</label>
+    <input type="text" name="author" id="author" required readonly style="
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      min-height: 20px;
+    ">
+
+    <label for="genretags">Genre (tags):</label>
+    <input type="text" name="genretags" id="genretags" required readonly style="
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      min-height: 20px;
+    ">
+
+    <label for="rating">Rating (out of 5):</label>
+    <input type="number" id="rating" name="rating" min="1" max="5" step="0.5" style="width: 100%; padding: 8px; margin-bottom: 16px;"><br>
+
+    <label for="readp">Reading Progress (%):</label>
+    <input type="number" id="readp" name="readp" min="1" max="100" step="1" placeholder="0" style="width: 100%; padding: 8px; margin-bottom: 16px;"><br>
+
+    <label for="notes">Notes:</label>
+    <textarea id="notes" name="notes" rows="4" cols="50" placeholder="Optional Notes..." style="width: 100%; padding: 8px; margin-bottom: 16px;"></textarea><br>
+
+    <input type="submit" value="Upload Book" style="padding: 10px 20px;">
+  </form>
+
+  <script>
+    const titleInput = document.getElementById('title');
+    const authorInput = document.getElementById('author');
+    const genreTagsInput = document.getElementById('genretags');
+    const suggestions = document.getElementById('book-suggestions');
+
+    titleInput.addEventListener('input', () => {
+      const query = titleInput.value.trim();
+      if (query.length < 3) {
+        suggestions.style.display = 'none';
+        return;
+      }
+      fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+          suggestions.innerHTML = '';
+          if (!data.docs || data.docs.length === 0) {
+            suggestions.style.display = 'none';
+            return;
+          }
+          data.docs.forEach(doc => {
+            const li = document.createElement('li');
+            li.style.display = 'flex';
+            li.style.alignItems = 'center';
+            li.style.padding = '8px';
+            li.style.cursor = 'pointer';
+            li.onmouseenter = () => li.style.background = '#f0f0f0';
+            li.onmouseleave = () => li.style.background = 'white';
+
+            // Cover image
+            const coverId = doc.cover_i;
+            const img = document.createElement('img');
+            img.src = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-S.jpg` : '';
+            img.alt = '';
+            img.style.width = '40px';
+            img.style.height = '60px';
+            img.style.objectFit = 'cover';
+            img.style.marginRight = '8px';
+            li.appendChild(img);
+
+            // Title & author container
+            const info = document.createElement('div');
+            const titleEl = document.createElement('div');
+            titleEl.textContent = doc.title;
+            titleEl.style.fontWeight = '600';
+            const authorEl = document.createElement('div');
+            authorEl.textContent = doc.author_name ? doc.author_name.join(', ') : 'Unknown';
+            authorEl.style.fontSize = '0.9em';
+            authorEl.style.color = '#555';
+            info.appendChild(titleEl);
+            info.appendChild(authorEl);
+            li.appendChild(info);
+
+            li.addEventListener('click', async () => {
+              titleInput.value = doc.title;
+              authorInput.value = doc.author_name ? doc.author_name.join(', ') : 'Unknown';
+
+              // Try subjects from search.json first
+              let subjects = doc.subject ? doc.subject.slice(0, 5) : [];
+              // If none, fetch from works.json
+              if (subjects.length === 0 && doc.key) {
+                try {
+                  const wresp = await fetch(`https://openlibrary.org${doc.key}.json`);
+                  const wdata = await wresp.json();
+                  subjects = wdata.subjects ? wdata.subjects.slice(0, 5) : [];
+                } catch (e) {
+                  console.error('Error fetching work details:', e);
+                }
+              }
+
+              genreTagsInput.value = subjects.length ? subjects.join(', ') : 'No genres available';
+
+              suggestions.innerHTML = '';
+              suggestions.style.display = 'none';
+            });
+            suggestions.appendChild(li);
+          });
+          suggestions.style.display = 'block';
+        })
+        .catch(err => console.error(err));
+    });
+
+    document.addEventListener('click', e => {
+      if (!suggestions.contains(e.target) && e.target !== titleInput) {
+        suggestions.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

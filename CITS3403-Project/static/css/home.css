@@ -1,0 +1,86 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; }
+
+.main-content {
+  display: flex;
+  padding: 20px 10%;
+  gap: 30px;
+}
+.book-list {
+  width: 30%;
+}
+.book-item {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.right-column {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.carousel {
+  overflow: hidden;
+  position: relative;
+}
+.carousel-track {
+  display: flex;
+  animation: scroll 20s linear infinite;
+}
+.carousel-item {
+  min-width: 300px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  margin-right: 20px;
+  background-color: #fafafa;
+  border-radius: 10px;
+}
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+canvas {
+  width: 100% !important;
+  height: 600px !important;
+}
+.chat-container {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  overflow: hidden;
+  min-height: 120px;
+}
+.chat-message {
+  opacity: 1;
+  transition: all 0.4s ease;
+  position: relative;
+}
+.chat-message.slide-out {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.chat-message.slide-in {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.chat-message.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+.chat-controls {
+  margin-top: 10px;
+  text-align: right;
+}
+.chat-controls button {
+  padding: 8px 15px;
+  background-color: #3b3b4f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
