@@ -31,7 +31,7 @@ _Track everything merged into `main`._
 
 ### 29th April
 - Finally fixed `README.md` so it displays more information
-- Renamed `index.html` ➔ `landing.html` (new homepage)
+- Renamed `index.html` ➔ `home.html` (new homepage)
 - Renamed `Signup_and_login.html` ➔ `landing.html` (for non-logged-in users) 
 - Temporarily removed the `books` table (may re-add later)
 - Removed `/venv` that was added in the previous commit
@@ -39,7 +39,7 @@ _Track everything merged into `main`._
     - Passwords are hashed and stored in database
     - Added error messages for incorrect login or duplicate credentials
     - Additionally, `landing.html` is now `/` and `home.html` is moved to `/home.html`
-    - Furthermore, users must log in to see `/home.html`, othwerwise theyr are stuck in the landing page
+    - Furthermore, users must log in to see `/home.html`, otherwise they are stuck in the landing page
 - Updated `home.html`
     - Disabled most features on `home.html` pending backend completion
     - Replaced book recommendations section on home page so that it pulls from API instead of sample data
