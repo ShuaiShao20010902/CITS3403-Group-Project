@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.section {
+    margin-top: 30px;
+}
+
+.shared-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.card {
+    background: #eef2f7;
+    padding: 15px;
+    border-radius: 10px;
+    width: 250px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+}
+
+.share-form {
+    margin-bottom: 20px;
+}
+
+.share-form input {
+    padding: 8px;
+    width: 250px;
+    margin-right: 10px;
+}
+
+.share-form button {
+    padding: 8px 16px;
+}
+
+#share-message {
+    margin-top: 10px;
+    font-weight: bold;
+}

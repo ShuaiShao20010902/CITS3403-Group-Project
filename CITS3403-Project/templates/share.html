@@ -1,75 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Public Sharing</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: Arial, sans-serif; }
-
-.content {
-  padding: 20px 10%;
-}
-
-h2, h3, h4 {
-  margin-bottom: 1rem;
-}
-
-ul {
-  margin-left: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-p {
-  margin-bottom: 0.8rem;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Share Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
+    <script src="{{ url_for('static', filename='js/share.js') }}" defer></script>
 </head>
 <body>
-{% include 'nav.html' %}
+    <div class="container">
+        <h1>Sharing Dashboard</h1>
 
-<div class="content">
-  <section id="public-sharing" style="border-top: 1px solid #ccc; margin-top: 2rem; padding-top: 1rem;">
-    <h2>📢 Public Sharing</h2>
-    <p>This section is visible to anyone with the shared link.</p>
+        <!-- Share with someone -->
+        <div class="share-form">
+            <input type="text" id="share-username" placeholder="Enter username to share with">
+            <button id="share-button">Share</button>
+            <p id="share-message"></p>
+        </div>
 
-    <div style="margin-bottom: 2rem;">
-      <h3>📊 Reading Statistics</h3>
-      <ul>
-        <li>Total Books Read: <strong>XX</strong></li>
-        <li>Average Rating: <strong>4.2</strong></li>
-        <li>Favourite Genre: <strong>Fantasy</strong></li>
-      </ul>
+        <div class="section">
+            <h2>You're Sharing</h2>
+            <div class="shared-cards">
+                {% for item in your_shared_items %}
+                    <div class="card">
+                        <p><strong>Type:</strong> {{ item.content_type }}</p>
+                        <p>{{ item.content_data }}</p>
+                        <p class="timestamp">Shared on {{ item.created_at }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
 
-      <!-- Placeholder for future chart/graph -->
-      <div style="width: 100%; height: 200px; background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; color: #888;">
-        [Chart or Graph Placeholder]
-      </div>
+        <div class="section">
+            <h2>Shared from Others</h2>
+            <div class="shared-cards">
+                {% for item in shared_to_user %}
+                    <div class="card">
+                        <p><strong>From:</strong> {{ item.sharer_username }}</p>
+                        <p><strong>Type:</strong> {{ item.content_type }}</p>
+                        <p>{{ item.content_data }}</p>
+                        <p class="timestamp">Shared on {{ item.created_at }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-
-    <div>
-      <h3>🌟 Top 3 Books</h3>
-      
-      <div style="margin-bottom: 1rem; padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
-        <h4>📘 Book Title One</h4>
-        <p><strong>Rating:</strong> ★★★★☆</p>
-        <p><em>Notes:</em> This book really stood out to me for its world-building and emotional depth.</p>
-      </div>
-
-      <div style="margin-bottom: 1rem; padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
-        <h4>📙 Book Title Two</h4>
-        <p><strong>Rating:</strong> ★★★★★</p>
-        <p><em>Notes:</em> A must-read for sci-fi fans. The ending blew my mind.</p>
-      </div>
-
-      <div style="padding: 1rem; background-color: #fafafa; border: 1px solid #ddd;">
-        <h4>📗 Book Title Three</h4>
-        <p><strong>Rating:</strong> ★★★★☆</p>
-        <p><em>Notes:</em> A comforting read with lots of heart and relatable characters.</p>
-      </div>
-    </div>
-  </section>
-</div>
 </body>
 </html>
