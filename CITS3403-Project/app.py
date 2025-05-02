@@ -77,6 +77,30 @@ def init_db():
             ('jane_doe', 'password456', 'janedoe@outlook.com')
         ])
 
+    # Table for items a user chooses to share
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS shared_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            content_type TEXT,
+            content_data TEXT,
+            created_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    ''')
+
+    # Table to track which users receive shared items
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS shared_with (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            shared_item_id INTEGER,
+            receiver_user_id INTEGER,
+            FOREIGN KEY (shared_item_id) REFERENCES shared_items(id),
+            FOREIGN KEY (receiver_user_id) REFERENCES users(user_id)
+        )
+    ''')
+    
+
     conn.commit()
     conn.close()
 
@@ -92,9 +116,69 @@ def home():
     username = session.get('username')   # will be None if not logged in
     return render_template('home.html', username=username)
 
-@app.route('/publicshare.html')
-def public_share():
-    return render_template('publicshare.html')
+@app.route('/share', methods=['GET', 'POST'])
+def share():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    current_user_id = session['user_id']
+
+    if request.method == 'POST':
+        data = request.get_json()
+        recipient_username = data['username']
+
+        c.execute('SELECT user_id FROM users WHERE username = ?', (recipient_username,))
+        receiver = c.fetchone()
+        if not receiver:
+            conn.close()
+            return jsonify({'status': 'error', 'message': 'User not found'})
+
+        receiver_user_id = receiver[0]
+
+        # Fetch user's shared items
+        c.execute('SELECT id FROM shared_items WHERE user_id = ?', (current_user_id,))
+        items = c.fetchall()
+
+        for (item_id,) in items:
+            # Check if already shared to prevent duplicates
+            c.execute('''
+                SELECT 1 FROM shared_with 
+                WHERE shared_item_id = ? AND receiver_user_id = ?
+            ''', (item_id, receiver_user_id))
+            if not c.fetchone():
+                c.execute('''
+                    INSERT INTO shared_with (shared_item_id, receiver_user_id)
+                    VALUES (?, ?)
+                ''', (item_id, receiver_user_id))
+
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'success', 'message': 'Shared successfully!'})
+
+    # GET method - render page
+    c.execute('''
+        SELECT id, content_type, content_data, created_at FROM shared_items
+        WHERE user_id = ?
+    ''', (current_user_id,))
+    your_shared_items = [dict(zip(['id', 'content_type', 'content_data', 'created_at'], row)) for row in c.fetchall()]
+
+    c.execute('''
+        SELECT si.content_type, si.content_data, si.created_at, u.username
+        FROM shared_items si
+        JOIN shared_with sw ON si.id = sw.shared_item_id
+        JOIN users u ON si.user_id = u.user_id
+        WHERE sw.receiver_user_id = ?
+    ''', (current_user_id,))
+    shared_to_user = [
+        {'content_type': row[0], 'content_data': row[1], 'created_at': row[2], 'sharer_username': row[3]}
+        for row in c.fetchall()
+    ]
+
+    conn.close()
+    return render_template(
+        'share.html',
+        your_shared_items=your_shared_items,
+        shared_to_user=shared_to_user
+    )
 
 @app.route('/uploadbook.html')
 def public_uploadbook():
