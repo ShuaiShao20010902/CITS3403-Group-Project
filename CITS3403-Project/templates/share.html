@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Share Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
+    <script src="{{ url_for('static', filename='js/share.js') }}" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Sharing Dashboard</h1>
+
+        <!-- Share with someone -->
+        <div class="share-form">
+            <input type="text" id="share-username" placeholder="Enter username to share with">
+            <button id="share-button">Share</button>
+            <p id="share-message"></p>
+        </div>
+
+        <div class="section">
+            <h2>You're Sharing</h2>
+            <div class="shared-cards">
+                {% for item in your_shared_items %}
+                    <div class="card">
+                        <p><strong>Type:</strong> {{ item.content_type }}</p>
+                        <p>{{ item.content_data }}</p>
+                        <p class="timestamp">Shared on {{ item.created_at }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Shared from Others</h2>
+            <div class="shared-cards">
+                {% for item in shared_to_user %}
+                    <div class="card">
+                        <p><strong>From:</strong> {{ item.sharer_username }}</p>
+                        <p><strong>Type:</strong> {{ item.content_type }}</p>
+                        <p>{{ item.content_data }}</p>
+                        <p class="timestamp">Shared on {{ item.created_at }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
