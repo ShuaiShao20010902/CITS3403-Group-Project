@@ -40,6 +40,7 @@ body {
 
 .book-details {
     flex: 1;
+    word-break: break-word; /* Sometimes Openlibrary contain long url */
 }
 
 .book-details h1 {
@@ -100,6 +101,7 @@ body {
     width: 500px;
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
 .modal-content form label {
@@ -132,6 +134,12 @@ body {
 
 .modal-content form button:hover {
     background-color: #3a3a59;
+}
+
+.close{
+    position: absolute;
+    top: 10px;
+    right: 20px;
 }
 
 .genre-tags {

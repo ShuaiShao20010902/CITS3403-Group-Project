@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book Specific Page</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='bookspecificpage.css') }}">
+  <title>{{ book.title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bookspecificpage.css') }}">
 </head>
 
 <body>
@@ -26,13 +26,14 @@
             </div>
         </div>
 
-        <div class = "book-right"></div>
+        <div class = "book-right">
             <div class = "book-cover">
                 <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
-            <div class = "user-stats">
-                <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
-                <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
-                <button type="button" class = "edit-user-btn" onclick="openModal()">Edit User Information</button>
+                <div class = "user-stats">
+                    <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
+                    <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
+                    <button type="button" class = "edit-user-btn" onclick="openModal()">Edit User Information</button>
+                </div>
             </div>
         </div>
     </div>
@@ -58,7 +59,6 @@
             <p class="no-notes">No notes yet. Be the first to add one!</p>
         {% endif %}
     </div>
-
 
     <div id="editModal" class="edit-modal">
         <div class = "modal-content">

@@ -63,12 +63,13 @@
       data.forEach(book => {
         track.append(`
           <div class="carousel-item">
-            <img src="${book.cover_url}" alt="${book.title}" style="width:100%; height:auto; border-radius: 8px;"/>
-            <h3>${book.title}</h3>
-            <p>${book.authors}</p>
+            <a href="/book/${book.id}">
+              <img src="${book.cover_url}" alt="${book.title}" style="width:100%; height:auto; border-radius: 8px;"/>
+              <h3>${book.title}</h3>
+              <p>${book.authors}</p>
           </div>
         `);
-      });
+      });å
     });
 
     // I have disabled the other features for now as they require a more clear structure of what data is to be stored

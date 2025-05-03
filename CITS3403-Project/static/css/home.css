@@ -84,3 +84,7 @@ canvas {
   border-radius: 5px;
   cursor: pointer;
 }
+a {  /* remove link underlines */
+  text-decoration: none;
+  color: inherit;
+}
