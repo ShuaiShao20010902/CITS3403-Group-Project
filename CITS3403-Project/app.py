@@ -174,11 +174,8 @@ def share():
     ]
 
     conn.close()
-    return render_template(
-        'share.html',
-        your_shared_items=your_shared_items,
-        shared_to_user=shared_to_user
-    )
+    
+    return render_template('share.html', your_shared_items=your_shared_items, shared_to_user=shared_to_user)
 
 @app.route('/uploadbook.html')
 def public_uploadbook():
