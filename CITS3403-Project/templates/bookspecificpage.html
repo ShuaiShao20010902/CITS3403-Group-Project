@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{{ book.title }}</title>
+  <title>Book Specific Page</title>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bookspecificpage.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bookspecificpage.css') }}">
 </head>
 
 <body>
@@ -26,14 +28,13 @@
             </div>
         </div>
 
-        <div class = "book-right">
+        <div class = "book-right"></div>
             <div class = "book-cover">
                 <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
-                <div class = "user-stats">
-                    <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
-                    <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
-                    <button type="button" class = "edit-user-btn" onclick="openModal()">Edit User Information</button>
-                </div>
+            <div class = "user-stats">
+                <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
+                <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
+                <button type="button" class = "edit-user-btn" onclick="openModal()">Edit User Information</button>
             </div>
         </div>
     </div>
@@ -60,14 +61,15 @@
         {% endif %}
     </div>
 
+
     <div id="editModal" class="edit-modal">
         <div class = "modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h2>Edit Book Information</h2>
             <p>Update your progress and notes below:</p>
-            <form method = "POST" action = "{{ url_for('book_specific_page', book_id=book_id) }}">
-                <label for="rating">Your Rating (0 - 5):</label>
-                <input type = "number" name = "rating" min = "1" max = "5" step = "0.1">
+            <form id = "user-form" method = "POST" action = "{{ url_for('update_book', book_id=book_id) }}">
+                <label for="rating">Your rating out of 5:</label>
+                <input type = "number" name = "rating" min = "0" max = "5" step = "0.1">
 
                 <label for = "page_read">Add your progress:</label> 
                 <input type="number" name="page_read" id="page_read" min="0" max="{{ book.pages }}" step="1" oninput="updateProgress()">
@@ -75,14 +77,19 @@
                 <label for="notes">Edit your Notes:</label>
                 <textarea name="notes" rows="4" cols="50"></textarea>
 
+                <div id = "form-message"></div>
                 <button type="submit">Save</button>
                 <button type="button" onclick="closeModal()">Cancel</button>
+                
             </form>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <script>
         function openModal() {
             document.getElementById("editModal").style.display = "block";
+            $('#form-message').hide().text(''); //hide old messages
         }
         
         function closeModal() {
@@ -94,7 +101,31 @@
             if (event.target == modal) {
                 modal.style.display = "none";
             }
-        }
+        }  
+    </script>
+
+    <script>
+        $('#user-form').on('submit', function(e){
+            e.preventDefault();
+
+            $.ajax({
+                url: "{{ url_for('update_book', book_id=book_id) }}",
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response){
+                    const msg = $('#form-message');
+                    msg.text('Saved Successfully!').css('color', 'green').fadeIn();
+
+                    setTimeout(function() {
+                        msg.fadeOut();
+                        closeModal();
+                }, 1500);
+                },
+                error: function(){
+                    $('#form-message').text("Error has occurred. Please try again.")
+                }
+            });
+        });
     </script>
 
 </body>

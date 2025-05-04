@@ -104,19 +104,43 @@ def init_db():
     conn.commit()
     conn.close()
 
+#region Utility functions
+
+def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
+    """
+    Parameters:
+    - value: value to validate
+    - field_name: name for error messages
+    - required: if required to have a value
+    - value_type: expected value type
+    - min_value: minimum value
+    - max_value: maximum value
+
+    Returns:
+    - validated value or None if invalid (no message even if required, wrong type etc.) with error messages
+    """
+    if required and not value:
+        flash(f'{field_name} is required', 'error')
+        return None
+    try:
+        value = value_type(value)
+    except (ValueError, TypeError):
+        flash(f'{field_name} must be a {value_type.__name__}', 'error')
+        return None
+    if min_value is not None and value < min_value:
+        flash(f'{field_name} must be at least {min_value}', 'error')
+        return None
+    if max_value is not None and value > max_value:
+        flash(f'{field_name} must be at most {max_value}', 'error')
+        return None
+    return value
+
 #region Routes for Pages
 @app.route('/')
 def landing():
     if 'user_id' in session:
         return redirect(url_for('home'))  # Redirect logged-in users to the home
     return render_template('landing.html')  # Show landing page if not logged in
-
-@app.route('/dev-login')
-def dev_login():
-    session['user_id'] = 1
-    session['username'] = 'test_user'
-    return redirect(url_for('home'))
-
 
 @app.route('/home.html')
 def home():
@@ -278,6 +302,84 @@ def logout():
     session.pop('user_id', None)  
     return redirect(url_for('landing'))  
 
+@app.route('/book/<string:book_id>/update', methods=['POST'])
+def update_book(book_id):
+    rating = request.form.get('rating')
+    page_read = request.form.get('page_read')
+    notes = request.form.get('notes')
+    
+    # Validate inputs
+    rating = validate_input(rating, 'Rating', required=False, value_type=float, min_value=0.0, max_value=5.0)
+    page_read = validate_input(page_read, 'Page Read', required=False, value_type=int, min_value=0)
+
+    if rating is None or page_read is None:
+        return redirect(url_for('book_specific_page', book_id=book_id))
+
+    #ADD LATER - change to DB logic
+    print(f"Rating: {rating}, Page Read: {page_read}, Notes: {notes}")
+
+    return jsonify({'success': True})
+
+@app.route('/book/<string:book_id>', methods=['GET', 'POST'])
+def book_specific_page(book_id):
+
+    # In case API fails or missing fields
+    fallback = {
+        'title': 'Unknown Title',
+        'author': 'Unknown Author',
+        'pages': 0,
+        'isbn': 'N/A',
+        'year': 0,
+        'description': 'No description available.',
+        'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
+        'genres': []
+    }
+    
+    #1. check if basic book_id is valid or not (protect from crashes))
+    try: 
+        resp = requests.get(
+            f'https://openlibrary.org/works/{book_id}.json'
+        )
+        resp.raise_for_status()  # Raise an error for bad responses
+        book_data = resp.json()
+    except requests.RequestException:
+        return render_template('bookspecificpage.html', book=fallback, user_data={}, book_id=book_id, community_notes=[])
+
+    #2. initial book dictionary (get information that is not edition specific)
+    book = {
+        'title': book_data.get('title', fallback['title']),
+        'author': fallback['author'],  # Will fetch below
+        'pages': fallback['pages'],
+        'isbn': fallback['isbn'],
+        'year': fallback['year'],
+        'description': book_data.get('description', {}).get('value', 'No description available.') if isinstance(book_data.get('description'), dict) else book_data.get('description', 'No description available.'),
+        'cover_url': f"https://covers.openlibrary.org/b/id/{book_data.get('covers', [])[0]}-L.jpg" if book_data.get('covers') else fallback['cover_url'],
+        'genres': book_data.get('subjects', [])[:5]  # Top 5 genres
+    }
+    
+    #3. get author information from the author api
+    try:
+        author_key = book_data['authors'][0]['author']['key'] 
+        author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
+        author_resp.raise_for_status()
+        book['author'] = author_resp.json().get('name', 'Unknown')
+    except (IndexError, KeyError, requests.RequestException):
+        pass
+
+    #4. pages, isbn, year are edition information (will not be found in the standard .json), optional information? if too slow
+    try:
+        edition_resp = requests.get(f'https://openlibrary.org/works/{book_id}/editions.json?limit=1')
+        edition_resp.raise_for_status()
+        edition_data = edition_resp.json()['entries'][0]
+
+        book['pages'] = edition_data.get('number_of_pages', 'N/A')
+        book['isbn'] = edition_data.get('isbn_10', ['N/A'])[0] if 'isbn_10' in edition_data else 'N/A'
+        book['year'] = edition_data.get('publish_date', fallback['year'])
+    except (IndexError, KeyError, requests.RequestException):
+        pass
+    #5. return information to the template
+    return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[])
+
 @app.route('/test.html')
 def test():
     return render_template('test.html')
@@ -354,98 +456,6 @@ def api_user_chat():
 # Removed for now, I will do the statistics later - enat
 #@app.route('/api/user_books_by_genre')
 #def user_books_by_genre():
-    
-@app.route('/book/<string:book_id>')
-def book_specific_page(book_id):
-
-    fallback = {
-        'title': 'Unknown Title',
-        'author': 'Unknown Author',
-        'pages': 0,
-        'isbn': 'N/A',
-        'year': 0,
-        'description': 'No description available.',
-        'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
-        'genres': []
-    }
-
-    try: 
-        # 1. Fetch book data from Open Library API
-        resp = requests.get(
-            f'https://openlibrary.org/works/{book_id}.json'
-        )
-        resp.raise_for_status()  # Raise an error for bad responses
-        book_data = resp.json()
-    except requests.RequestException:
-        return render_template('bookspecificpage.html', book=fallback, user_data={}, book_id=book_id, community_notes=[])
-
-    #the defaults
-    book = {
-        'title': book_data.get('title', 'Unknown Title'),
-        'author': 'Unknown Author',  # Will fetch below
-        'pages': book_data.get('number_of_pages', 'N/A'),
-        'isbn': book_data.get('isbn_10', ['N/A'])[0] if 'isbn_10' in book_data else 'N/A',
-        'year': book_data.get('publish_date', 'Unknown Year'),
-        'description': book_data.get('description', {}).get('value', 'No description available.') if isinstance(book_data.get('description'), dict) else book_data.get('description', 'No description available.'),
-        'cover_url': f"https://covers.openlibrary.org/b/id/{book_data.get('covers', [])[0]}-L.jpg" if book_data.get('covers') else fallback['cover_url'],
-        'genres': book_data.get('subjects', [])[:5]  # Top 5 genres
-    }
-    
-    try:
-        author_key = book_data['authors'][0]['author']['key'] 
-        author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
-        author_resp.raise_for_status()
-        book['author'] = author_resp.json().get('name', 'Unknown')
-    except (IndexError, KeyError, requests.RequestException):
-        pass
-
-    #pages, isbn, year are edition information (will not be found in the standard .json)
-    try:
-        edition_resp = requests.get(f'https://openlibrary.org/works/{book_id}/editions.json?limit=1')
-        edition_resp.raise_for_status()
-        edition_data = edition_resp.json()['entries'][0]
-
-        book['pages'] = edition_data.get('number_of_pages', 'N/A')
-        book['isbn'] = edition_data.get('isbn_10', ['N/A'])[0] if 'isbn_10' in edition_data else 'N/A'
-        book['year'] = edition_data.get('publish_date', fallback['year'])
-    except (IndexError, KeyError, requests.RequestException):
-        pass
-
-    return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[])
-
-
-
-    # # Random data for testing
-    # book = {
-    #     'title': 'Test Book',
-    #     'author': 'Author Name',
-    #     'pages': 300,
-    #     'isbn': '1234567890',
-    #     'year': 2020,
-    #     'description': 'One Ring to rule them all, One Ring to find them, One Ring to bring them all and in the darkness bind them. In ancient times the Rings of Power were crafted by the Elven-smiths, and Sauron, the Dark Lord, forged the One Ring, filling it with his own power so that he could rule all others. But the One Ring was taken from him, and though he sought it throughout Middle-earth, it remained lost to him. After many ages it fell into the hands of Bilbo Baggins, as told in The Hobbit.',
-    #     'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
-    #     'genres': ['Fantasy', 'Adventure']
-        
-    # }
-    # user_data = {
-    #     'rating': 4.5,
-    #     'page_read': 150,
-    #     'notes': 'I love this'
-    # }
-
-    # community_notes = [
-    #     {
-    #         'username': 'user1',
-    #         'note': 'I love this book!',
-    #         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #     },
-    #     {
-    #         'username': 'user2',
-    #         'note': 'It was okay, got bored at the middle section.',
-    #         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #     }
-    # ]
-    # return render_template('bookspecificpage.html', book=book, user_data=user_data, book_id = book_id, community_notes=community_notes)
 
 if __name__ == '__main__':
     init_db()

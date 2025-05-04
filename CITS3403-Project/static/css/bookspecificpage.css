@@ -214,6 +214,10 @@ body {
     text-align: center;
 }
 
+#form-message {
+    margin-bottom: 10px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .book-container,
