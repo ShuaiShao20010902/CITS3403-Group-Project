@@ -264,3 +264,183 @@ def setup_routes(app):
             }
         ]
         return render_template('bookspecificpage.html', book=book, user_data=user_data, book_id=book_id, community_notes=community_notes)
+    
+    #updated for SQLALchemy 
+
+    from flask import Flask, jsonify, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User, UserChat, SharedItem, SharedWith
+import requests
+import random
+from datetime import datetime
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'this-is-the-super-secret-key'
+
+db.init_app(app)
+
+@app.route('/')
+def landing():
+    if 'user_id' in session:
+        return redirect(url_for('home'))
+    return render_template('landing.html')
+
+@app.route('/home.html')
+def home():
+    username = session.get('username')
+    return render_template('home.html', username=username)
+
+@app.route('/share', methods=['GET', 'POST'])
+def share():
+    current_user_id = session['user_id']
+
+    if request.method == 'POST':
+        data = request.get_json()
+        recipient_username = data['username']
+
+        receiver = User.query.filter_by(username=recipient_username).first()
+        if not receiver:
+            return jsonify({'status': 'error', 'message': 'User not found'})
+
+        receiver_user_id = receiver.user_id
+        items = SharedItem.query.filter_by(user_id=current_user_id).all()
+
+        for item in items:
+            already_shared = SharedWith.query.filter_by(shared_item_id=item.id, receiver_user_id=receiver_user_id).first()
+            if not already_shared:
+                shared_with = SharedWith(shared_item_id=item.id, receiver_user_id=receiver_user_id)
+                db.session.add(shared_with)
+
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Shared successfully!'})
+
+    your_shared_items = SharedItem.query.filter_by(user_id=current_user_id).all()
+    shared_to_user = db.session.query(SharedItem, User).join(SharedWith, SharedItem.id == SharedWith.shared_item_id).join(User, SharedWith.receiver_user_id == User.user_id).filter(SharedWith.receiver_user_id == current_user_id).all()
+
+    return render_template('share.html', your_shared_items=your_shared_items, shared_to_user=shared_to_user)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        email = request.form['email'].strip()
+        password = request.form['password']
+
+        hashed = generate_password_hash(password)
+
+        if User.query.filter_by(username=username).first():
+            flash('Username already in use', 'error')
+            return redirect(url_for('signup'))
+        if User.query.filter_by(email=email).first():
+            flash('Email already in use', 'error')
+            return redirect(url_for('signup'))
+
+        new_user = User(username=username, email=email, password=hashed)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Account created successfully', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email'].strip()
+        password = request.form['password']
+
+        user = User.query.filter_by(email=email).first()
+
+        if not email or not password or user is None or not check_password_hash(user.password, password):
+            flash('Invalid credentials', 'error')
+            return redirect(url_for('login'))
+
+        session.clear()
+        session['user_id'] = user.user_id
+        session['username'] = user.username
+        flash('Logged in successfully', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('landing'))
+
+@app.route('/api/books')
+def api_books():
+    resp = requests.get('https://openlibrary.org/search.json', params={'q': 'the', 'limit': 100})
+    data = resp.json().get('docs', [])
+    sample = random.sample(data, min(10, len(data)))
+
+    books = []
+    for w in sample:
+        ol_key = w.get('key', '')
+        cover_id = w.get('cover_i')
+        books.append({
+            "id": ol_key.split('/')[-1],
+            "title": w.get('title'),
+            "authors": w.get('author_name', []),
+            "year": w.get('first_publish_year'),
+            "cover_url": cover_id and f"https://covers.openlibrary.org/b/id/{cover_id}-L.jpg",
+            "subjects": w.get('subject', [])[:5]
+        })
+
+    return jsonify(books)
+
+@app.route('/api/user_chat')
+def api_user_chat():
+    user_id = int(request.args.get('user_id', 1))
+    messages = db.session.query(UserChat, User.username.label('sender_name'), User.username.label('receiver_name')).join(User, UserChat.sender == User.user_id).filter(UserChat.receiver == user_id).order_by(UserChat.datestamp.asc()).all()
+
+    formatted_messages = [
+        {
+            "sender": message.sender_name,
+            "receiver": message.receiver_name,
+            "datestamp": message.datestamp,
+            "message": message.message
+        }
+        for message in messages
+    ]
+
+    return jsonify(formatted_messages)
+
+@app.route('/book/<int:book_id>')
+def book_specific_page(book_id):
+    book = {
+        'title': 'Test Book',
+        'author': 'Author Name',
+        'pages': 300,
+        'isbn': '1234567890',
+        'year': 2020,
+        'description': 'One Ring to rule them all...',
+        'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
+        'genres': ['Fantasy', 'Adventure']
+    }
+    user_data = {
+        'rating': 4.5,
+        'page_read': 150,
+        'notes': 'I love this'
+    }
+    community_notes = [
+        {
+            'username': 'user1',
+            'note': 'I love this book!',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        {
+            'username': 'user2',
+            'note': 'It was okay, got bored at the middle section.',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    ]
+    return render_template('bookspecificpage.html', book=book, user_data=user_data, book_id=book_id, community_notes=community_notes)
+
+if __name__ == '__main__':
+    from models import init_db
+    init_db(app)
+    app.run(debug=True)

@@ -100,3 +100,79 @@ def init_db():
 
     conn.commit()
     conn.close()
+
+    #models updated as per SQLAlchemy
+
+    from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
+
+db = SQLAlchemy()
+
+class User(db.Model):
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(80), nullable=False, unique=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(200), nullable=False)
+
+    books = db.relationship('UserBook', backref='user', cascade="all, delete-orphan")
+    sent_messages = db.relationship('UserChat', foreign_keys='UserChat.sender', backref='sender_user', cascade="all, delete-orphan")
+    received_messages = db.relationship('UserChat', foreign_keys='UserChat.receiver', backref='receiver_user', cascade="all, delete-orphan")
+    shared_items = db.relationship('SharedItem', backref='user', cascade="all, delete-orphan")
+
+
+class UserBook(db.Model):
+    __tablename__ = 'user_books'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
+    book_id = db.Column(db.Integer, primary_key=True)
+    read_percent = db.Column(db.Integer, default=0)
+    rating = db.Column(db.Float, default=0.0)
+    notes = db.Column(db.Text)
+    completed = db.Column(db.Boolean, default=False)
+
+
+class UserChat(db.Model):
+    __tablename__ = 'user_chat'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    receiver = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    datestamp = db.Column(db.String(50))
+    message = db.Column(db.Text)
+
+
+class SharedItem(db.Model):
+    __tablename__ = 'shared_items'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    content_type = db.Column(db.String(50))
+    content_data = db.Column(db.Text)
+    created_at = db.Column(db.String(50))
+
+
+class SharedWith(db.Model):
+    __tablename__ = 'shared_with'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    shared_item_id = db.Column(db.Integer, db.ForeignKey('shared_items.id'))
+    receiver_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+
+
+def init_db(app):
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+
+        # Add sample data if tables are empty
+        if not User.query.first():
+            user1 = User(username='john_doe', email='johndoe@gmail.com', password=generate_password_hash('password123'))
+            user2 = User(username='jane_doe', email='janedoe@outlook.com', password=generate_password_hash('password456'))
+            db.session.add_all([user1, user2])
+            db.session.commit()
+
+        if not UserChat.query.first():
+            sample_msgs = [
+                UserChat(sender=2, receiver=1, datestamp="2025-04-18 10:00", message="Hey John, how are you?"),
+                UserChat(sender=2, receiver=1, datestamp="2025-04-18 10:05", message="Check out this new book."),
+                UserChat(sender=1, receiver=2, datestamp="2025-04-18 10:10", message="Thanks Jane, will do!")
+            ]
+            db.session.add_all(sample_msgs)
+            db.session.commit()
