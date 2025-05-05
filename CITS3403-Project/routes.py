@@ -35,7 +35,6 @@ def validate_input(value, field_name, required=True, value_type=int, min_value=N
         return None
     return value
 
-
 def setup_routes(app):
     @app.route('/')
     def landing():
@@ -154,70 +153,115 @@ def setup_routes(app):
             })
         return jsonify(books)
 
+    @app.route('/api/user_chat')
+    def api_user_chat():
+        user_id = int(request.args.get('user_id', 1))
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        query = '''
+            SELECT u1.username AS sender_name, u2.username AS receiver_name, uc.datestamp, uc.message
+            FROM user_chat uc
+            JOIN users u1 ON uc.sender = u1.user_id
+            JOIN users u2 ON uc.receiver = u2.user_id
+            WHERE uc.receiver = ?
+            ORDER BY uc.datestamp ASC
+        '''
+        c.execute(query, (user_id,))
+        messages = [
+            {
+                "sender": row[0],
+                "receiver": row[1],
+                "datestamp": row[2],
+                "message": row[3]
+            } for row in c.fetchall()
+        ]
+        conn.close()
+        return jsonify(messages)
+    
+    #for user submitted info on book specific page
     @app.route('/book/<string:book_id>/update', methods=['POST'])
     def update_book(book_id):
-        rating = validate_input(request.form.get('rating'), 'Rating', required=False, value_type=float, min_value=0.0, max_value=5.0)
+        rating = request.form.get('rating')
         status = request.form.get('status')
-        page_read = validate_input(request.form.get('page_read'), 'Page Read', required=False, value_type=int, min_value=0)
+        page_read = request.form.get('page_read')
         notes = request.form.get('notes')
+        
+        # Validate inputs
+        rating = validate_input(rating, 'Rating', required=False, value_type=float, min_value=0.0, max_value=5.0)
+        page_read = validate_input(page_read, 'Page Read', required=False, value_type=int, min_value=0)
 
-        valid_status = {'reading', 'completed', 'on_hold', 'dropped'}
-        if status not in valid_status:
-            flash('Invalid reading status selected', 'error')
+        ALLOWED_STATUSES = {'reading', 'completed', 'on_hold', 'dropped'}
+        if status not in ALLOWED_STATUSES:
+            flash("Invalid reading status selected", "error")
             return redirect(url_for('book_specific_page', book_id=book_id))
+
         if rating is None or page_read is None:
             return redirect(url_for('book_specific_page', book_id=book_id))
 
-        # TODO: persist to database
+        #ADD LATER - change to DB logic TESTING PURPOSES ONLY
         print(f"Rating: {rating}, Status: {status}, Page Read: {page_read}, Notes: {notes}")
-        return jsonify({'success': True}), 200
 
-    @app.route('/book/<string:book_id>', methods=['GET'])
+        return jsonify({'success': True})
+
+    # Book specific page
+    @app.route('/book/<string:book_id>', methods=['GET', 'POST'])
     def book_specific_page(book_id):
+
+        # In case API fails or missing fields
         fallback = {
-            'title': 'Unknown Title', 'author': 'Unknown Author',
-            'pages': 0, 'isbn': 'N/A', 'year': 0,
+            'title': 'Unknown Title',
+            'author': 'Unknown Author',
+            'pages': 0,
+            'isbn': 'N/A',
+            'year': 0,
             'description': 'No description available.',
             'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
             'genres': []
         }
-
-        try:
-            resp = requests.get(f'https://openlibrary.org/works/{book_id}.json')
-            resp.raise_for_status()
-            data = resp.json()
+        
+        #1. check if basic book_id is valid or not (protect from crashes))
+        try: 
+            resp = requests.get(
+                f'https://openlibrary.org/works/{book_id}.json'
+            )
+            resp.raise_for_status()  # Raise an error for bad responses
+            book_data = resp.json()
         except requests.RequestException:
             return render_template('bookspecificpage.html', book=fallback, user_data={}, book_id=book_id, community_notes=[])
 
+        #2. initial book dictionary (get information that is not edition specific)
         book = {
-            'title': data.get('title', fallback['title']),
-            'description': (data.get('description', {}).get('value')
-                            if isinstance(data.get('description'), dict)
-                            else data.get('description', fallback['description'])),
-            'cover_url': (f"https://covers.openlibrary.org/b/id/{data.get('covers')[0]}-L.jpg"
-                          if data.get('covers') else fallback['cover_url']),
-            'genres': data.get('subjects', [])[:5],
-            'author': fallback['author'], 'pages': fallback['pages'],
-            'isbn': fallback['isbn'], 'year': fallback['year']
+            'title': book_data.get('title', fallback['title']),
+            'author': fallback['author'],  # Will fetch below
+            'pages': fallback['pages'],
+            'isbn': fallback['isbn'],
+            'year': fallback['year'],
+            'description': book_data.get('description', {}).get('value', 'No description available.') if isinstance(book_data.get('description'), dict) else book_data.get('description', 'No description available.'),
+            'cover_url': f"https://covers.openlibrary.org/b/id/{book_data.get('covers', [])[0]}-L.jpg" if book_data.get('covers') else fallback['cover_url'],
+            'genres': book_data.get('subjects', [])[:5]  # Top 5 genres
         }
+        
+        #3. get author information from the author api
         try:
-            akey = data['authors'][0]['author']['key']
-            ar = requests.get(f'https://openlibrary.org{akey}.json')
-            ar.raise_for_status()
-            book['author'] = ar.json().get('name', fallback['author'])
-        except Exception:
+            author_key = book_data['authors'][0]['author']['key'] 
+            author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
+            author_resp.raise_for_status()
+            book['author'] = author_resp.json().get('name', 'Unknown')
+        except (IndexError, KeyError, requests.RequestException):
             pass
 
+        #4. pages, isbn, year are edition information (will not be found in the standard .json), optional information? if too slow
         try:
-            ed = requests.get(f'https://openlibrary.org/works/{book_id}/editions.json?limit=1')
-            ed.raise_for_status()
-            ed0 = ed.json()['entries'][0]
-            book['pages'] = ed0.get('number_of_pages') or ed0.get('pagination', fallback['pages'])
-            isbn10 = ed0.get('isbn_10', [None])[0]
-            isbn13 = ed0.get('isbn_13', [None])[0]
-            book['isbn'] = isbn10 or isbn13 or fallback['isbn']
-            book['year'] = ed0.get('publish_date', fallback['year'])
-        except Exception:
-            pass
+            edition_resp = requests.get(f'https://openlibrary.org/works/{book_id}/editions.json?limit=1')
+            edition_resp.raise_for_status()
+            edition_data = edition_resp.json()['entries'][0]
 
-        return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[] )
+            book['pages'] = edition_data.get('number_of_pages') or edition_data.get('pagination', 'N/A')
+            isbn_10 = edition_data.get('isbn_10', ['N/A'])
+            isbn_13 = edition_data.get('isbn_13', ['N/A'])
+            book['isbn'] = isbn_10[0] if isbn_10[0] != 'N/A' else (isbn_13[0] if isbn_13 else 'N/A')
+            book['year'] = edition_data.get('publish_date', fallback['year'])
+        except (IndexError, KeyError, requests.RequestException):
+            pass
+        #5. return information to the template
+        return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[])
