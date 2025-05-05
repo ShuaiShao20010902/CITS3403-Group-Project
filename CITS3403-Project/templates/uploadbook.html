@@ -85,15 +85,28 @@
     const genreTagsInput = document.getElementById('genretags');
     const suggestions = document.getElementById('book-suggestions');
 
+    let latestquery = '';
+
     titleInput.addEventListener('input', () => {
       const query = titleInput.value.trim();
+
+      latestquery = query;
+
       if (query.length < 3) {
         suggestions.style.display = 'none';
         return;
       }
-      fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`)
+
+      const fetchquery = query;
+
+      fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`)  
         .then(res => res.json())
         .then(data => {
+
+          // check if  query is still the same
+          if (latestquery !== fetchquery) {
+            return;
+          }
           suggestions.innerHTML = '';
           if (!data.docs || data.docs.length === 0) {
             suggestions.style.display = 'none';
