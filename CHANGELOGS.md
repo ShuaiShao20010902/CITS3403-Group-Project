@@ -1,33 +1,28 @@
 # Changelogs
 
----
-
-## Unaccessible Pages
-- `bookspecificpage.html` (to be added once backend is done)
-- `sharepage.html`
-- `sharestats.html`
-
----
-
-## Issues (Make GitHub Issues Later)
-- Navbar CSS issue in `uploadbook.html`
-- Secret key for session is very vulnerable
-- Book recommendations take ~10 seconds to load
-- Book autofill suggestions in `uploadbook.html` are not very accurate (may be an API issue)
-- After logout, old "Logged in successfully" message still visible when revisiting login page (should disappear)
-
----
-
-## To-Do
-- Recreate books tables to store some data locally for faster statistics analysis
-- Remove and redo the current message feature
-- Enable `uploadbook.html` to send data to database
-- Complete `bookspecificpage.html` and backend integration
-
----
-
-## Change Logs
 _Track everything merged into `main`._
+
+### 5th May
+- Updated Backend
+    - Added the schema for books to be stored locally
+    - Backend no longer uses SQLite3 but now uses SQLalchemy
+- Updated bookspecificpage.html
+    - Links the book recommendation from home page to their book specific page
+    - bookspecificpage.html currently makes 3 requests to Pen Libraries' API for each book
+- Bug Fixes
+    - Fixed nav.html not showing in share.html 
+    - Fixed route for uploadbook (not sure why this was missing to begin with)
+
+### 4th May
+- app.py is separated into three files
+    - models.py： Database models and initialization. This file is responsible for all database-related operations and structures
+    - routes.py - All routes and API endpoints. This file handles the HTTP routing and request processing
+    - app.py - Main Application Entry Point. This file serves as the application's entry point and coordinator
+- Critical Bug Fix
+    - Unexpected indent 
+
+### 3rd May
+- Created the HTML, CSS, JS and route for share.html
 
 ### 29th April
 - Finally fixed `README.md` so it displays more information

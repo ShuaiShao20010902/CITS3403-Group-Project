@@ -16,7 +16,7 @@
       {% if session.get('user_id') %}
         <a href="{{ url_for('home') }}"><button>Home</button></a>
         <a href="{{ url_for('share') }}"><button>Share</button></a>
-        <a href="{{ url_for('public_uploadbook') }}"><button>Add Book</button></a>
+        <a href="{{ url_for('uploadbook') }}"><button>Add Book</button></a>
         <a href="{{ url_for('logout') }}"><button>Log Out</button></a>
       {% else %}
         <a href="{{ url_for('landing') }}"><button>Home</button></a>
