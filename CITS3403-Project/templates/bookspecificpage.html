@@ -33,13 +33,14 @@
                 <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
             <div class = "user-stats">
                 <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
+                <p><strong>Status:</strong> {{ user_data.status or "No status yet"}}</p>
                 <p><strong>Current Page:</strong> {{ user_data.page_read or 0 }} / {{ book.pages }}</p>
                 <button type="button" class = "edit-user-btn" onclick="openModal()">Edit User Information</button>
             </div>
         </div>
     </div>
 
-    <div class = "note-container card">
+    <div class = "note-container card"> 
         <p><strong>Your Notes:</strong></p>
         <p>{{ user_data.notes or "No notes yet." }}</p>
     </div>
@@ -61,7 +62,6 @@
         {% endif %}
     </div>
 
-
     <div id="editModal" class="edit-modal">
         <div class = "modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -71,7 +71,15 @@
                 <label for="rating">Your rating out of 5:</label>
                 <input type = "number" name = "rating" min = "0" max = "5" step = "0.1">
 
-                <label for = "page_read">Add your progress:</label> 
+                <label for="Status">Reading status:</label>
+                <select name="status" id="status" onchange="handleStatus()">
+                    <option value="reading">Reading</option>
+                    <option value="completed">Completed</option> <!-- Will autofill page_read to max (not implemented yet)-->
+                    <option value="on_hold">On Hold</option>
+                    <option value="dropped">Dropped</option>
+                </select>
+
+                <label for = "page_read">Page you are up to:</label> 
                 <input type="number" name="page_read" id="page_read" min="0" max="{{ book.pages }}" step="1" oninput="updateProgress()">
 
                 <label for="notes">Edit your Notes:</label>
@@ -80,7 +88,6 @@
                 <div id = "form-message"></div>
                 <button type="submit">Save</button>
                 <button type="button" onclick="closeModal()">Cancel</button>
-                
             </form>
     </div>
 
@@ -102,6 +109,14 @@
                 modal.style.display = "none";
             }
         }  
+        function handleStatus(){
+            const status = document.getElementById("status").value;
+            const pageInput = document.getElementById("page_read");
+            const maxPage = parseInt(pageInput.max);
+            if (status === "completed") {
+                pageInput.value = maxPage;
+            }
+        }
     </script>
 
     <script>
