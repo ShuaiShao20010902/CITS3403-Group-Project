@@ -74,7 +74,7 @@
                 <label for="Status">Reading status:</label>
                 <select name="status" id="status" onchange="handleStatus()">
                     <option value="reading">Reading</option>
-                    <option value="completed">Completed</option> <!-- Will autofill page_read to max (not implemented yet)-->
+                    <option value="completed">Completed</option> <!-- Will autofill page_read to max -->
                     <option value="on_hold">On Hold</option>
                     <option value="dropped">Dropped</option>
                 </select>
@@ -109,6 +109,8 @@
                 modal.style.display = "none";
             }
         }  
+
+        //autofill the page numbers (completed = max pages)
         function handleStatus(){
             const status = document.getElementById("status").value;
             const pageInput = document.getElementById("page_read");

@@ -9,64 +9,75 @@
 <body>
   {% include "nav.html" %}
 
-  <form action="/upload" method="POST" style="max-width: 600px; margin: 120px auto 0;">
-    <h1>Upload a Book</h1>
+  <div class = "form-container">
+    <form action="/upload" method="POST">
 
-    <!-- Autocomplete wrapper: positions suggestions relative to input -->
-    <div class="autocomplete-wrapper" style="position: relative; margin-bottom: 16px;">
-      <label for="title">Book Title:</label>
-      <input type="text" name="book" id="title" required autocomplete="off" style="width: 100%; padding: 8px;">
-      <ul id="book-suggestions" style="
-        position: absolute;
-        top: calc(100% + 4px);
-        left: 0;
-        right: 0;
-        background: white;
+      <h1>Upload a Book</h1>
+
+      <!-- Autocomplete wrapper: positions suggestions relative to input -->
+      <div class="autocomplete-wrapper" style="position: relative; margin-bottom: 16px;">
+        <label for="title">Book Title:</label>
+        <input type="text" name="book" id="title" required autocomplete="off" style="width: 100%; padding: 8px;">
+        <ul id="book-suggestions" style="
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          max-height: 240px;
+          overflow-y: auto;
+          z-index: 2000;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: none;
+        "></ul>
+      </div>
+
+      <label for="author">Author:</label>
+      <input type="text" name="author" id="author" required readonly style="
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        background: #f0f0f0;
         border: 1px solid #ccc;
         border-radius: 4px;
-        max-height: 240px;
-        overflow-y: auto;
-        z-index: 2000;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: none;
-      "></ul>
-    </div>
+        min-height: 20px;
+      ">
 
-    <label for="author">Author:</label>
-    <input type="text" name="author" id="author" required readonly style="
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 16px;
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      min-height: 20px;
-    ">
+      <label for="genretags">Genre (tags):</label>
+      <input type="text" name="genretags" id="genretags" required readonly style="
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        min-height: 20px;
+      ">
 
-    <label for="genretags">Genre (tags):</label>
-    <input type="text" name="genretags" id="genretags" required readonly style="
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 16px;
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      min-height: 20px;
-    ">
+      <label for="rating">Rating (out of 5):</label>
+      <input type="number" id="rating" name="rating" min="1" max="5" step="0.5" style="width: 100%; padding: 8px; margin-bottom: 16px;"><br>
 
-    <label for="rating">Rating (out of 5):</label>
-    <input type="number" id="rating" name="rating" min="1" max="5" step="0.5" style="width: 100%; padding: 8px; margin-bottom: 16px;"><br>
+      <label for="Status">Reading status:</label>
+        <select name="status" id="status" onchange="handleStatus()">
+            <option value="reading">Reading</option>
+            <option value="completed">Completed</option>
+            <option value="on_hold">On Hold</option>
+            <option value="dropped">Dropped</option>
+        </select>
 
-    <label for="readp">Reading Progress (%):</label>
-    <input type="number" id="readp" name="readp" min="1" max="100" step="1" placeholder="0" style="width: 100%; padding: 8px; margin-bottom: 16px;"><br>
+      <label for="readp">Reading Progress (%):</label>
+      <input type="number" id="readp" name="readp" min="1" max="100" step="1" placeholder="0" style="width: 100%; padding: 8px; margin-bottom: 16px;"><br>
 
-    <label for="notes">Notes:</label>
-    <textarea id="notes" name="notes" rows="4" cols="50" placeholder="Optional Notes..." style="width: 100%; padding: 8px; margin-bottom: 16px;"></textarea><br>
+      <label for="notes">Notes:</label>
+      <textarea id="notes" name="notes" rows="4" cols="50" placeholder="Optional Notes..." style="width: 100%; padding: 8px; margin-bottom: 16px;"></textarea><br>
 
-    <input type="submit" value="Upload Book" style="padding: 10px 20px;">
-  </form>
+      <input type="submit" value="Upload Book" style="padding: 10px 20px;">
+    </form>
+  </div>
 
   <script>
     const titleInput = document.getElementById('title');
