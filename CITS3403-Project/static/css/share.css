@@ -6,14 +6,20 @@ body {
 }
 
 .container {
-    max-width: 900px;
-    margin: auto;
-    background: white;
+    max-width: 800px;
+    margin: 0 auto;
     padding: 20px;
+    background: white;
     border-radius: 8px;
 }
 
-h1, h2 {
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+h2 {
     color: #333;
 }
 
@@ -29,24 +35,54 @@ h1, h2 {
 
 .card {
     background: #eef2f7;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     padding: 15px;
-    border-radius: 10px;
+    margin-bottom: 15px;
     width: 250px;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card img.book-cover {
+    max-width: 100px;
+    margin-bottom: 10px;
+}
+
+.timestamp {
+    font-size: 0.9em;
+    color: #666;
 }
 
 .share-form {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
+.share-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.share-form select,
 .share-form input {
-    padding: 8px;
-    width: 250px;
-    margin-right: 10px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .share-form button {
-    padding: 8px 16px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.share-form button:hover {
+    background-color: #0056b3;
 }
 
 #share-message {

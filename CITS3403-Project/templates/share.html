@@ -13,6 +13,22 @@
 
         <!-- Share with someone -->
         <div class="share-form">
+            <label for="book-dropdown">Select a Book to Share:</label>
+            <select id="book-dropdown">
+                <option value="" disabled selected>Select a book</option>
+                {% for book in user_books %}
+                    <option value="{{ book.book_id }}" data-cover="{{ book.cover_url }}" data-note="{{ book.notes }}" data-rating="{{ book.rating }}">
+                        {{ book.title }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <div id="book-details" class="card" style="display: none;">
+                <img id="book-cover" src="" alt="Book Cover" class="book-cover">
+                <p><strong>Note:</strong> <span id="book-note"></span></p>
+                <p><strong>Rating:</strong> <span id="book-rating"></span></p>
+            </div>
+
             <input type="text" id="share-username" placeholder="Enter username to share with">
             <button id="share-button">Share</button>
             <p id="share-message"></p>

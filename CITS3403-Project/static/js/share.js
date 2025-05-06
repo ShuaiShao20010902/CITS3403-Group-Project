@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     shareButton.addEventListener('click', () => {
         const username = shareUsername.value.trim();
-        if (!username) {
-            message.textContent = "Please enter a username.";
+        const bookId = document.getElementById('book-dropdown').value;
+
+        if (!username || !bookId) {
+            message.textContent = 'Please select a book and enter a username.';
             return;
         }
 
@@ -15,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username })
+            body: JSON.stringify({ username, book_id: bookId })
         })
         .then(response => response.json())
         .then(data => {
@@ -26,6 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 message.style.color = 'red';
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            message.textContent = 'An error occurred while sharing.';
         });
+    });
+
+    // Handle book selection and display details
+    document.getElementById('book-dropdown').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const coverUrl = selectedOption.getAttribute('data-cover');
+        const note = selectedOption.getAttribute('data-note');
+        const rating = selectedOption.getAttribute('data-rating');
+
+        if (coverUrl && note && rating) {
+            document.getElementById('book-cover').src = coverUrl;
+            document.getElementById('book-note').textContent = note;
+            document.getElementById('book-rating').textContent = rating;
+            document.getElementById('book-details').style.display = 'block';
+        } else {
+            document.getElementById('book-details').style.display = 'none';
+        }
     });
 });
