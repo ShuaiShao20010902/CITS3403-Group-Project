@@ -6,6 +6,8 @@ _Track everything merged into `main`._
 - Updated Backend
     - Added the schema for books to be stored locally
     - Backend no longer uses SQLite3 but now uses SQLalchemy
+    - Added a script for testing in /static/tests
+    - Added a migration script
 - Updated bookspecificpage.html
     - Links the book recommendation from home page to their book specific page
     - bookspecificpage.html currently makes 3 requests to Pen Libraries' API for each book
