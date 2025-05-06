@@ -7,13 +7,14 @@ _Track everything merged into `main`._
     - Added the schema for books to be stored locally
     - Backend no longer uses SQLite3 but now uses SQLalchemy
     - Added a script for testing in /static/tests
-    - Added a migration script
+    - Added a migration script in /migrations/versions
 - Updated bookspecificpage.html
     - Links the book recommendation from home page to their book specific page
-    - bookspecificpage.html currently makes 3 requests to Pen Libraries' API for each book
+    - bookspecificpage.html currently makes 3 requests to Open Libraries' API for each book
 - Bug Fixes
     - Fixed nav.html not showing in share.html 
-    - Fixed route for uploadbook (not sure why this was missing to begin with)
+    - Fixed route for uploadbook and forgot_password (it seems that the earlier commit did not use the latest version of main at the time)
+    - session now starts after signing up 
 
 ### 4th May
 - app.py is separated into three files
