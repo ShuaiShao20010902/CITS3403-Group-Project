@@ -104,8 +104,12 @@ def setup_routes(app):
                 return redirect(url_for('signup'))
 
             hashed = generate_password_hash(password)
-            db.session.add(User(username=username, email=email, password=hashed))
+            user = User(username=username, email=email, password=hashed)
+            db.session.add(user)
             db.session.commit()
+            session.clear()
+            session['user_id'] = user.user_id
+            session['username'] = user.username
             flash('Account created successfully', 'success')
             return redirect(url_for('home'))
 
@@ -133,6 +137,10 @@ def setup_routes(app):
     def logout():
         session.clear()
         return redirect(url_for('landing'))
+    
+    @app.route('/forgot-password')
+    def forgot_password():
+        return render_template('forgot_password.html')
 
     @app.route('/api/books')
     def api_books():
