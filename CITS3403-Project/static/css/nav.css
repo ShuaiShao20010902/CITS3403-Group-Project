@@ -1,32 +1,41 @@
 header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #1e1e2f;
-    color: white;
-    padding: 15px 30px;
-    font-weight: bold;
-    font-size: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  header .buttons button {
-    margin-left: 15px;
-    padding: 10px 15px;
-    background-color: #3b3b4f;
-    font-weight: bold;
-    font-size: 16px;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  header .buttons a {
-    text-decoration: none;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1e1e2f;
+  color: white;
+  padding: 15px 30px;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-sizing: border-box;
+  transform: translateZ(0);
+}
+
+header .buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px; 
+}
+
+header .buttons button {
+  padding: 10px 15px;
+  background-color: #3b3b4f;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+  min-width: max-content;
+}
+
+header .buttons a {
+  text-decoration: none;
+  display: inline-block;
+}
