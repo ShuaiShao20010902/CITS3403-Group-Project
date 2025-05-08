@@ -1,0 +1,186 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; }
+.browse-page {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+  
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .top-bars {
+    margin: 20px 0;
+  }
+  
+  .filter-bar select,
+  .filter-bar button {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .book-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .book-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    padding: 20px;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .book-cover {
+    width: 120px;
+    height: 180px;
+    background-color: #eee;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  .book-info {
+    flex: 1;
+  }
+  
+  .book-info h3 {
+    font-size: 22px;
+    color: #292942;
+    margin-bottom: 5px;
+  }
+  
+  .book-info p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  
+  .book-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .book-list:empty {
+    display: none;
+  }
+  
+  .book-actions select,
+  .book-actions button {
+    padding: 8px;
+    font-size: 13px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
+  
+  .book-actions button:hover {
+    background-color: #ddd;
+  }
+
+  .search-input {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    flex: 1;
+    max-width: 100%;
+  }
+  
+  .add-book-btn {
+    background-color: #7a7a7b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .add-book-btn:hover {
+    background-color: #2f2f4f;
+    transform: translateY(-2px);
+  }
+
+.import-box {
+  max-width: 600px;
+  margin: 60px auto; /* more top & bottom spacing */
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: Arial, sans-serif;
+}
+
+.import-box h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+  color: #2c2c2c;
+}
+
+.import-box p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.import-box label {
+  font-weight: bold;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+.import-box input,
+.import-box select,
+.import-box textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+}
+
+.import-box textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.import-box .import-btn {
+  margin-top: 24px;
+  background-color: #1c1c2b;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.import-box .import-btn:hover {
+  background-color: #2f2f4f;
+}
+

@@ -89,6 +89,10 @@ def setup_routes(app):
     def uploadbook():
         return render_template('uploadbook.html')
 
+    @app.route('/browse.html')
+    def browse():
+        return render_template('browse.html')
+
     @app.route('/signup', methods=['GET', 'POST'])
     def signup():
         if request.method == 'POST':
