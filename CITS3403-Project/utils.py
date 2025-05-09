@@ -12,11 +12,11 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
     if isinstance(edition_key, list):
         edition_key = edition_key[0]
     work_key = api_book_data.get('work_key')
-
+    
     print(f"API Book Data: {api_book_data}")
 
     if not edition_key:
-        edition_key = f"UNKNOWN-{work_key.split('/')[-1]}-{int(datetime.now().timestamp())}" #UNKNOWN-KEY-TIMESTAMP (causing database issues if UNKNOWN (multiple) for unique key)
+        edition_key = _edition_key(work_key) or f"UNKNOWN-{work_key.split('/')[-1]}-{int(datetime.now().timestamp())}" #UNKNOWN-KEY-TIMESTAMP (causing database issues if UNKNOWN (multiple) for unique key)
 
     if not work_key:
         raise ValueError("No work_key found in the API response")
@@ -31,7 +31,7 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
         return existing
     
     #fetch WORK information (everything besides pages / ISBN / publishers) [FETCH 1]
-    work_json = _error_check(f"https://openlibrary.org{work_key}.json")
+    work_json = _error_check(f"https://openlibrary.org/{work_key}.json")
 
     #fetch EDITION information (pages / ISBN / publishers) [FETCH 2]
     edition_json = _error_check(f"https://openlibrary.org/books/{edition_key}.json")
@@ -110,9 +110,9 @@ def _extract_description(work_json: dict) -> str:
         return raw.get("value", "")
     return raw or ""
 
-#edition keys are always missing from the API (90% of the time)
+#edition keys are always missing from the search API (90% of the time in search API), backup to call editions API
 def _edition_key(work_key: str) -> str | None:
-    ed_json = _error_check(f"https://openlibrary.org{work_key}/editions.json?limit=1")
+    ed_json = _error_check(f"https://openlibrary.org/{work_key}/editions.json?limit=1")
     if ed_json and ed_json.get("entries"):
         return ed_json["entries"][0]["key"].split("/")[-1]   # "OL12345M"
     return None
