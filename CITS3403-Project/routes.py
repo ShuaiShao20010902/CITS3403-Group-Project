@@ -1,5 +1,6 @@
 from flask import request, jsonify, render_template, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from utils import add_book_to_dashboard_database
 from models import db, User, SharedItem, SharedWith
 import requests
 import random
@@ -35,7 +36,7 @@ def validate_input(value, field_name, required=True, value_type=int, min_value=N
         return None
     return value
 
-def setup_routes(app):
+def setup_routes(app): 
     @app.route('/')
     def landing():
         if 'user_id' in session:
@@ -277,3 +278,18 @@ def setup_routes(app):
             pass
         #5. return information to the template
         return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[])
+    
+    #endpoint to add book to dashboard (utils.py, browse.html, search)
+    @app.route("/add_book", methods=["POST"])    
+    def add_book():
+        data = request.get_json()
+        print("/add_book route hit with:", data)
+        try:
+            add_book_to_dashboard_database(data, user_id = 1) #hard coded id for now
+            # add_book_to_dashboard_database(data, current_user.user_id)
+            return jsonify({'status': 'success'}), 200
+        except IntegrityError as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': 'You have already added this book!'}), 400
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)}), 500

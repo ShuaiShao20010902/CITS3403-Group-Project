@@ -63,9 +63,39 @@ titleInput.addEventListener('input', () => {
             </div>
         `;
         resultsContainer.appendChild(card);
+
+        //addd to dashboard button
+        const addBtn = card.querySelector('button');
+
+        addBtn.addEventListener('click', () => {
+        // give backend the work_key and the edition_key
+        fetch('/add_book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+            work_key: doc.key,
+            edition_key: Array.isArray(doc.edition_key) ? doc.edition_key[0] : doc.edition_key
+            })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.status === 'success') {
+            addBtn.textContent = 'Added ✔';
+            addBtn.disabled = true;
+            } else {
+            alert('Failed: ' + (res.message || 'unknown error'));
+            }
+        })
+        .catch(() => alert('Network error, please try again'));
+        });
       });
     })
     .catch(err => {
-      console.error('Failed to fetch books:', err);
+      console.error('Can not fetch books:', err);
     });
 });
+
+//add to dashboard button -> change to "added to dashboard" when clicked or in database already
+// need an alert to say "added to dashboard"
+// need to add edit user information
+// need to add the sort feature too
