@@ -34,8 +34,32 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
     work_json = _error_check(f"https://openlibrary.org/{work_key}.json")
 
     #fetch EDITION information (pages / ISBN / publishers) [FETCH 2]
-    edition_json = _error_check(f"https://openlibrary.org/books/{edition_key}.json")
+    edition_json = _error_check(f"https://openlibrary.org/books/{edition_key}.json") or {}
 
+    if not (edition_json.get("number_of_pages") or edition_json.get("pagination")):
+        edition_group = _error_check(f"https://openlibrary.org{work_key}/editions.json?limit=100") or {}
+        entries = edition_group.get("entries", [])
+
+        #try and find best edition (based on # of pages, ISBN, publishers) -> in case missing data we pick best option
+        best = None
+        highest_score = -1
+
+        for ed in entries:
+            score = 0
+            if ed.get("number_of_pages"): score += 3
+            if ed.get("isbn_13"): score += 2
+            if ed.get("publishers"): score += 1
+            if score > highest_score:
+                best = ed
+                highest_score = score
+
+        if best:
+            edition_json = best
+            raw_key = best.get("key")
+            if raw_key and raw_key.startswith("/books/"):
+                edition_key = raw_key.replace("/books/", "")
+
+    #page count
     pages_s = edition_json.get('number_of_pages') or edition_json.get('pagination', "N/A")
     if isinstance(pages_s, str):  #if string convert to int
         digits = "".join(ch for ch in pages_s if ch.isdigit())
@@ -53,8 +77,8 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
         number_of_pages = pages,
         isbn_10=','.join(edition_json.get('isbn_10', [])) if edition_json.get('isbn_10') else None,
         isbn_13=','.join(edition_json.get('isbn_13', [])) if edition_json.get('isbn_13') else None,
-        publish_date=edition_json.get('first_publish_year'),
-        publishers=', '.join(edition_json.get('publisher', [])),
+        publish_date=edition_json.get('publish_date'),
+        publishers=', '.join(edition_json.get('publishers', [])),
         cover_id=(work_json.get("covers", [None])[0]),
         last_fetched=datetime.now(timezone.utc),
     )
@@ -79,6 +103,18 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
             db.session.add(author)
             db.session.flush()
         book.authors.append(author)
+
+    print(f"[DEBUG] Book added: {book.title}")
+    print(f"[DEBUG] Edition Key: {book.edition_key}")
+    print(f"[DEBUG] Work Key: {book.work_key}")
+    print(f"[DEBUG] Number of Pages: {book.number_of_pages}")
+    print(f"[DEBUG] ISBN-10: {book.isbn_10}")
+    print(f"[DEBUG] ISBN-13: {book.isbn_13}")
+    print(f"[DEBUG] Publishers: {book.publishers}")
+    print(f"[DEBUG] Authors:")
+    for author in book.authors:
+        print(f"    - {author.name} (Key: {author.openlib_key})")
+    
 
     db.session.commit()
 

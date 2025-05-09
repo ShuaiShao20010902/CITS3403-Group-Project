@@ -1,11 +1,11 @@
 from flask import request, jsonify, render_template, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
 from utils import add_book_to_dashboard_database
 from models import db, User, SharedItem, SharedWith
 import requests
 import random
 from datetime import datetime
-
 
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
     """
