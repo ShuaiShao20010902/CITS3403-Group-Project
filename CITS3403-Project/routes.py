@@ -1,9 +1,9 @@
 from flask import request, jsonify, render_template, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, SharedItem, SharedWith
+from models import *
 import requests
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -45,7 +45,33 @@ def setup_routes(app):
     @app.route('/home.html')
     def home():
         username = session.get('username')
-        return render_template('home.html', username=username)
+        user = User.query.filter_by(username=username).first()
+        continue_reading = []
+        chart_data = []
+
+        if user:
+            # Get books that aren't completed
+            continue_reading = [
+                ub.book for ub in UserBook.query.filter_by(user_id=user.user_id, completed=False).all()
+            ]
+
+            # Generate daily reading logs for last 30 days
+            today = datetime.utcnow().date()
+            past_30_days = [today - timedelta(days=i) for i in range(29, -1, -1)]
+
+            for day in past_30_days:
+                total_pages = db.session.query(db.func.sum(ReadingLog.pages_read)).filter(
+                    ReadingLog.user_id == user.user_id,
+                    db.func.date(ReadingLog.date) == day
+                ).scalar() or 0
+                chart_data.append({'date': day.strftime('%Y-%m-%d'), 'pages_read': total_pages})
+
+        return render_template(
+            'home.html',
+            username=username,
+            continue_reading=continue_reading,
+            chart_data=chart_data
+        )
 
     @app.route('/share', methods=['GET', 'POST'])
     def share():
@@ -160,31 +186,6 @@ def setup_routes(app):
                 'subjects': w.get('subject', [])[:5]
             })
         return jsonify(books)
-
-    @app.route('/api/user_chat')
-    def api_user_chat():
-        user_id = int(request.args.get('user_id', 1))
-        conn = sqlite3.connect(DB_FILE)
-        c = conn.cursor()
-        query = '''
-            SELECT u1.username AS sender_name, u2.username AS receiver_name, uc.datestamp, uc.message
-            FROM user_chat uc
-            JOIN users u1 ON uc.sender = u1.user_id
-            JOIN users u2 ON uc.receiver = u2.user_id
-            WHERE uc.receiver = ?
-            ORDER BY uc.datestamp ASC
-        '''
-        c.execute(query, (user_id,))
-        messages = [
-            {
-                "sender": row[0],
-                "receiver": row[1],
-                "datestamp": row[2],
-                "message": row[3]
-            } for row in c.fetchall()
-        ]
-        conn.close()
-        return jsonify(messages)
     
     #for user submitted info on book specific page
     @app.route('/book/<string:book_id>/update', methods=['POST'])
