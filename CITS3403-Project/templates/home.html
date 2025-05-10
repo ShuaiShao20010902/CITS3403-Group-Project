@@ -6,41 +6,90 @@
   <title>Book Reading Tracker</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
   {% include 'nav.html' %}
 
   <div class="main-content">
-    <div class="right-column">
-      {% if username %}
-        <div class="welcome-back">
-          <h2>Welcome back, {{ username }}!</h2>
+    <section class="continue-reading">
+      <h2>Continue Reading</h2>
+      {% if continue_reading %}
+        <div class="cr-container">
+          <button class="cr-arrow cr-left">&#10094;</button>
+          <div class="cr-track" id="continue-track">
+            {% for b in continue_reading %}
+              <div class="cr-item">
+                <a href="/book/{{ b.work_id }}">
+                  <img src="https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg" alt="{{ b.title }}" class="cover-img"/>
+                  <h4>{{ b.title }}</h4>
+                  <p class="cr-authors">{{ b.author }}</p>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+          <button class="cr-arrow cr-right">&#10095;</button>
         </div>
+      {% else %}
+        <p class="no-books">Start tracking a book to see it here!</p>
       {% endif %}
+    </section>
 
-      <h2>More books to discover</h2>
-      <p> This takes a few seconds to load</p>
-      <div class="carousel">
-        <div class="carousel-track" id="carousel-track"> </div>
+    <section class="stats">
+      <h2>Your Reading Stats (Last 30 Days)</h2>
+      <div class="chart-container">
+        <canvas id="readingChart"></canvas>
       </div>
-    </div>
+    </section>
   </div>
 
   <script>
-    // Recommendations
-    $.get('/api/books', function(data) {
-      const track = $('#carousel-track');
-      data.forEach(book => {
-        track.append(`
-          <div class="carousel-item">
-            <a href="/book/${book.id}">
-              <img src="${book.cover_url}" alt="${book.title}" style="width:100%; height:auto; border-radius: 8px;"/>
-              <h3>${book.title}</h3>
-              <p>${book.authors}</p>
-          </div>
-        `);
-      });å
+    (function(){
+      const track = document.getElementById('continue-track');
+      const left  = document.querySelector('.cr-left');
+      const right = document.querySelector('.cr-right');
+      const itemWidth = 220;  // CSS width + margin
+      let position = 0;
+
+      if (track) {
+        left.addEventListener('click', () => {
+          position = (position - itemWidth * 3 + track.scrollWidth) % track.scrollWidth;
+          track.style.transform = `translateX(-${position}px)`;
+        });
+        right.addEventListener('click', () => {
+          position = (position + itemWidth * 3) % track.scrollWidth;
+          track.style.transform = `translateX(-${position}px)`;
+        });
+      }
+    })();
+
+    // Reading stats chart
+    const ctx = document.getElementById('readingChart').getContext('2d');
+    const chartData = {{ chart_data | tojson }};
+    const dates = chartData.map(item => item.date);
+    const pages = chartData.map(item => item.pages_read);
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: 'Pages Read',
+          data: pages,
+          fill: true,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          tension: 0.2,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: 'Date' }},
+          y: { title: { display: true, text: 'Pages' }, beginAtZero: true }
+        }
+      }
     });
   </script>
 </body>

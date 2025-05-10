@@ -1,11 +1,13 @@
 from flask import request, jsonify, render_template, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from models import *
 from sqlalchemy.exc import IntegrityError
 from utils import add_book_to_dashboard_database
 from models import db, User, SharedItem, SharedWith
 import requests
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
     """
@@ -46,7 +48,34 @@ def setup_routes(app):
     @app.route('/home.html')
     def home():
         username = session.get('username')
-        return render_template('home.html', username=username)
+        user = User.query.filter_by(username=username).first()
+        continue_reading = []
+        chart_data = []
+
+        if user:
+            # Get books that aren't completed
+            continue_reading = [
+                ub.book for ub in UserBook.query.filter_by(user_id=user.user_id, completed=False).all()
+            ]
+
+            # Generate daily reading logs for last 30 days
+            today = datetime.utcnow().date()
+            past_30_days = [today - timedelta(days=i) for i in range(29, -1, -1)]
+
+            for day in past_30_days:
+                total_pages = db.session.query(db.func.sum(ReadingLog.pages_read)).filter(
+                    ReadingLog.user_id == user.user_id,
+                    db.func.date(ReadingLog.date) == day
+                ).scalar() or 0
+                chart_data.append({'date': day.strftime('%Y-%m-%d'), 'pages_read': total_pages})
+
+        return render_template(
+            'home.html',
+            username=username,
+            continue_reading=continue_reading,
+            chart_data=chart_data
+        )
+
 
     @app.route('/share', methods=['GET', 'POST'])
     def share():
@@ -165,31 +194,6 @@ def setup_routes(app):
                 'subjects': w.get('subject', [])[:5]
             })
         return jsonify(books)
-
-    @app.route('/api/user_chat')
-    def api_user_chat():
-        user_id = int(request.args.get('user_id', 1))
-        conn = sqlite3.connect(DB_FILE)
-        c = conn.cursor()
-        query = '''
-            SELECT u1.username AS sender_name, u2.username AS receiver_name, uc.datestamp, uc.message
-            FROM user_chat uc
-            JOIN users u1 ON uc.sender = u1.user_id
-            JOIN users u2 ON uc.receiver = u2.user_id
-            WHERE uc.receiver = ?
-            ORDER BY uc.datestamp ASC
-        '''
-        c.execute(query, (user_id,))
-        messages = [
-            {
-                "sender": row[0],
-                "receiver": row[1],
-                "datestamp": row[2],
-                "message": row[3]
-            } for row in c.fetchall()
-        ]
-        conn.close()
-        return jsonify(messages)
     
     #for user submitted info on book specific page
     @app.route('/book/<string:book_id>/update', methods=['POST'])
@@ -216,68 +220,80 @@ def setup_routes(app):
 
         return jsonify({'success': True})
 
-    # Book specific page
+
     @app.route('/book/<string:book_id>', methods=['GET', 'POST'])
     def book_specific_page(book_id):
-
-        # In case API fails or missing fields
+        # Fallback in case book not found
         fallback = {
             'title': 'Unknown Title',
             'author': 'Unknown Author',
             'pages': 0,
-            'isbn': 'N/A',
-            'year': 0,
             'description': 'No description available.',
             'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
             'genres': []
         }
-        
-        #1. check if basic book_id is valid or not (protect from crashes))
-        try: 
-            resp = requests.get(
-                f'https://openlibrary.org/works/{book_id}.json'
+
+        # Fetch the book from DB
+        book_row = Book.query.filter_by(work_id=book_id).first()
+        if not book_row:
+            return render_template(
+                'bookspecificpage.html',
+                book=fallback,
+                user_data={},
+                book_id=book_id,
+                community_notes=[],
+                pages_read_total=0
             )
-            resp.raise_for_status()  # Raise an error for bad responses
-            book_data = resp.json()
-        except requests.RequestException:
-            return render_template('bookspecificpage.html', book=fallback, user_data={}, book_id=book_id, community_notes=[])
 
-        #2. initial book dictionary (get information that is not edition specific)
+        # Build the book dict
         book = {
-            'title': book_data.get('title', fallback['title']),
-            'author': fallback['author'],  # Will fetch below
-            'pages': fallback['pages'],
-            'isbn': fallback['isbn'],
-            'year': fallback['year'],
-            'description': book_data.get('description', {}).get('value', 'No description available.') if isinstance(book_data.get('description'), dict) else book_data.get('description', 'No description available.'),
-            'cover_url': f"https://covers.openlibrary.org/b/id/{book_data.get('covers', [])[0]}-L.jpg" if book_data.get('covers') else fallback['cover_url'],
-            'genres': book_data.get('subjects', [])[:5]  # Top 5 genres
+            'title': book_row.title,
+            'author': book_row.author,
+            'pages': book_row.number_of_pages,
+            'description': book_row.description or fallback['description'],
+            'cover_url': f"https://covers.openlibrary.org/b/id/{book_row.cover_id}-L.jpg" if book_row.cover_id else fallback['cover_url'],
+            'genres': []
         }
-        
-        #3. get author information from the author api
-        try:
-            author_key = book_data['authors'][0]['author']['key'] 
-            author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
-            author_resp.raise_for_status()
-            book['author'] = author_resp.json().get('name', 'Unknown')
-        except (IndexError, KeyError, requests.RequestException):
-            pass
 
-        #4. pages, isbn, year are edition information (will not be found in the standard .json), optional information? if too slow
-        try:
-            edition_resp = requests.get(f'https://openlibrary.org/works/{book_id}/editions.json?limit=1')
-            edition_resp.raise_for_status()
-            edition_data = edition_resp.json()['entries'][0]
+        # Parse subjects into genres (JSON or CSV)
+        if book_row.subjects:
+            try:
+                import json
+                subs = json.loads(book_row.subjects)
+                book['genres'] = subs[:5] if isinstance(subs, list) else [s.strip() for s in book_row.subjects.split(',')][:5]
+            except:
+                book['genres'] = [s.strip() for s in book_row.subjects.split(',')][:5]
 
-            book['pages'] = edition_data.get('number_of_pages') or edition_data.get('pagination', 'N/A')
-            isbn_10 = edition_data.get('isbn_10', ['N/A'])
-            isbn_13 = edition_data.get('isbn_13', ['N/A'])
-            book['isbn'] = isbn_10[0] if isbn_10[0] != 'N/A' else (isbn_13[0] if isbn_13 else 'N/A')
-            book['year'] = edition_data.get('publish_date', fallback['year'])
-        except (IndexError, KeyError, requests.RequestException):
-            pass
-        #5. return information to the template
-        return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[])
+        # Fetch user and user-specific data
+        username = session.get('username')
+        user = User.query.filter_by(username=username).first()
+        user_data = {}
+        pages_read_total = 0
+
+        if user:
+            # UserBook info
+            ub = UserBook.query.filter_by(user_id=user.user_id, book_id=book_id).first()
+            if ub:
+                user_data = {
+                    'rating': ub.rating,
+                    'status': 'Completed' if ub.completed else 'Reading',
+                    'notes': ub.notes,
+                }
+
+            # Sum pages_read from ReadingLog
+            pages_read_total = db.session.query(
+                db.func.coalesce(db.func.sum(ReadingLog.pages_read), 0)
+            ).filter_by(user_id=user.user_id, book_id=book_id).scalar()
+
+        return render_template(
+            'bookspecificpage.html',
+            book=book,
+            user_data=user_data,
+            book_id=book_id,
+            community_notes=[],
+            pages_read_total=pages_read_total
+        )
+
     
     #endpoint to add book to dashboard (utils.py, browse.html, search)
     @app.route("/add_book", methods=["POST"])    

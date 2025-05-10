@@ -13,6 +13,26 @@
 
         <!-- Share with someone -->
         <div class="share-form">
+            <label for="book-dropdown">Select a Book to Share:</label>
+            <select id="book-dropdown">
+                <option value="" disabled selected>Select a book</option>
+                <option value="1" data-cover="https://via.placeholder.com/100" data-note="This is a great book!" data-rating="4.5">
+                    Book Title 1
+                </option>
+                <option value="2" data-cover="https://via.placeholder.com/100" data-note="An interesting read." data-rating="3.8">
+                    Book Title 2
+                </option>
+                <option value="3" data-cover="https://via.placeholder.com/100" data-note="Highly recommended!" data-rating="5.0">
+                    Book Title 3
+                </option>
+            </select>
+
+            <div id="book-details" class="card" style="display: none;">
+                <img id="book-cover" src="" alt="Book Cover" class="book-cover">
+                <p><strong>Note:</strong> <span id="book-note"></span></p>
+                <p><strong>Rating:</strong> <span id="book-rating"></span></p>
+            </div>
+
             <input type="text" id="share-username" placeholder="Enter username to share with">
             <button id="share-button">Share</button>
             <p id="share-message"></p>
