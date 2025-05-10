@@ -1,9 +1,10 @@
 from flask import request, jsonify, render_template, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, SharedItem, SharedWith
+from app.models import db, User, SharedItem, SharedWith
 import requests
 import random
 from datetime import datetime
+import sqlite3
 
 
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
