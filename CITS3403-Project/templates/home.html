@@ -19,10 +19,10 @@
           <div class="cr-track" id="continue-track">
             {% for b in continue_reading %}
               <div class="cr-item">
-                <a href="/book/{{ b.book_id }}">
+                <a href="/book/{{ b.work_id }}">
                   <img src="https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg" alt="{{ b.title }}" class="cover-img"/>
                   <h4>{{ b.title }}</h4>
-                  <p class="cr-authors">{{ b.authors }}</p>
+                  <p class="cr-authors">{{ b.author }}</p>
                 </a>
               </div>
             {% endfor %}

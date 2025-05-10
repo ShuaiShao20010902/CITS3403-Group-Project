@@ -9,14 +9,12 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'this-is-the-super-secret-key'
 
-    db.init_app(app)             # from models
+    db.init_app(app)             
     migrate = Migrate(app, db)
-    setup_routes(app)            # register all routes
+    setup_routes(app)           
     return app
 
 if __name__ == '__main__':
     app = create_app()
     init_db(app)
     app.run(debug=True)
-    
-

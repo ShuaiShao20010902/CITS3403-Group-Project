@@ -73,6 +73,7 @@ def setup_routes(app):
             chart_data=chart_data
         )
 
+
     @app.route('/share', methods=['GET', 'POST'])
     def share():
         user_id = session.get('user_id')
@@ -212,65 +213,77 @@ def setup_routes(app):
 
         return jsonify({'success': True})
 
-    # Book specific page
+
     @app.route('/book/<string:book_id>', methods=['GET', 'POST'])
     def book_specific_page(book_id):
-
-        # In case API fails or missing fields
+        # Fallback in case book not found
         fallback = {
             'title': 'Unknown Title',
             'author': 'Unknown Author',
             'pages': 0,
-            'isbn': 'N/A',
-            'year': 0,
             'description': 'No description available.',
             'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
             'genres': []
         }
-        
-        #1. check if basic book_id is valid or not (protect from crashes))
-        try: 
-            resp = requests.get(
-                f'https://openlibrary.org/works/{book_id}.json'
+
+        # Fetch the book from DB
+        book_row = Book.query.filter_by(work_id=book_id).first()
+        if not book_row:
+            return render_template(
+                'bookspecificpage.html',
+                book=fallback,
+                user_data={},
+                book_id=book_id,
+                community_notes=[],
+                pages_read_total=0
             )
-            resp.raise_for_status()  # Raise an error for bad responses
-            book_data = resp.json()
-        except requests.RequestException:
-            return render_template('bookspecificpage.html', book=fallback, user_data={}, book_id=book_id, community_notes=[])
 
-        #2. initial book dictionary (get information that is not edition specific)
+        # Build the book dict
         book = {
-            'title': book_data.get('title', fallback['title']),
-            'author': fallback['author'],  # Will fetch below
-            'pages': fallback['pages'],
-            'isbn': fallback['isbn'],
-            'year': fallback['year'],
-            'description': book_data.get('description', {}).get('value', 'No description available.') if isinstance(book_data.get('description'), dict) else book_data.get('description', 'No description available.'),
-            'cover_url': f"https://covers.openlibrary.org/b/id/{book_data.get('covers', [])[0]}-L.jpg" if book_data.get('covers') else fallback['cover_url'],
-            'genres': book_data.get('subjects', [])[:5]  # Top 5 genres
+            'title': book_row.title,
+            'author': book_row.author,
+            'pages': book_row.number_of_pages,
+            'description': book_row.description or fallback['description'],
+            'cover_url': f"https://covers.openlibrary.org/b/id/{book_row.cover_id}-L.jpg" if book_row.cover_id else fallback['cover_url'],
+            'genres': []
         }
-        
-        #3. get author information from the author api
-        try:
-            author_key = book_data['authors'][0]['author']['key'] 
-            author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
-            author_resp.raise_for_status()
-            book['author'] = author_resp.json().get('name', 'Unknown')
-        except (IndexError, KeyError, requests.RequestException):
-            pass
 
-        #4. pages, isbn, year are edition information (will not be found in the standard .json), optional information? if too slow
-        try:
-            edition_resp = requests.get(f'https://openlibrary.org/works/{book_id}/editions.json?limit=1')
-            edition_resp.raise_for_status()
-            edition_data = edition_resp.json()['entries'][0]
+        # Parse subjects into genres (JSON or CSV)
+        if book_row.subjects:
+            try:
+                import json
+                subs = json.loads(book_row.subjects)
+                book['genres'] = subs[:5] if isinstance(subs, list) else [s.strip() for s in book_row.subjects.split(',')][:5]
+            except:
+                book['genres'] = [s.strip() for s in book_row.subjects.split(',')][:5]
 
-            book['pages'] = edition_data.get('number_of_pages') or edition_data.get('pagination', 'N/A')
-            isbn_10 = edition_data.get('isbn_10', ['N/A'])
-            isbn_13 = edition_data.get('isbn_13', ['N/A'])
-            book['isbn'] = isbn_10[0] if isbn_10[0] != 'N/A' else (isbn_13[0] if isbn_13 else 'N/A')
-            book['year'] = edition_data.get('publish_date', fallback['year'])
-        except (IndexError, KeyError, requests.RequestException):
-            pass
-        #5. return information to the template
-        return render_template('bookspecificpage.html', book=book, user_data={}, book_id=book_id, community_notes=[])
+        # Fetch user and user-specific data
+        username = session.get('username')
+        user = User.query.filter_by(username=username).first()
+        user_data = {}
+        pages_read_total = 0
+
+        if user:
+            # UserBook info
+            ub = UserBook.query.filter_by(user_id=user.user_id, book_id=book_id).first()
+            if ub:
+                user_data = {
+                    'rating': ub.rating,
+                    'status': 'Completed' if ub.completed else 'Reading',
+                    'notes': ub.notes,
+                }
+
+            # Sum pages_read from ReadingLog
+            pages_read_total = db.session.query(
+                db.func.coalesce(db.func.sum(ReadingLog.pages_read), 0)
+            ).filter_by(user_id=user.user_id, book_id=book_id).scalar()
+
+        return render_template(
+            'bookspecificpage.html',
+            book=book,
+            user_data=user_data,
+            book_id=book_id,
+            community_notes=[],
+            pages_read_total=pages_read_total
+        )
+
