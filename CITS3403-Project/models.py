@@ -62,8 +62,6 @@ class Book(db.Model):
     cover_id = db.Column(db.Integer)
     last_fetched = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
-
-#Below this is mostly just sample data
 def init_db(app):
     with app.app_context():
         db.create_all()

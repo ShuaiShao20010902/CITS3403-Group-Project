@@ -4,128 +4,110 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Specific Page</title>
-
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bookspecificpage.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='bookspecificpage.css') }}">
 </head>
 
 <body>
-    {% include "nav.html" %}
-    <div class="book-container card">
-        <div class="book-details">
-            <h1>{{ book.title }}</h1>
-            <h2>{{ book.author or "Author name unavailable" }}</h2>
-            <div class="genre-tags">
-                {% for genre in book.genres[:5] %}
-                    <span class="genre-tag">{{ genre }}</span>
-                {% endfor %}
-            </div>
-            <p><strong>Description:</strong> {{ book.description or "No description available." }}</p>
-            <div class="metadata">
-                <span><strong>Pages:</strong> {{ book.pages or "Pages unavailable" }}</span>
-            </div>
-        </div>
+  {% include "nav.html" %}
 
-        <div class="book-right">
-            <div class="book-cover">
-                <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
-                <div class="user-stats">
-                    <p><strong>Your Rating:</strong> {{ user_data.rating or "Not rated yet" }}</p>
-                    <p><strong>Status:</strong> {{ user_data.status or "No status yet" }}</p>
-                    <p><strong>Current Page:</strong> {{ pages_read_total or 0 }} / {{ book.pages }}</p>
-                    <button type="button" class="edit-user-btn" onclick="openModal()">Edit User Information</button>
-                </div>
-            </div>
-        </div>
+  <!-- Main Book Info -->
+  <div class="book-container card">
+    <div class="book-details">
+      <h1>{{ book.title }}</h1>
+      <h2>{{ book.author or "Author name unavailable" }}</h2>
+      <div class="genre-tags">
+        {% for genre in book.genres[:5] %}
+          <span class="genre-tag">{{ genre }}</span>
+        {% endfor %}
+      </div>
+      <p><strong>Description:</strong> {{ book.description or "No description available." }}</p>
+      <div class="metadata">
+        <span><strong>Pages:</strong> {{ book.pages or "Pages unavailable" }}</span>
+      </div>
     </div>
 
-    <div class="note-container card"> 
-        <p><strong>Your Notes:</strong></p>
-        <p>{{ user_data.notes or "No notes yet." }}</p>
-    </div>
-
-    <div id="editModal" class="edit-modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Edit Book Information</h2>
-            <p>Update your progress and notes below:</p>
-            <form id="user-form" method="POST" action="{{ url_for('update_book', book_id=book_id) }}">
-                <label for="rating">Your rating out of 5:</label>
-                <input type="number" name="rating" min="0" max="5" step="0.1">
-
-                <label for="status">Reading status:</label>
-                <select name="status" id="status" onchange="handleStatus()">
-                    <option value="reading">Reading</option>
-                    <option value="completed">Completed</option>
-                    <option value="on_hold">On Hold</option>
-                    <option value="dropped">Dropped</option>
-                </select>
-
-                <label for="page_read">Page you are up to:</label> 
-                <input type="number" name="page_read" id="page_read" min="0" max="{{ book.pages }}" step="1" oninput="updateProgress()">
-
-                <label for="notes">Edit your Notes:</label>
-                <textarea name="notes" rows="4" cols="50"></textarea>
-
-                <div id="form-message"></div>
-                <button type="submit">Save</button>
-                <button type="button" onclick="closeModal()">Cancel</button>
-            </form>
+    <div class="book-right">
+      <div class="book-cover">
+        <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
+        <div class="user-stats">
+          <p><strong>Status:</strong> {{ user_data.status or "No status yet" }}</p>
+          <p><strong>Current Page:</strong> {{ pages_read_total or 0 }} / {{ book.pages }}</p>
+          <button type="button" class="generic-btn" onclick="openForm()">Edit Read Progress</button>
         </div>
+      </div>
     </div>
+  </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <!-- Rating Card -->
+  <div class="rating-container card">
+    <h3>Your Rating</h3>
+    <div id="star-rating" class="star-rating">
+      {% for i in range(5) %}
+      <span class="star" data-index="{{ i }}"></span>
+      {% endfor %}
+    </div>
+    <button id="rate-button" class="generic-btn">Rate</button>
+    <div id="rating-message" class="rating-message"></div>
+  </div>
 
-    <script>
-        function openModal() {
-            document.getElementById("editModal").style.display = "block";
-            $('#form-message').hide().text('');
-        }
-        
-        function closeModal() {
-            document.getElementById("editModal").style.display = "none";
-        }
-        
-        window.onclick = function(event) {
-            const modal = document.getElementById("editModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
+  <!-- Inline-Editable Notes Card -->
+  <div class="note-container card">
+    <p><strong>Your Notes:</strong></p>
+    <div id="notes-display" class="notes-display">{{ user_data.notes or "No notes yet. Click here to start typing." }}</div>
+    <textarea id="notes-editor" class="notes-editor" style="display:none;"></textarea>
+    <div id="notes-actions" class="notes-actions" style="display:none;">
+      <button id="save-notes" class="generic-btn">Save</button>
+      <button id="discard-notes" class="generic-btn">Discard</button>
+      <span id="notes-message" style="margin-left:1em;"></span>
+    </div>
+  </div>
 
-        function handleStatus() {
-            const status = document.getElementById("status").value;
-            const pageInput = document.getElementById("page_read");
-            const maxPage = parseInt(pageInput.max);
-            if (status === "completed") {
-                pageInput.value = maxPage;
-            }
-        }
-    </script>
+  <div id="logModal" class="log-modal" hidden>
+    <div class="modal-content">
 
-    <script>
-        $('#user-form').on('submit', function(e){
-            e.preventDefault();
+        <button class="close-log generic-btn-light" onclick="closeForm()">×</button>
 
-            $.ajax({
-                url: "{{ url_for('update_book', book_id=book_id) }}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: function(response){
-                    const msg = $('#form-message');
-                    msg.text('Saved Successfully!').css('color', 'green').fadeIn();
+        <h2>Reading Log for {{ book.title }}</h2>
+        <p>You have read <strong id="pages-read-total">{{ pages_read_total or 0 }}</strong> / <strong>{{ book.pages }}</strong> pages.</p>
 
-                    setTimeout(function() {
-                        msg.fadeOut();
-                        closeModal();
-                    }, 1500);
-                },
-                error: function(){
-                    $('#form-message').text("Error has occurred. Please try again.")
-                }
-            });
-        });
-    </script>
+        <div class="entry-view">
+        <button id="prev-entry" class="nav-btn"  title="Previous">&larr;</button>
+
+        <div id="single-entry" class="entry-text">No entries yet</div>
+
+        <button id="edit-button" class="generic-btn-light" title="Edit">Edit</button>
+
+        <button id="next-entry" class="nav-btn"  title="Next">&rarr;</button>
+        </div>
+
+        <div id="entry-actions" class="entry-actions" hidden>
+        <input id="edit-pages" type="number" min="1" max="{{ book.pages }}">
+        <button id="save-entry"   class="generic-btn">Save</button>
+        <button id="delete-entry" class="generic-btn danger">Delete</button>
+        </div>
+
+        <hr>
+
+        <!-- add new -->
+        <h3>Add New Entry</h3>
+        <input id="log-date"  type="date">
+        <h3>Pages Read</h3>
+        <input id="log-pages" type="number" min="1" max="{{ book.pages }}">
+        <button id="add-entry" class="generic-btn">Add Entry</button>
+
+        <div id="log-message" class="log-message"></div>
+    </div>
+  </div>
+
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Inject globals
+    window.UPDATE_BOOK_URL = "{{ url_for('update_book', book_id=book_id) }}";
+    window.readingLogs = {{ reading_logs | tojson }} || [];
+  </script>
+  <script src="{{ url_for('static', filename='js/bookspecific.js') }}"></script>
 
 </body>
 </html>

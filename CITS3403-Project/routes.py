@@ -1,4 +1,4 @@
-from flask import request, jsonify, render_template, redirect, url_for, session, flash
+from flask import request, jsonify, render_template, redirect, url_for, abort, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import *
 from sqlalchemy.exc import IntegrityError
@@ -196,30 +196,74 @@ def setup_routes(app):
             })
         return jsonify(books)
     
-    #for user submitted info on book specific page
-    @app.route('/book/<string:book_id>/update', methods=['POST'])
+    @app.route('/update_book/<string:book_id>', methods=['POST'])
     def update_book(book_id):
-        rating = request.form.get('rating')
-        status = request.form.get('status')
-        page_read = request.form.get('page_read')
-        notes = request.form.get('notes')
+        # 1. Current user
+        username = session.get('username') or abort(401)
+        user = User.query.filter_by(username=username).first_or_404()
+
+        # 2. Ensure book exists
+        Book.query.filter_by(work_id=book_id).first_or_404()
+
+        # 3. Get / create UserBook (same as before) …
+        ub = UserBook.query.filter_by(user_id=user.user_id,
+                                    book_id=book_id).first()
+        if not ub:
+            ub = UserBook(user_id=user.user_id, book_id=book_id)
+            db.session.add(ub)
+
+        # ——— handle UserBook fields (rating, status, notes) exactly as you had ——— #
+
+        # 4. Handle reading-log actions -----------------------------------------
+        # (A) delete-latest takes priority over add/update
+        # inside update_book, before handling page_read
         
-        # Validate inputs
-        rating = validate_input(rating, 'Rating', required=False, value_type=float, min_value=0.0, max_value=5.0)
-        page_read = validate_input(page_read, 'Page Read', required=False, value_type=int, min_value=0)
+        if 'delete_date' in request.form:
+            d = request.form['delete_date']
+            ReadingLog.query.filter_by(user_id=user.user_id,
+                                    book_id=book_id,
+                                    date=d).delete()
+            db.session.commit()
+            return jsonify(success=True)
 
-        ALLOWED_STATUSES = {'reading', 'completed', 'on_hold', 'dropped'}
-        if status not in ALLOWED_STATUSES:
-            flash("Invalid reading status selected", "error")
-            return redirect(url_for('book_specific_page', book_id=book_id))
+        if 'edit_date' in request.form and 'page_read' in request.form:
+            d = request.form['edit_date']
+            pages = int(request.form['page_read'])
+            log = ReadingLog.query.filter_by(user_id=user.user_id,
+                                            book_id=book_id,
+                                            date=d).first_or_404()
+            log.pages_read = pages
+            db.session.commit()
+            return jsonify(success=True)
 
-        if rating is None or page_read is None:
-            return redirect(url_for('book_specific_page', book_id=book_id))
 
-        #ADD LATER - change to DB logic TESTING PURPOSES ONLY
-        print(f"Rating: {rating}, Status: {status}, Page Read: {page_read}, Notes: {notes}")
+        if 'page_read' in request.form:
+            try:
+                pages = int(request.form['page_read'])
+                today = date.today()
+                log = (ReadingLog.query
+                    .filter_by(user_id=user.user_id,
+                                book_id=book_id,
+                                date=today)
+                    .first())
+                if not log:
+                    log = ReadingLog(user_id=user.user_id,
+                                    book_id=book_id,
+                                    date=today,
+                                    pages_read=pages)
+                    db.session.add(log)
+                else:
+                    log.pages_read = pages
+                db.session.commit()
+                return jsonify(success=True,
+                            new_log={'date': today.isoformat(),
+                                        'pages_read': pages})
+            except (TypeError, ValueError):
+                pass
 
-        return jsonify({'success': True})
+        db.session.commit()
+        return jsonify(success=True)
+
 
 
     @app.route('/book/<string:book_id>', methods=['GET', 'POST'])
@@ -286,13 +330,29 @@ def setup_routes(app):
                 db.func.coalesce(db.func.sum(ReadingLog.pages_read), 0)
             ).filter_by(user_id=user.user_id, book_id=book_id).scalar()
 
+        reading_logs = []
+        if user:
+            logs = (ReadingLog
+                    .query
+                    .filter_by(user_id=user.user_id, book_id=book_id)
+                    .order_by(ReadingLog.date.asc())
+                    .all())
+            # serialize to simple dicts
+            for l in logs:
+                reading_logs.append({
+                    'id': l.id,
+                    'date': l.date.isoformat(),
+                    'pages_read': l.pages_read
+                })
+
         return render_template(
             'bookspecificpage.html',
             book=book,
             user_data=user_data,
             book_id=book_id,
             community_notes=[],
-            pages_read_total=pages_read_total
+            pages_read_total=pages_read_total,
+            reading_logs=reading_logs
         )
 
     #endpoint to add book to dashboard (utils.py, browse.html, search)
