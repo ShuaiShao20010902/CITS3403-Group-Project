@@ -86,3 +86,49 @@ def _extract_description(work_json: dict) -> str:
     if isinstance(raw, dict):
         return raw.get("value", "")
     return raw or "No description available."
+
+def manual_book_save(form, user_id=None):
+    try:
+        title = form.title.data.strip()
+        author = form.author.data.strip()
+        genres = form.genres.data.strip()
+        description = form.description.data.strip()
+        pages = form.number_of_pages.data
+        work_id = f"MANUAL-{title[:10].replace(' ', '_')}-{author[:10].replace(' ', '_')}".upper() #MANUAL-BOOK_TITLE[Max 10]-AUTHOR[Max10] (all cap)
+        
+#Create row in database
+        book = Book.query.get(work_id)
+        new_book = book is None
+        if new_book:
+            book = Book(
+                work_id        = work_id,
+                title          = title,
+                author         = author,
+                subjects       = genres,
+                description    = description,
+                number_of_pages= pages,
+                last_fetched   = datetime.now(timezone.utc)
+            )
+        db.session.add(book)
+
+        link = None
+        if user_id:
+            link = UserBook.query.filter_by(user_id=user_id, book_id=work_id).first()
+            if link is None:
+                link = UserBook(user_id=user_id, book_id=work_id)
+                db.session.add(link)
+
+            #check for user fields
+            if hasattr(form, "rating") and form.rating.data is not None:
+                link.rating = form.rating.data
+            if hasattr(form, "notes") and form.notes.data:
+                link.notes  = form.notes.data.strip()
+            if hasattr(form, "completed"):
+                link.completed = bool(form.completed.data)
+
+        db.session.commit()
+        return "success", "Book added successfully."
+    
+    except Exception as e:
+        db.session.rollback()
+        return "error", f"Unexpected error: {e}"
