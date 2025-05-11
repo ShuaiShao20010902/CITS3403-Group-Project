@@ -43,6 +43,9 @@
             <div class="shared-cards">
                 {% for item in your_shared_items %}
                     <div class="card">
+                        {% if item.cover_url %}
+                            <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                        {% endif %}
                         <p><strong>Type:</strong> {{ item.content_type }}</p>
                         <p>{{ item.content_data }}</p>
                         <p class="timestamp">Shared on {{ item.created_at }}</p>
@@ -54,9 +57,12 @@
         <div class="section">
             <h2>Shared with You</h2>
             <div class="shared-cards">
-                {% for item, user in shared_to_user %}
+                {% for item in shared_to_user %}
                     <div class="card">
-                        <p><strong>From:</strong> {{ user.username }}</p>
+                        {% if item.cover_url %}
+                            <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                        {% endif %}
+                        <p><strong>From:</strong> {{ item.shared_by }}</p>
                         <p><strong>Type:</strong> {{ item.content_type }}</p>
                         <p>{{ item.content_data }}</p>
                         <p class="timestamp">Shared on {{ item.created_at }}</p>

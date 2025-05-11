@@ -87,6 +87,7 @@ def setup_routes(app):
             return redirect(url_for('login'))
 
         if request.method == 'POST':
+            # Handle sharing logic
             data = request.get_json()
             recipient_username = data.get('username')
             book_id = data.get('book_id')
@@ -122,16 +123,37 @@ def setup_routes(app):
         user_books = UserBook.query.filter_by(user_id=user_id).all()
 
         # Fetch items shared by the user
-        your_shared_items = SharedItem.query.filter_by(user_id=user_id).all()
+        your_shared_items = []
+        for item in SharedItem.query.filter_by(user_id=user_id).all():
+            # Extract book ID from content_data
+            book_id = item.content_data.split("Title: ")[1].split(",")[0]
+            book = Book.query.filter_by(work_id=book_id).first()
+            your_shared_items.append({
+                'content_type': item.content_type,
+                'content_data': item.content_data,
+                'created_at': item.created_at,
+                'cover_url': f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book else None
+            })
 
         # Fetch items shared with the user
-        shared_to_user = (
+        shared_to_user = []
+        for item, user in (
             db.session.query(SharedItem, User)
             .join(SharedWith, SharedItem.id == SharedWith.shared_item_id)
             .join(User, SharedWith.receiver_user_id == User.user_id)
             .filter(SharedWith.receiver_user_id == user_id)
             .all()
-        )
+        ):
+            # Extract book ID from content_data
+            book_id = item.content_data.split("Title: ")[1].split(",")[0]
+            book = Book.query.filter_by(work_id=book_id).first()
+            shared_to_user.append({
+                'content_type': item.content_type,
+                'content_data': item.content_data,
+                'created_at': item.created_at,
+                'cover_url': f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book else None,
+                'shared_by': user.username
+            })
 
         return render_template(
             'share.html',
