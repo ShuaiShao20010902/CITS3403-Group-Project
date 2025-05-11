@@ -8,8 +8,7 @@ import requests
 import random
 from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
-
-main = Blueprint('main', __name__)
+from app.blueprints import main
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
