@@ -2,29 +2,37 @@ from flask import Flask
 from flask_migrate import Migrate
 import os
 
-# Create app
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'this-is-the-super-secret-key'
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'this-is-the-super-secret-key'
 
-# Import models after app instance is created to avoid circular imports
-from app.models import db, init_db
+    # Import models
+    from app.models import db
 
-# Initialize the database
-db.init_app(app)
+    # Initialize database
+    db.init_app(app)
 
-# Setup migrations
-migrate = Migrate(app, db)
+    # Setup migrations
+    migrate = Migrate(app, db)
 
-# Import and setup routes
-from app.routes import setup_routes
-setup_routes(app)
+    # Import and register blueprints
+    from app.blueprints import main
+    app.register_blueprint(main)
 
-# Initialize database if needed
-with app.app_context():
-    db.create_all()
+    # Import routes to ensure they are registered with the blueprint
+    # Note: This import is placed here to avoid circular imports
+    from app import routes
 
-# This allows the app to be run directly
+    # Create tables
+    with app.app_context():
+        db.create_all()
+
+    return app
+
+# Create the application instance
+app = create_app()
+
 if __name__ == '__main__':
     app.run(debug=True)
