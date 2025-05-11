@@ -23,7 +23,6 @@
       {{ form.genres.label }} {{ form.genres() }}
       {{ form.description.label }} {{ form.description() }}
       {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
-        <div id="pages-error" class="field-errors"></div>
     
       <button type="button" id = "user-button" onclick="toggleUserInfo(this)">
         Add User Info (Optional) ▼
@@ -31,7 +30,6 @@
     
       <div id="user-info" style="display: none; margin-top: 20px;">
         {{ form.rating.label }} {{ form.rating() }}
-          <div id="rating-error" class="field-errors"></div>
         {{ form.notes.label }} {{ form.notes() }}
         {{ form.completed(type="hidden", id="completed-field") }}
 
@@ -70,42 +68,6 @@
             : 'Mark as Complete ✅';
           btn.classList.toggle('complete', newDone);
         });
-
-        const ratingInput = document.getElementById('rating-input');
-        const ratingError = document.getElementById('rating-error');
-
-        function validateRating() {
-          const val = ratingInput.value.trim();
-          ratingError.textContent = '';  // clear
-
-          if (val === '') return;        // optional: only validate if non-empty
-
-          const num = parseFloat(val);
-          if (isNaN(num)) {
-            ratingError.textContent = '⚠️ Not a valid number.';
-          } else if (num < 0 || num > 5) {
-            ratingError.textContent = '⚠️ Number must be between 0 and 5.';
-          }
-        }
-
-        // Validate on blur or every keystroke
-        ratingInput.addEventListener('blur', validateRating);
-        // or: ratingInput.addEventListener('input', validateRating);
-
-
-        // (Repeat for pages field)
-        const pagesInput = document.getElementById('number_of_pages');
-        const pagesError = document.getElementById('pages-error');
-        function validatePages() {
-          const val = pagesInput.value.trim();
-          pagesError.textContent = '';
-          if (val === '') return;
-          const num = parseInt(val, 10);
-          if (isNaN(num) || num <= 0) {
-            pagesError.textContent = '⚠️ Must be a positive integer.';
-          }
-        }
-        pagesInput.addEventListener('blur', validatePages);
       });
   </script>
 </body>

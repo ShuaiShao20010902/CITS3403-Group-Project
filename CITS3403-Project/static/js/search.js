@@ -41,12 +41,12 @@ titleInput.addEventListener('input', () => {
   const fetchquery = query;
 
   const sortParam = sortMap[currentSort];
-  let url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`;
+  let url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`; //change limit for more than 10 results
   if (sortParam) {
     url += `&sort=${encodeURIComponent(sortParam)}`;
   }
 
-  fetch(url) //change limit for more than 10 results (not sure how much)
+  fetch(url) 
     .then(res => res.json())
     .then(data => {
       if (latestquery !== fetchquery) return;
