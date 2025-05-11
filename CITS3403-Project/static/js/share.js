@@ -1,37 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const shareButton = document.getElementById('share-button');
     const shareUsername = document.getElementById('share-username');
     const message = document.getElementById('share-message');
 
-    shareButton.addEventListener('click', () => {
-        const username = shareUsername.value.trim();
+    document.getElementById('share-button').addEventListener('click', function () {
+        const username = document.getElementById('share-username').value;
         const bookId = document.getElementById('book-dropdown').value;
 
         if (!username || !bookId) {
-            message.textContent = 'Please select a book and enter a username.';
+            document.getElementById('share-message').textContent = 'Please select a book and enter a username.';
             return;
         }
 
         fetch('/share', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, book_id: bookId })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username, book_id: bookId })
         })
         .then(response => response.json())
         .then(data => {
-            message.textContent = data.message;
-            if (data.status === 'success') {
-                message.style.color = 'green';
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                message.style.color = 'red';
-            }
+            document.getElementById('share-message').textContent = data.message;
         })
         .catch(error => {
             console.error('Error:', error);
-            message.textContent = 'An error occurred while sharing.';
+            document.getElementById('share-message').textContent = 'An error occurred while sharing.';
         });
     });
 

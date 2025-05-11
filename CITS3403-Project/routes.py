@@ -81,41 +81,64 @@ def setup_routes(app):
 
     @app.route('/share', methods=['GET', 'POST'])
     def share():
-        user_id = session.get('user_id')
+        user_id = session.get('user_id')  # Logged-in user's ID
         if not user_id:
-            flash('You must be logged in to share.', 'error')
+            flash('You must be logged in to share books.', 'error')
             return redirect(url_for('login'))
 
         if request.method == 'POST':
-            data = request.get_json() or {}
-            recipient = data.get('username', '').strip()
-            receiver = User.query.filter_by(username=recipient).first()
-            if not receiver:
+            data = request.get_json()
+            recipient_username = data.get('username')
+            book_id = data.get('book_id')
+
+            # Validate recipient
+            recipient = User.query.filter_by(username=recipient_username).first()
+            if not recipient:
                 return jsonify({'status': 'error', 'message': 'User not found'}), 404
 
-            items = SharedItem.query.filter_by(user_id=user_id).all()
-            for item in items:
-                exists = SharedWith.query.filter_by(
-                    shared_item_id=item.id,
-                    receiver_user_id=receiver.user_id
-                ).first()
-                if not exists:
-                    db.session.add(SharedWith(
-                        shared_item_id=item.id,
-                        receiver_user_id=receiver.user_id
-                    ))
-            db.session.commit()
-            return jsonify({'status': 'success', 'message': 'Shared successfully!'}), 200
+            # Validate book
+            book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+            if not book:
+                return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
 
-        owned = SharedItem.query.filter_by(user_id=user_id).all()
-        shared = (
+            # Create a shared item
+            shared_item = SharedItem(
+                user_id=user_id,
+                content_type='book',
+                content_data=f"Title: {book.book.title}, Notes: {book.notes}, Rating: {book.rating}",
+                created_at=datetime.utcnow()
+            )
+            db.session.add(shared_item)
+            db.session.commit()
+
+            # Link the shared item to the recipient
+            shared_with = SharedWith(shared_item_id=shared_item.id, receiver_user_id=recipient.user_id)
+            db.session.add(shared_with)
+            db.session.commit()
+
+            return jsonify({'status': 'success', 'message': 'Book shared successfully!'})
+
+        # Fetch books added by the user
+        user_books = UserBook.query.filter_by(user_id=user_id).all()
+
+        # Fetch items shared by the user
+        your_shared_items = SharedItem.query.filter_by(user_id=user_id).all()
+
+        # Fetch items shared with the user
+        shared_to_user = (
             db.session.query(SharedItem, User)
             .join(SharedWith, SharedItem.id == SharedWith.shared_item_id)
             .join(User, SharedWith.receiver_user_id == User.user_id)
             .filter(SharedWith.receiver_user_id == user_id)
             .all()
         )
-        return render_template('share.html', your_shared_items=owned, shared_to_user=shared)
+
+        return render_template(
+            'share.html',
+            user_books=user_books,
+            your_shared_items=your_shared_items,
+            shared_to_user=shared_to_user
+        )
 
     @app.route('/uploadbook.html', methods=['GET', 'POST'] )
     def uploadbook():

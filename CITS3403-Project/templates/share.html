@@ -16,15 +16,11 @@
             <label for="book-dropdown">Select a Book to Share:</label>
             <select id="book-dropdown">
                 <option value="" disabled selected>Select a book</option>
-                <option value="1" data-cover="https://via.placeholder.com/100" data-note="This is a great book!" data-rating="4.5">
-                    Book Title 1
-                </option>
-                <option value="2" data-cover="https://via.placeholder.com/100" data-note="An interesting read." data-rating="3.8">
-                    Book Title 2
-                </option>
-                <option value="3" data-cover="https://via.placeholder.com/100" data-note="Highly recommended!" data-rating="5.0">
-                    Book Title 3
-                </option>
+                {% for book in user_books %}
+                    <option value="{{ book.book_id }}" data-cover="{{ book.book.cover_id }}" data-note="{{ book.notes }}" data-rating="{{ book.rating }}">
+                        {{ book.book.title }}
+                    </option>
+                {% endfor %}
             </select>
 
             <div id="book-details" class="card" style="display: none;">
@@ -52,11 +48,11 @@
         </div>
 
         <div class="section">
-            <h2>Shared from Others</h2>
+            <h2>Shared with You</h2>
             <div class="shared-cards">
-                {% for item in shared_to_user %}
+                {% for item, user in shared_to_user %}
                     <div class="card">
-                        <p><strong>From:</strong> {{ item.sharer_username }}</p>
+                        <p><strong>From:</strong> {{ user.username }}</p>
                         <p><strong>Type:</strong> {{ item.content_type }}</p>
                         <p>{{ item.content_data }}</p>
                         <p class="timestamp">Shared on {{ item.created_at }}</p>
