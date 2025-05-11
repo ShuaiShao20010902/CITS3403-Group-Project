@@ -7,28 +7,24 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'this-is-the-super-secret-key'
-
+    
     # Import models
     from app.models import db
-
+    
     # Initialize database
     db.init_app(app)
-
+    
     # Setup migrations
     migrate = Migrate(app, db)
-
+    
     # Import and register blueprints
     from app.blueprints import main
     app.register_blueprint(main)
-
-    # Import routes to ensure they are registered with the blueprint
-    # Note: This import is placed here to avoid circular imports
-    from app import routes
-
+    
     # Create tables
     with app.app_context():
         db.create_all()
-
+    
     return app
 
 # Create the application instance

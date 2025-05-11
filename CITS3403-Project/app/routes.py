@@ -1,4 +1,4 @@
-from flask import request, jsonify, render_template, redirect, url_for, abort, session, flash
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, abort, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import *
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +8,8 @@ import requests
 import random
 from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
-from app.blueprints import main
+
+main = Blueprint('main', __name__)
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -44,7 +45,7 @@ def validate_input(value, field_name, required=True, value_type=int, min_value=N
 @main.route('/')
 def landing():
     if 'user_id' in session:
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     return render_template('landing.html')
 
 @main.route('/home.html')
@@ -85,7 +86,7 @@ def share():
     user_id = session.get('user_id')
     if not user_id:
         flash('You must be logged in to share.', 'error')
-        return redirect(url_for('login'))
+        return redirect(url_for('main.login'))
 
     if request.method == 'POST':
         data = request.get_json() or {}
@@ -124,7 +125,7 @@ def uploadbook():
     if form.validate_on_submit():
         status, msg = manual_book_save(form, user_id=session.get('user_id'))
         flash(msg, "success" if status == "success" else "error")
-        return redirect(url_for('browse'))
+        return redirect(url_for('main.browse'))
     
     return render_template('uploadbook.html', form=form)
 
@@ -135,7 +136,7 @@ def browse():
     if form.validate_on_submit():
         status, msg = manual_book_save(form, user_id=session.get('user_id'))
         flash(msg, "success" if status == "success" else "error")
-        return redirect(url_for('browse'))
+        return redirect(url_for('main.browse'))
     return render_template('browse.html', form=form)
 
 @main.route('/signup', methods=['GET', 'POST'])
@@ -147,10 +148,10 @@ def signup():
 
         if User.query.filter_by(username=username).first():
             flash('Username already in use', 'error')
-            return redirect(url_for('signup'))
+            return redirect(url_for('main.signup'))
         if User.query.filter_by(email=email).first():
             flash('Email already in use', 'error')
-            return redirect(url_for('signup'))
+            return redirect(url_for('main.signup'))
 
         hashed = generate_password_hash(password)
         user = User(username=username, email=email, password=hashed)
@@ -160,7 +161,7 @@ def signup():
         session['user_id'] = user.user_id
         session['username'] = user.username
         flash('Account created successfully', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
 
     return render_template('signup.html')
 
@@ -172,20 +173,20 @@ def login():
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password, password):
             flash('Invalid credentials', 'error')
-            return redirect(url_for('login'))
+            return redirect(url_for('main.login'))
 
         session.clear()
         session['user_id'] = user.user_id
         session['username'] = user.username
         flash('Logged in successfully', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
 
     return render_template('login.html')
 
 @main.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('landing'))
+    return redirect(url_for('main.landing'))
 
 @main.route('/forgot-password')
 def forgot_password():
