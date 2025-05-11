@@ -166,7 +166,7 @@ def setup_routes(app):
         for item, user in (
             db.session.query(SharedItem, User)
             .join(SharedWith, SharedItem.id == SharedWith.shared_item_id)
-            .join(User, SharedWith.receiver_user_id == User.user_id)
+            .join(User, SharedItem.user_id == User.user_id)  # Correctly join to the user who shared the item
             .filter(SharedWith.receiver_user_id == user_id)
             .all()
         ):
@@ -195,7 +195,7 @@ def setup_routes(app):
                 'rating': content_data.get('rating'),
                 'created_at': item.created_at,
                 'cover_url': cover_url,
-                'shared_by': user.username
+                'shared_by': user.username  # Correctly set to the username of the person who shared the item
             })
 
         return render_template(
