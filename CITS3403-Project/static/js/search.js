@@ -3,7 +3,15 @@ const resultsContainer = document.getElementById('book-results');
 const noMatches = document.getElementById('no-matches');
 const importBox = document.getElementById('import-box');
 
+//modal
+const modal = document.getElementById('modals');
+const pageInput = document.getElementById('pageInput');
+const confirmBtn = document.getElementById('confirmAddButton');
+const cancelBtn = document.getElementById('cancelAddButton');
+
 let latestquery = '';
+let selectedBook = null;
+let selectedAddBtn = null;
 
 titleInput.addEventListener('input', () => {
   const query = titleInput.value.trim();
@@ -37,7 +45,7 @@ titleInput.addEventListener('input', () => {
 
       books.forEach(doc => {
         const title = doc.title || 'Untitled';
-        const author = doc.author_name ? doc.author_name.join(', ') : 'Unknown';
+        const author = doc.author_name ? doc.author_name.join(', ') : 'Unknown Author';
         const year = doc.first_publish_year || 'Unknown Year';
         const coverId = doc.cover_i;
         const coverUrl = coverId
@@ -54,11 +62,6 @@ titleInput.addEventListener('input', () => {
                 <p><strong>Year:</strong> ${year}</p>
             </div>
             <div class="book-actions">
-                <select>
-                <option>To Read</option>
-                <option>Reading</option>
-                <option>Completed</option>
-                </select>
                 <button>Add to Dashboard</button>
             </div>
         `;
@@ -68,34 +71,62 @@ titleInput.addEventListener('input', () => {
         const addBtn = card.querySelector('button');
 
         addBtn.addEventListener('click', () => {
-        // give backend the work_key and the edition_key
-        fetch('/add_book', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-            work_key: doc.key,
-            edition_key: Array.isArray(doc.edition_key) ? doc.edition_key[0] : doc.edition_key
-            })
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (res.status === 'success') {
-            addBtn.textContent = 'Added ✔';
-            addBtn.disabled = true;
-            } else {
-            alert('Failed: ' + (res.message || 'unknown error'));
-            }
-        })
-        .catch(() => alert('Network error, please try again'));
+          selectedBook = doc;
+          selectedAddBtn = addBtn;
+          modal.style.display = 'flex';
+          pageInput.value = '';
+          pageInput.focus();
         });
       });
     })
     .catch(err => {
       console.error('Can not fetch books:', err);
-    });
+      noMatches.style.display = 'none';
+      importBox.style.display = 'none';
+  });
 });
 
-//add to dashboard button -> change to "added to dashboard" when clicked or in database already
+confirmBtn.addEventListener('click', () => {
+  const pagesStr = pageInput.value.trim();
+  const pages = parseInt(pagesStr, 10);
+
+  if (isNaN(pages) || pages <= 0) {
+    alert("Enter a valid positive number of pages.");
+    return;
+  }
+
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Adding...';
+
+  fetch('/add_book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+      work_key: selectedBook.key,
+      number_of_pages: pages 
+      })
+  })
+  .then(r => r.json())
+  .then(res => {
+      if (res.status === 'success') {
+      selectedAddBtn.textContent = 'Added ✔';
+      selectedAddBtn.disabled = true;
+      modal.style.display = 'none';
+      } else {
+      alert('Failed: ' + (res.message || 'unknown error'));
+      }
+  })
+  .catch(() => alert('Network error, please try again'))
+  .finally(() => {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Confirm';
+  });
+});
+
+cancelBtn.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
+
 // need an alert to say "added to dashboard"
 // need to add edit user information
 // need to add the sort feature too

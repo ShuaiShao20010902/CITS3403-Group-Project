@@ -8,7 +8,7 @@ import requests
 import random
 from datetime import datetime, timedelta
 
-
+# for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
     """
     Parameters:
@@ -47,6 +47,7 @@ def setup_routes(app):
 
     @app.route('/home.html')
     def home():
+
         username = session.get('username')
         user = User.query.filter_by(username=username).first()
         continue_reading = []
@@ -294,18 +295,33 @@ def setup_routes(app):
             pages_read_total=pages_read_total
         )
 
-    
     #endpoint to add book to dashboard (utils.py, browse.html, search)
     @app.route("/add_book", methods=["POST"])    
     def add_book():
         data = request.get_json()
-        print("/add_book route hit with:", data)
+        # print("/add_book route data sent:", data)
+
+        pages = validate_input(data.get('number_of_pages'), 'Number of Pages', required=True, value_type=int, min_value=1)
+        if pages is None:
+             return jsonify({'status': 'fail'}), 400 
+        data['number_of_pages'] = pages
+
+        #comment this part out if want to hardcode to user 1 for testing
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'status': 'error', 'message': 'You must be logged in.'}), 401
+        #------
+
         try:
-            add_book_to_dashboard_database(data, user_id = 1) #hard coded id for now
-            # add_book_to_dashboard_database(data, current_user.user_id)
-            return jsonify({'status': 'success'}), 200
+            #result = add_book_to_dashboard_database(data, user_id = 1) #hard coded id for now
+            result = add_book_to_dashboard_database(data, user_id)
+            if result['status'] == 'success':
+                msg = "Added to dashboard." if "linked" in result['message'].lower() or "added" in result['message'].lower() else "Added."
+                return jsonify({'status': 'success', 'message': msg}), 200
+            else:
+                return jsonify({'status': 'fail', 'message': 'Book already exists!'}), 400
         except IntegrityError as e:
             db.session.rollback()
-            return jsonify({'status': 'error', 'message': 'You have already added this book!'}), 400
+            return jsonify({'status': 'error', 'message': 'Book already exists!'}), 400
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500

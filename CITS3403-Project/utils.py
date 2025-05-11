@@ -1,128 +1,69 @@
 import requests
 from datetime import datetime, timezone
-from models import db, Book, Author, UserBook
+from models import db, Book, UserBook
 
 def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
-    """
-    work_key -> "/works/OL166894W"
-    edition_key -> "OL12345678M" or ["OL12345678M", ...]
-    """
-
-    edition_key = api_book_data.get('edition_key')
-    if isinstance(edition_key, list):
-        edition_key = edition_key[0]
-    work_key = api_book_data.get('work_key')
+    raw_work_key = api_book_data.get('work_key')
+    if not raw_work_key or not raw_work_key.startswith("/works/"):
+        return {'status': 'error', 'message': 'Invalid or missing work_key from API data.'}
     
-    print(f"API Book Data: {api_book_data}")
+    work_id_str = raw_work_key.split('/')[-1]
 
-    if not edition_key:
-        edition_key = _edition_key(work_key) or f"UNKNOWN-{work_key.split('/')[-1]}-{int(datetime.now().timestamp())}" #UNKNOWN-KEY-TIMESTAMP (causing database issues if UNKNOWN (multiple) for unique key)
+    pages = api_book_data.get("number_of_pages") or 0
 
-    if not work_key:
-        raise ValueError("No work_key found in the API response")
+    # print(f"[DEBUG]: Processing for work_id: {work_id_str}, User ID: {user_id}")
+    # print(f"[DEBUG]: Initial API Book Data received: {api_book_data}")
 
     #check book if in database, if so, link to user (checks users as well in helper) and exit
-    if not edition_key.startswith("UNKNOWN"):
-        existing = Book.query.filter_by(edition_key=edition_key).first()
-    else:
-        existing = Book.query.filter_by(work_key=work_key, edition_key=edition_key).first()
-    if existing:
-        _link_user(existing.id, user_id)
-        return existing
+    book = Book.query.get(work_id_str)
+    if book:
+        # print("[DEBUG]: Book already exists in DB.")
+        if UserBook.query.filter_by(user_id=user_id, book_id=book.work_id).first():
+            return {'status': 'error', 'message': 'You have already added this book!'}
+        db.session.add(UserBook(user_id=user_id, book_id=book.work_id))
+        db.session.commit()
+        return {'status': 'success', 'message': f"Book '{book.title}' linked to dashboard."}
     
     #fetch WORK information (everything besides pages / ISBN / publishers) [FETCH 1]
-    work_json = _error_check(f"https://openlibrary.org/{work_key}.json")
+    work_json = _error_check(f"https://openlibrary.org{raw_work_key}.json")
 
-    #fetch EDITION information (pages / ISBN / publishers) [FETCH 2]
-    edition_json = _error_check(f"https://openlibrary.org/books/{edition_key}.json") or {}
+    authors = []
+    for entry in work_json.get("authors", []):
+        a_key = entry.get("author", {}).get("key") or entry.get("key")
+        if not a_key:
+            continue
+        a_json = _error_check(f"https://openlibrary.org{a_key}.json")
+        if a_json and a_json.get("name"):
+            authors.append(a_json["name"])
+    author_str = ", ".join(authors) or "Unknown Author"
 
-    if not (edition_json.get("number_of_pages") or edition_json.get("pagination")):
-        edition_group = _error_check(f"https://openlibrary.org{work_key}/editions.json?limit=100") or {}
-        entries = edition_group.get("entries", [])
-
-        #try and find best edition (based on # of pages, ISBN, publishers) -> in case missing data we pick best option
-        best = None
-        highest_score = -1
-
-        for ed in entries:
-            score = 0
-            if ed.get("number_of_pages"): score += 3
-            if ed.get("isbn_13"): score += 2
-            if ed.get("publishers"): score += 1
-            if score > highest_score:
-                best = ed
-                highest_score = score
-
-        if best:
-            edition_json = best
-            raw_key = best.get("key")
-            if raw_key and raw_key.startswith("/books/"):
-                edition_key = raw_key.replace("/books/", "")
-
-    #page count
-    pages_s = edition_json.get('number_of_pages') or edition_json.get('pagination', "N/A")
-    if isinstance(pages_s, str):  #if string convert to int
-        digits = "".join(ch for ch in pages_s if ch.isdigit())
-        pages = int(digits) if digits else 0
-    else:
-        pages = pages_s or 0
-
-    # add book to database (build the row with the info from fetches 1 + 2)
+    # add book to database (build the row with the info from fetches 1)
     book = Book(
-        edition_key=edition_key,
-        work_key=work_key,
+        work_id=work_id_str,
         title=work_json.get('title', 'Unknown Title'),
+        author = author_str,
         description = _extract_description(work_json), #make sure its string (sometimes its a dictionary)
         subjects = ", ".join(work_json.get("subjects", [])),
         number_of_pages = pages,
-        isbn_10=','.join(edition_json.get('isbn_10', [])) if edition_json.get('isbn_10') else None,
-        isbn_13=','.join(edition_json.get('isbn_13', [])) if edition_json.get('isbn_13') else None,
-        publish_date=edition_json.get('publish_date'),
-        publishers=', '.join(edition_json.get('publishers', [])),
         cover_id=(work_json.get("covers", [None])[0]),
         last_fetched=datetime.now(timezone.utc),
     )
 
     db.session.add(book)
-    print(f"Book '{book.title}' added to DB and linked to user ID {user_id}")
-    db.session.flush()  # Assign book.id
-
-    #add authors to author table (fetch 3)
-    for entry in work_json.get("authors", []):
-        a_key = entry.get("author", {}).get("key")
-        if not a_key:
-            continue
-        a_json = _error_check(f"https://openlibrary.org{a_key}.json")
-        name = a_json.get("name") if a_json else None
-        if not name:
-            continue
-
-        author = Author.query.filter_by(name=name).first()
-        if not author:
-            author = Author(name=name, openlib_key=a_key)
-            db.session.add(author)
-            db.session.flush()
-        book.authors.append(author)
-
-    print(f"[DEBUG] Book added: {book.title}")
-    print(f"[DEBUG] Edition Key: {book.edition_key}")
-    print(f"[DEBUG] Work Key: {book.work_key}")
-    print(f"[DEBUG] Number of Pages: {book.number_of_pages}")
-    print(f"[DEBUG] ISBN-10: {book.isbn_10}")
-    print(f"[DEBUG] ISBN-13: {book.isbn_13}")
-    print(f"[DEBUG] Publishers: {book.publishers}")
-    print(f"[DEBUG] Authors:")
-    for author in book.authors:
-        print(f"    - {author.name} (Key: {author.openlib_key})")
-    
-
+    db.session.add(UserBook(user_id=user_id, book_id=work_id_str))
+    # print(f"[DEBUG] Book '{book.title}' added to DB and linked to user ID {user_id}")
     db.session.commit()
 
-    # link to user
-    _link_user(book.id, user_id)
-    print(f"Linking book {book.id} to user {user_id}")
+    # print(f"[DEBUG] Book added: {book.title}")
+    # print(f"[DEBUG] Work Key: {book.work_id}")
+    # print(f"[DEBUG] Number of Pages: {book.number_of_pages}")
+    # print(f"[DEBUG] Authors: {book.author}")
 
-    return book
+    return {
+        'status': 'success',
+        'message': f"Book '{book.title}' added to DB and linked to dashboard.",
+        'book_id': book.work_id
+    }
 
 #helper functions
 
@@ -144,11 +85,4 @@ def _extract_description(work_json: dict) -> str:
     raw = work_json.get("description")
     if isinstance(raw, dict):
         return raw.get("value", "")
-    return raw or ""
-
-#edition keys are always missing from the search API (90% of the time in search API), backup to call editions API
-def _edition_key(work_key: str) -> str | None:
-    ed_json = _error_check(f"https://openlibrary.org/{work_key}/editions.json?limit=1")
-    if ed_json and ed_json.get("entries"):
-        return ed_json["entries"][0]["key"].split("/")[-1]   # "OL12345M"
-    return None
+    return raw or "No description available."

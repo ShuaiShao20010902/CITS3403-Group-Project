@@ -24,26 +24,8 @@
         </div>
     
         <div class="book-list" id="book-results">
-            <!-- <div class="book-card">
-                <img src="cover.jpg" alt="Book Cover" class="book-cover" />
-        
-                <div class="book-info">
-                    <h3>Book Title</h3>
-                    <p><strong>Author:</strong> Aerith</p>
-                    <p><strong>Pages:</strong> 320 • Paperback</p>
-                    <p><strong>Genres:</strong> <span>Fiction</span>, <span>Adventure</span></p>
-                </div>
-        
-                <div class="book-actions">
-                <select>
-                    <option>To Read</option>
-                    <option>Reading</option>
-                    <option>Completed</option>
-                </select>
-                <button>Add to Dashboard</button>
-                </div>
-            </div> -->
         </div>
+
         <div class="import-box" id = "import-box" style = "display: none;">
             <h2>Import a book</h2>
             <p>Can not find the book? Manually import a book into the database.</p>
@@ -55,17 +37,28 @@
                 <label for="author">Author</label>
                 <input type="text" id="author" placeholder="Enter author...">
             
-                <label for="isbn">ISBN</label>
-                <input type="text" id="isbn" placeholder="Enter ISBN (10 or 13)...">
-            
                 <label for="genres">Genres</label>
                 <input type="text" id="genres" placeholder="e.g. Fantasy, Sci-fi">
             
                 <label for="description">Description</label>
                 <textarea id="description" placeholder="Enter book description..." rows="4"></textarea>
+
+                <label for="pages">Number of Pages</label>
+                <input type="number" id="pages" name="pages" placeholder="e.g. 300" min="1">
             
                 <button type="submit" class="import-btn">Import book</button>
             </form>
+        </div>
+    </div>
+
+    <div id="modals" class="modals" style="display: none;">
+        <div class="modal">
+          <h3>Enter Number of Pages</h3>
+          <input type="number" id="pageInput" placeholder="e.g. 250" min="1">
+          <div class="modal-buttons">
+            <button id="confirmAddButton">Add</button>
+            <button id="cancelAddButton">Cancel</button>
+          </div>
         </div>
     </div>
 </body>
