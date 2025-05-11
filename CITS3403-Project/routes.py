@@ -8,6 +8,7 @@ import requests
 import random
 from datetime import datetime, timedelta
 from forms import ManualBookForm, CombinedBookForm
+import json
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -102,13 +103,21 @@ def setup_routes(app):
             if not book:
                 return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
 
-            # Create a shared item
+            # Create a shared item with structured content_data
             shared_item = SharedItem(
                 user_id=user_id,
                 content_type='book',
-                content_data=f"Title: {book.book.title}, Notes: {book.notes}, Rating: {book.rating}",
+                content_data=json.dumps({
+                    'title': book.book.title,
+                    'notes': book.notes,
+                    'rating': book.rating
+                }) if book.book.title else None,  # Ensure title is not None
                 created_at=datetime.utcnow()
             )
+
+            if not shared_item.content_data:
+                return jsonify({'status': 'error', 'message': 'Invalid content_data'}), 400
+
             db.session.add(shared_item)
             db.session.commit()
 
@@ -125,14 +134,29 @@ def setup_routes(app):
         # Fetch items shared by the user
         your_shared_items = []
         for item in SharedItem.query.filter_by(user_id=user_id).all():
-            # Extract book ID from content_data
-            book_id = item.content_data.split("Title: ")[1].split(",")[0]
-            book = Book.query.filter_by(work_id=book_id).first()
+            if not item.content_data:
+                print(f"Skipping SharedItem with ID {item.id} due to empty content_data")
+                continue
+
+            try:
+                # Parse content_data as JSON
+                content_data = json.loads(item.content_data)
+            except json.JSONDecodeError as e:
+                print(f"Skipping SharedItem with ID {item.id} due to invalid JSON: {e}")
+                continue
+
+            book_title = content_data.get('title')
+            book = Book.query.filter_by(title=book_title).first()
+            cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
+
+            # Debugging: Log book details
+            print(f"Shared by User - Book Title: {book_title}, Book: {book}, Cover URL: {cover_url}")
+
             your_shared_items.append({
                 'content_type': item.content_type,
                 'content_data': item.content_data,
                 'created_at': item.created_at,
-                'cover_url': f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book else None
+                'cover_url': cover_url
             })
 
         # Fetch items shared with the user
@@ -144,14 +168,29 @@ def setup_routes(app):
             .filter(SharedWith.receiver_user_id == user_id)
             .all()
         ):
-            # Extract book ID from content_data
-            book_id = item.content_data.split("Title: ")[1].split(",")[0]
-            book = Book.query.filter_by(work_id=book_id).first()
+            if not item.content_data:
+                print(f"Skipping SharedItem with ID {item.id} due to empty content_data")
+                continue
+
+            try:
+                # Parse content_data as JSON
+                content_data = json.loads(item.content_data)
+            except json.JSONDecodeError as e:
+                print(f"Skipping SharedItem with ID {item.id} due to invalid JSON: {e}")
+                continue
+
+            book_title = content_data.get('title')
+            book = Book.query.filter_by(title=book_title).first()
+            cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
+
+            # Debugging: Log book details
+            print(f"Shared to User - Book Title: {book_title}, Book: {book}, Cover URL: {cover_url}")
+
             shared_to_user.append({
                 'content_type': item.content_type,
                 'content_data': item.content_data,
                 'created_at': item.created_at,
-                'cover_url': f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book else None,
+                'cover_url': cover_url,
                 'shared_by': user.username
             })
 
