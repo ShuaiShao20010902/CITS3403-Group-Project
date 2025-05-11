@@ -17,7 +17,11 @@
             <select id="book-dropdown">
                 <option value="" disabled selected>Select a book</option>
                 {% for book in user_books %}
-                    <option value="{{ book.book_id }}" data-cover="{{ book.book.cover_id }}" data-note="{{ book.notes }}" data-rating="{{ book.rating }}">
+                    <option 
+                        value="{{ book.book_id }}" 
+                        data-cover="https://covers.openlibrary.org/b/id/{{ book.book.cover_id }}-L.jpg" 
+                        data-note="{{ book.notes }}" 
+                        data-rating="{{ book.rating }}">
                         {{ book.book.title }}
                     </option>
                 {% endfor %}

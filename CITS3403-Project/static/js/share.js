@@ -33,13 +33,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const note = selectedOption.getAttribute('data-note');
         const rating = selectedOption.getAttribute('data-rating');
 
-        if (coverUrl && note && rating) {
+        if (coverUrl) {
             document.getElementById('book-cover').src = coverUrl;
-            document.getElementById('book-note').textContent = note;
-            document.getElementById('book-rating').textContent = rating;
-            document.getElementById('book-details').style.display = 'block';
         } else {
-            document.getElementById('book-details').style.display = 'none';
+            document.getElementById('book-cover').src = ''; // Fallback if no cover URL
         }
+
+        if (note) {
+            document.getElementById('book-note').textContent = note;
+        } else {
+            document.getElementById('book-note').textContent = 'No notes available.';
+        }
+
+        if (rating) {
+            document.getElementById('book-rating').textContent = `Rating: ${rating}`;
+        } else {
+            document.getElementById('book-rating').textContent = 'No rating available.';
+        }
+
+        document.getElementById('book-details').style.display = 'block';
     });
 });
