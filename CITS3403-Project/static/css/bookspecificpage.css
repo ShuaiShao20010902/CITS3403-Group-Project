@@ -57,7 +57,6 @@ body {
     margin-bottom: 15px;
 }
 
-
 .book-details p {
     font-size: 18px;
     margin-bottom: 10px;
@@ -71,76 +70,6 @@ body {
     display: flex;
     gap: 30px;
     flex-wrap: wrap;
-}
-
-/* Note Container */
-
-.note-container {
-    width: 900px;
-    margin: 30px auto 50px;
-}
-
-/* Modal */
-.edit-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4); 
-}
-
-.modal-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 30px;
-    border: 1px solid #ccc;
-    width: 500px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-.modal-content form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #343434;
-}
-
-.modal-content form input,
-.modal-content form textarea,
-.modal-content form select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.modal-content form button {
-    background-color: #1e1e2f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-right: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.modal-content form button:hover {
-    background-color: #3a3a59;
-}
-
-.close{
-    position: absolute;
-    top: 10px;
-    right: 20px;
 }
 
 .genre-tags {
@@ -160,77 +89,149 @@ body {
     display: inline-block;
 }
 
-/* Button */
-.edit-user-btn {
-    background-color: #1e1e2f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.edit-user-btn:hover {
-    background-color: #2f2f4f;
-    transform: translateY(-2px);
-}
-
-/* Community Notes */
-.community-notes {
-    width: 900px;
-    margin: 30px auto 50px;
-}
-
-.community-notes-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.community-note {
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.community-note strong {
-    color: #1e1e2f;
-}
-
-.community-note p {
-    margin: 5px 0 0;
-    color: #555;
-}
-
-.no-notes {
-    font-style: italic;
-    color: #888;
-    text-align: center;
-}
-
 #form-message {
     margin-bottom: 10px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .book-container,
-    .note-container,
-    .community-notes {
-        width: 90%;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .modal-content {
-        width: 90%;
-        margin: 20% auto;
-    }
+.rating-container {
+    width: 900px;
+    margin: 50px auto;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
 }
+
+.star {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+.star svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Modal overlay ---------- */
+.log-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;               /* simpler centering */
+  place-items: center;
+  background: rgba(0 0 0 / .5);
+  z-index: 1000;
+}
+.log-modal[hidden] { display: none; }
+
+/* ---------- Modal box ---------- */
+.modal-content {
+  background: #fff;
+  width: clamp(300px, 90vw, 500px);
+  padding: 2rem 1.5rem;
+  border-radius: .5rem;
+  box-shadow: 0 3px 12px rgba(0 0 0 / .25);
+  position: relative;
+  display: grid;
+  gap: 1rem;
+}
+.close-log {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* ---------- Entry viewer ---------- */
+.entry-view {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  border: 1px solid #ddd;
+  border-radius: .4rem;
+  padding: .6rem .8rem;
+  min-height: 48px;
+}
+.entry-text { flex: 1; }
+
+/* ---------- Buttons ---------- */
+.generic-btn, .generic-btn-light, .nav-btn {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  padding: .5rem 1rem;
+  border-radius: .4rem;
+  transition: background .25s, transform .15s;
+}
+.generic-btn        { background:#1e1e2f; color:#fff; }
+.generic-btn:hover  { background:#2f2f4f; transform:translateY(-2px); }
+
+.generic-btn.danger { background:#b91c1c; }
+.generic-btn.danger:hover { background:#991b1b; }
+
+.generic-btn-light  { background:transparent; color:#666; }
+.generic-btn-light:hover { color:#000; }
+
+.nav-btn {
+  background:#e5e7eb;
+  width:2.5rem;
+  aspect-ratio:1;
+}
+.nav-btn:disabled   { opacity:.4; cursor:default; }
+
+/* ---------- Inputs & message ---------- */
+input[type="number"],
+input[type="date"] {
+  padding:.4rem .6rem;
+  border:1px solid #ccc;
+  border-radius:.3rem;
+  font:inherit;
+}
+
+.entry-actions {
+  display:flex;
+  gap:.5rem;
+  align-items:center;
+}
+
+.log-message {
+  font-size:.9rem;
+  color:#b91c1c;
+  min-height:1.2rem;
+}
+
+/* ---------- Notes area ---------- */
+.note-container {
+    width: 900px;
+    margin: 30px auto 50px;
+}
+
+#notes-display,
+#notes-editor {
+  width: 100%;
+  min-height: 6em;
+  padding: .5rem;
+  border: 1px solid #ccc;
+  border-radius: .4rem;
+  font: inherit;
+}
+#notes-display {
+  white-space: pre-wrap;
+  cursor: text;
+}
+#notes-editor { display: none; }          /* hidden until edit */
+
+#notes-actions {
+  display: none;                          /* shown by JS */
+  margin-top: .5rem;
+  gap: .5rem;
+}
+
+#entry-actions[hidden] { display:none; }
+
+.generic-btn-light {
+  background:#e5e7eb;
+  color:#333;
+}
+.generic-btn-light:hover { background:#d4d4d8; }
+

@@ -2,6 +2,50 @@
 
 _Track everything merged into `main`._
 
+### 11th May
+- Browse Page Functionality
+    - Removed all searches relating to editions.json
+    - requirement.txt flask 3.0 not able to be used with flask caching so changed to 2.3.3
+    - Updated search.js (finds books via open library api)
+    - Created utils.py to store functions that pull info from open library api back to database
+    - User manually enter information via flask forms
+    - Functional manual add into database
+    - Updated uploadbook to add the correct information + css
+- Udated uploadbook
+    - Make uploadbook look a little bit better + sort button look better
+    - Deleted comments
+    - Added sort function
+- Updated bookspecificpage.html (Now has 3 functional parts)
+    - First: Rating System properly updates field in database but design may need to be updated 
+    - Second: Notes System properly updates field in database but design may need to be updated 
+    - Third: Tracking reading progress is partially implemented so that it is able to retrieve and modify entries in the Reading Log table. However there are errors when trying to update the entries of existing entries.
+        
+
+### 10th May
+- Updated Backend
+    - Authors and Books table added (requires API data from editions.json)
+    - Authors table has been deleted and replaced with a author field in the books table
+    - All fields whose information were from the editions endpoint has been deleted (isbn, publisher, edition IDs, publish date has been removed)
+    - This means that page number will be forced to be inputted by the user
+    - ID field of books has been deleted and the work_id is now used as Primary key
+
+### 9th May
+- Updated Dashboard
+    - Added a continue reading section
+    - Removed the recommendations (will now be in the browse page)
+    - Database has been migrated again
+    - Updated home.html and home.css and the route for it
+    - Removed a route that's no longer in use (user_chat)
+- Created Browse Page
+    - Replaces the old uploadbook.html page 
+    - Added the routes + search.js that links to the Open Library API
+- Browse page Functionality 
+    - Add books into database (Partially implemented)
+    - There are many edge cases that would cause errors paticularly related to edition.json
+    - Book editions are selected by looking through a lot of the editions to find the best one
+    - However, errors may happen since it is not garanteed that editions.json will not having missing data
+
+
 ### 5th May
 - Updated Backend
     - Added the schema for books to be stored locally

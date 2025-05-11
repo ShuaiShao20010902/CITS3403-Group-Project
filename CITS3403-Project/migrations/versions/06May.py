@@ -1,12 +1,10 @@
-"""Migration Script addded on the 6th of May where I added two new tables to the database - Enat"""
+"""
+Migration Script addded on the 6th of May where I added two new tables to the database to be able to track 
+information on the books and on the authors - Enat
+"""
+
 from alembic import op
 import sqlalchemy as sa
-
-revision = '06May'
-down_revision = None
-branch_labels = None
-depends_on = None
-
 
 def upgrade():
     op.create_table(

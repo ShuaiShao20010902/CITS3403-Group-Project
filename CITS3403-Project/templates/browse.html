@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/browse.css') }}">
+
+    <title>Test Page</title>
+</head>
+<body>
+    <div class="browse-page">
+        {% include "nav.html" %}
+        <div class = "top-bars">
+            <div class="filter-bar">
+                <input type="text" placeholder="Search all books..." class="search-input">
+                <div class="custom-select-wrapper">
+                    <select id = "sort-select">
+                        <option value="relevance">Relevance</option>
+                        <option value="new">Newest</option>
+                        <option value="old">Oldest</option>
+                    </select>
+                </div>
+            </div>
+            <a href="{{ url_for('uploadbook') }}"><button class ="add-book-btn"> Add book</button></a>
+            <p id = "no-matches" style = "display: none;">No matches.</p>
+        </div>
+    
+        <div class="book-list" id="book-results">
+        </div>
+
+        <div class="import-box" id = "import-box" style = "display: none;">
+            <h2>Import a book</h2>
+            <p>Can not find the book? Manually import a book into the database.</p>
+        
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                {{ form.title.label }} {{ form.title() }}
+                {{ form.author.label }} {{ form.author() }}
+                {{ form.genres.label }} {{ form.genres() }}
+                {{ form.description.label }} {{ form.description() }}
+                {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
+                {{ form.submit() }}
+              </form>              
+        </div>
+    </div>
+
+    <div id="modals" class="modals" style="display: none;">
+        <div class="modal">
+          <h3>Enter Number of Pages</h3>
+          <input type="number" id="pageInput" placeholder="e.g. 250" min="1">
+          <div class="modal-buttons">
+            <button id="confirmAddButton">Add</button>
+            <button id="cancelAddButton">Cancel</button>
+          </div>
+        </div>
+    </div>
+</body>
+
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+
+</html>
