@@ -11,9 +11,6 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
 
     pages = api_book_data.get("number_of_pages") or 0
 
-    # print(f"[DEBUG]: Processing for work_id: {work_id_str}, User ID: {user_id}")
-    # print(f"[DEBUG]: Initial API Book Data received: {api_book_data}")
-
     #check book if in database, if so, link to user (checks users as well in helper) and exit
     book = Book.query.get(work_id_str)
     if book:
@@ -51,13 +48,7 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
 
     db.session.add(book)
     db.session.add(UserBook(user_id=user_id, book_id=work_id_str))
-    # print(f"[DEBUG] Book '{book.title}' added to DB and linked to user ID {user_id}")
     db.session.commit()
-
-    # print(f"[DEBUG] Book added: {book.title}")
-    # print(f"[DEBUG] Work Key: {book.work_id}")
-    # print(f"[DEBUG] Number of Pages: {book.number_of_pages}")
-    # print(f"[DEBUG] Authors: {book.author}")
 
     return {
         'status': 'success',

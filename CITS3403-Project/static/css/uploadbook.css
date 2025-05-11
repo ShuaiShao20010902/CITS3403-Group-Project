@@ -40,7 +40,7 @@ form {
 
 .form-container {
     flex: 1 0 100%;
-    max-width: 700px; 
+    max-width: 500px; 
 }
 
 label {
@@ -93,3 +93,23 @@ input[type="submit"]:hover {
     padding-top: 12px;
     border-top: 1px solid #efefef; 
 }
+
+/* Toggle Button */
+#toggle-completed {
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 10;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #e8e7ee;
+    cursor: pointer;
+  }
+  
+  #toggle-completed:hover {
+    background: #f0f0f0;
+  }
+
+  #toggle-completed.complete {
+    background-color: #a9a9a9;
+  }

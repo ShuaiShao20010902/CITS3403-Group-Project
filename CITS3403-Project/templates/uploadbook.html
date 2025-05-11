@@ -11,7 +11,7 @@
 
   <div class="form-container" style="margin: 120px auto 0;">
 
-    <form method="POST">
+    <form method="POST" action="{{ url_for('uploadbook') }}">
 
       <h1>Upload a Book</h1>
 
@@ -23,6 +23,7 @@
       {{ form.genres.label }} {{ form.genres() }}
       {{ form.description.label }} {{ form.description() }}
       {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
+        <div id="pages-error" class="field-errors"></div>
     
       <button type="button" id = "user-button" onclick="toggleUserInfo(this)">
         Add User Info (Optional) ▼
@@ -30,24 +31,82 @@
     
       <div id="user-info" style="display: none; margin-top: 20px;">
         {{ form.rating.label }} {{ form.rating() }}
+          <div id="rating-error" class="field-errors"></div>
         {{ form.notes.label }} {{ form.notes() }}
-        {{ form.completed.label }} {{ form.completed() }}
+        {{ form.completed(type="hidden", id="completed-field") }}
+
+        <button type="button" id="toggle-completed">
+          {% if form.completed.data %}
+            Mark as Incomplete
+          {% else %}
+            Mark as Complete
+          {% endif %}
+        </button>
       </div>
     
       {{ form.submit() }}
     </form>
   </div>
+  <script>
+    function toggleUserInfo(btn){
+        const box  = document.getElementById('user-info');
+        const open = box.style.display !== 'block';
+  
+        box.style.display = open ? 'block' : 'none';
+        btn.innerText     = open 
+            ? 'Hide User Info ▲' 
+            : 'Add User Info (Optional) ▼';
+    }
+  
+    document.addEventListener('DOMContentLoaded', () => {
+        const hidden = document.getElementById('completed-field');
+        const btn    = document.getElementById('toggle-completed');
+  
+        btn.addEventListener('click', () => {
+          const newDone = !(hidden.value === 'True' || hidden.value === 'true');
+          hidden.value = newDone.toString();
+          btn.textContent = newDone
+            ? 'Mark as Incomplete ❌'
+            : 'Mark as Complete ✅';
+          btn.classList.toggle('complete', newDone);
+        });
+
+        const ratingInput = document.getElementById('rating-input');
+        const ratingError = document.getElementById('rating-error');
+
+        function validateRating() {
+          const val = ratingInput.value.trim();
+          ratingError.textContent = '';  // clear
+
+          if (val === '') return;        // optional: only validate if non-empty
+
+          const num = parseFloat(val);
+          if (isNaN(num)) {
+            ratingError.textContent = '⚠️ Not a valid number.';
+          } else if (num < 0 || num > 5) {
+            ratingError.textContent = '⚠️ Number must be between 0 and 5.';
+          }
+        }
+
+        // Validate on blur or every keystroke
+        ratingInput.addEventListener('blur', validateRating);
+        // or: ratingInput.addEventListener('input', validateRating);
+
+
+        // (Repeat for pages field)
+        const pagesInput = document.getElementById('number_of_pages');
+        const pagesError = document.getElementById('pages-error');
+        function validatePages() {
+          const val = pagesInput.value.trim();
+          pagesError.textContent = '';
+          if (val === '') return;
+          const num = parseInt(val, 10);
+          if (isNaN(num) || num <= 0) {
+            pagesError.textContent = '⚠️ Must be a positive integer.';
+          }
+        }
+        pagesInput.addEventListener('blur', validatePages);
+      });
+  </script>
 </body>
-
-<script>
-function toggleUserInfo(btn){
-    const box  = document.getElementById('user-info');
-    const open = box.style.display !== 'block';
-
-    box.style.display = open ? 'block' : 'none';
-    btn.innerText     = open 
-        ? 'Hide User Info ▲' 
-        : 'Add User Info (Optional) ▼';
-}
-</script>
 </html>
