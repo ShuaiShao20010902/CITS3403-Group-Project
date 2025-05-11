@@ -111,7 +111,7 @@ def setup_routes(app):
                     'title': book.book.title,
                     'notes': book.notes,
                     'rating': book.rating
-                }) if book.book.title else None,  # Ensure title is not None
+                }),
                 created_at=datetime.utcnow()
             )
 
@@ -154,7 +154,9 @@ def setup_routes(app):
 
             your_shared_items.append({
                 'content_type': item.content_type,
-                'content_data': item.content_data,
+                'title': content_data.get('title'),
+                'notes': content_data.get('notes'),
+                'rating': content_data.get('rating'),
                 'created_at': item.created_at,
                 'cover_url': cover_url
             })
@@ -188,7 +190,9 @@ def setup_routes(app):
 
             shared_to_user.append({
                 'content_type': item.content_type,
-                'content_data': item.content_data,
+                'title': content_data.get('title'),
+                'notes': content_data.get('notes'),
+                'rating': content_data.get('rating'),
                 'created_at': item.created_at,
                 'cover_url': cover_url,
                 'shared_by': user.username

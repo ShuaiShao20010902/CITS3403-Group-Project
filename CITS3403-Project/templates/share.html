@@ -47,7 +47,9 @@
                             <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
                         {% endif %}
                         <p><strong>Type:</strong> {{ item.content_type }}</p>
-                        <p>{{ item.content_data }}</p>
+                        <p><strong>Title:</strong> {{ item.title }}</p>
+                        <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
+                        <p><strong>Rating:</strong> {{ item.rating }}</p>
                         <p class="timestamp">Shared on {{ item.created_at }}</p>
                     </div>
                 {% endfor %}
@@ -64,7 +66,9 @@
                         {% endif %}
                         <p><strong>From:</strong> {{ item.shared_by }}</p>
                         <p><strong>Type:</strong> {{ item.content_type }}</p>
-                        <p>{{ item.content_data }}</p>
+                        <p><strong>Title:</strong> {{ item.title }}</p>
+                        <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
+                        <p><strong>Rating:</strong> {{ item.rating }}</p>
                         <p class="timestamp">Shared on {{ item.created_at }}</p>
                     </div>
                 {% endfor %}
