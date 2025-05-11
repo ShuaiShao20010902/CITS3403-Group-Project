@@ -1,13 +1,13 @@
 from flask import request, jsonify, render_template, redirect, url_for, abort, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import *
+from app.models import *
 from sqlalchemy.exc import IntegrityError
-from utils import add_book_to_dashboard_database, manual_book_save
-from models import db, User, SharedItem, SharedWith
+from app.utils import add_book_to_dashboard_database, manual_book_save
+from app.models import db, User, SharedItem, SharedWith
 import requests
 import random
-from datetime import datetime, timedelta
-from forms import ManualBookForm, CombinedBookForm
+from datetime import datetime, timedelta, date
+from app.forms import ManualBookForm, CombinedBookForm
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
