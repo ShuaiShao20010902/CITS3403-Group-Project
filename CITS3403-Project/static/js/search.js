@@ -13,6 +13,22 @@ let latestquery = '';
 let selectedBook = null;
 let selectedAddBtn = null;
 
+//Sorting
+const sortSelect = document.getElementById('sort-select');
+let currentSort = 'relevance';
+
+sortSelect.addEventListener('change', () => {
+  currentSort = sortSelect.value;
+  titleInput.dispatchEvent(new Event('input')); // re-trigger search
+});
+
+const sortMap = {
+  'relevance': '', //cause default
+  'new': 'new',
+  'old': 'old'
+};
+
+//Search bar
 titleInput.addEventListener('input', () => {
   const query = titleInput.value.trim();
   latestquery = query;
@@ -24,7 +40,13 @@ titleInput.addEventListener('input', () => {
 
   const fetchquery = query;
 
-  fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`) //change limit for more than 10 results (not sure how much)
+  const sortParam = sortMap[currentSort];
+  let url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`; //change limit for more than 10 results
+  if (sortParam) {
+    url += `&sort=${encodeURIComponent(sortParam)}`;
+  }
+
+  fetch(url) 
     .then(res => res.json())
     .then(data => {
       if (latestquery !== fetchquery) return;
@@ -86,6 +108,7 @@ titleInput.addEventListener('input', () => {
   });
 });
 
+//Page number adding
 confirmBtn.addEventListener('click', () => {
   const pagesStr = pageInput.value.trim();
   const pages = parseInt(pagesStr, 10);
@@ -127,6 +150,4 @@ cancelBtn.addEventListener('click', () => {
   modal.style.display = 'none';
 });
 
-// need an alert to say "added to dashboard"
 // need to add edit user information
-// need to add the sort feature too

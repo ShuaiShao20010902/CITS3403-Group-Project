@@ -2,11 +2,12 @@ from flask import request, jsonify, render_template, redirect, url_for, abort, s
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import *
 from sqlalchemy.exc import IntegrityError
-from utils import add_book_to_dashboard_database
+from utils import add_book_to_dashboard_database, manual_book_save
 from models import db, User, SharedItem, SharedWith
 import requests
 import random
 from datetime import datetime, timedelta
+from forms import ManualBookForm, CombinedBookForm
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -116,13 +117,25 @@ def setup_routes(app):
         )
         return render_template('share.html', your_shared_items=owned, shared_to_user=shared)
 
-    @app.route('/uploadbook.html')
+    @app.route('/uploadbook.html', methods=['GET', 'POST'] )
     def uploadbook():
-        return render_template('uploadbook.html')
+        form = CombinedBookForm()
+        if form.validate_on_submit():
+            status, msg = manual_book_save(form, user_id=session.get('user_id'))
+            flash(msg, "success" if status == "success" else "error")
+            return redirect(url_for('browse'))
+        
+        return render_template('uploadbook.html', form=form)
 
-    @app.route('/browse.html')
+    @app.route('/browse.html', methods=['GET', 'POST'])
     def browse():
-        return render_template('browse.html')
+        form = ManualBookForm()
+
+        if form.validate_on_submit():
+            status, msg = manual_book_save(form, user_id=session.get('user_id'))
+            flash(msg, "success" if status == "success" else "error")
+            return redirect(url_for('browse'))
+        return render_template('browse.html', form=form)
 
     @app.route('/signup', methods=['GET', 'POST'])
     def signup():

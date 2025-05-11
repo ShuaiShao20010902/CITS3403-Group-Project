@@ -20,13 +20,38 @@ body { font-family: Arial, sans-serif; }
   .top-bars {
     margin: 20px 0;
   }
+
+  .custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .custom-select-wrapper select {
+    appearance: none;
+    padding: 10px 36px 10px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: rgb(215, 215, 215);  
+  }
   
-  .filter-bar select,
+  .custom-select-wrapper::after {
+    content: '⇅';
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 15px;
+  }
+
   .filter-bar button {
     padding: 10px;
     font-size: 14px;
     border-radius: 6px;
     border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
   }
   
   .book-list {

@@ -13,11 +13,13 @@
         <div class = "top-bars">
             <div class="filter-bar">
                 <input type="text" placeholder="Search all books..." class="search-input">
-                <select>
-                <option value="relevance">Relevance</option>
-                <option value="new">Newest</option>
-                <option value="old">Oldest</option>
-            </select>
+                <div class="custom-select-wrapper">
+                    <select id = "sort-select">
+                        <option value="relevance">Relevance</option>
+                        <option value="new">Newest</option>
+                        <option value="old">Oldest</option>
+                    </select>
+                </div>
             </div>
             <a href="{{ url_for('uploadbook') }}"><button class ="add-book-btn"> Add book</button></a>
             <p id = "no-matches" style = "display: none;">No matches.</p>
@@ -30,24 +32,15 @@
             <h2>Import a book</h2>
             <p>Can not find the book? Manually import a book into the database.</p>
         
-            <form>
-                <label for="title">Title</label>
-                <input type="text" id="title" placeholder="Enter title...">
-            
-                <label for="author">Author</label>
-                <input type="text" id="author" placeholder="Enter author...">
-            
-                <label for="genres">Genres</label>
-                <input type="text" id="genres" placeholder="e.g. Fantasy, Sci-fi">
-            
-                <label for="description">Description</label>
-                <textarea id="description" placeholder="Enter book description..." rows="4"></textarea>
-
-                <label for="pages">Number of Pages</label>
-                <input type="number" id="pages" name="pages" placeholder="e.g. 300" min="1">
-            
-                <button type="submit" class="import-btn">Import book</button>
-            </form>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                {{ form.title.label }} {{ form.title() }}
+                {{ form.author.label }} {{ form.author() }}
+                {{ form.genres.label }} {{ form.genres() }}
+                {{ form.description.label }} {{ form.description() }}
+                {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
+                {{ form.submit() }}
+              </form>              
         </div>
     </div>
 
