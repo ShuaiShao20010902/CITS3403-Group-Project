@@ -9,6 +9,7 @@ import random
 from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
+import json
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -82,41 +83,128 @@ def home():
 
 @main.route('/share', methods=['GET', 'POST'])
 def share():
-    user_id = session.get('user_id')
+    user_id = session.get('user_id')  # Logged-in user's ID
     if not user_id:
-        flash('You must be logged in to share.', 'error')
+        flash('You must be logged in to share books.', 'error')
         return redirect(url_for('main.login'))
 
     if request.method == 'POST':
-        data = request.get_json() or {}
-        recipient = data.get('username', '').strip()
-        receiver = User.query.filter_by(username=recipient).first()
-        if not receiver:
+        # Handle sharing logic
+        data = request.get_json()
+        recipient_username = data.get('username')
+        book_id = data.get('book_id')
+
+        # Validate recipient
+        recipient = User.query.filter_by(username=recipient_username).first()
+        if not recipient:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
 
-        items = SharedItem.query.filter_by(user_id=user_id).all()
-        for item in items:
-            exists = SharedWith.query.filter_by(
-                shared_item_id=item.id,
-                receiver_user_id=receiver.user_id
-            ).first()
-            if not exists:
-                db.session.add(SharedWith(
-                    shared_item_id=item.id,
-                    receiver_user_id=receiver.user_id
-                ))
-        db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Shared successfully!'}), 200
+        # Validate book
+        book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+        if not book:
+            return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
 
-    owned = SharedItem.query.filter_by(user_id=user_id).all()
-    shared = (
+        # Create a shared item with structured content_data
+        shared_item = SharedItem(
+            user_id=user_id,
+            content_type='book',
+            content_data=json.dumps({
+                'title': book.book.title,
+                'notes': book.notes,
+                'rating': book.rating
+            }),
+            created_at=datetime.utcnow()
+        )
+
+        if not shared_item.content_data:
+            return jsonify({'status': 'error', 'message': 'Invalid content_data'}), 400
+
+        db.session.add(shared_item)
+        db.session.commit()
+
+        # Link the shared item to the recipient
+        shared_with = SharedWith(shared_item_id=shared_item.id, receiver_user_id=recipient.user_id)
+        db.session.add(shared_with)
+        db.session.commit()
+
+        return jsonify({'status': 'success', 'message': 'Book shared successfully!'})
+
+    # Fetch books added by the user
+    user_books = UserBook.query.filter_by(user_id=user_id).all()
+
+    # Fetch items shared by the user
+    your_shared_items = []
+    for item in SharedItem.query.filter_by(user_id=user_id).all():
+        if not item.content_data:
+            print(f"Skipping SharedItem with ID {item.id} due to empty content_data")
+            continue
+
+        try:
+            # Parse content_data as JSON
+            content_data = json.loads(item.content_data)
+        except json.JSONDecodeError as e:
+            print(f"Skipping SharedItem with ID {item.id} due to invalid JSON: {e}")
+            continue
+
+        book_title = content_data.get('title')
+        book = Book.query.filter_by(title=book_title).first()
+        cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
+
+        # Debugging: Log book details
+        print(f"Shared by User - Book Title: {book_title}, Book: {book}, Cover URL: {cover_url}")
+
+        your_shared_items.append({
+            'content_type': item.content_type,
+            'title': content_data.get('title'),
+            'notes': content_data.get('notes'),
+            'rating': content_data.get('rating'),
+            'created_at': item.created_at,
+            'cover_url': cover_url
+        })
+
+    # Fetch items shared with the user
+    shared_to_user = []
+    for item, user in (
         db.session.query(SharedItem, User)
         .join(SharedWith, SharedItem.id == SharedWith.shared_item_id)
-        .join(User, SharedWith.receiver_user_id == User.user_id)
+        .join(User, SharedItem.user_id == User.user_id)  # Correctly join to the user who shared the item
         .filter(SharedWith.receiver_user_id == user_id)
         .all()
+    ):
+        if not item.content_data:
+            print(f"Skipping SharedItem with ID {item.id} due to empty content_data")
+            continue
+
+        try:
+            # Parse content_data as JSON
+            content_data = json.loads(item.content_data)
+        except json.JSONDecodeError as e:
+            print(f"Skipping SharedItem with ID {item.id} due to invalid JSON: {e}")
+            continue
+
+        book_title = content_data.get('title')
+        book = Book.query.filter_by(title=book_title).first()
+        cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
+
+        # Debugging: Log book details
+        print(f"Shared to User - Book Title: {book_title}, Book: {book}, Cover URL: {cover_url}")
+
+        shared_to_user.append({
+            'content_type': item.content_type,
+            'title': content_data.get('title'),
+            'notes': content_data.get('notes'),
+            'rating': content_data.get('rating'),
+            'created_at': item.created_at,
+            'cover_url': cover_url,
+            'shared_by': user.username  # Correctly set to the username of the person who shared the item
+        })
+
+    return render_template(
+        'share.html',
+        user_books=user_books,
+        your_shared_items=your_shared_items,
+        shared_to_user=shared_to_user
     )
-    return render_template('share.html', your_shared_items=owned, shared_to_user=shared)
 
 @main.route('/uploadbook.html', methods=['GET', 'POST'] )
 def uploadbook():
