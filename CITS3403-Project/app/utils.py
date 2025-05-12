@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime, timezone
-from models import db, Book, UserBook
+from app.models import db, Book, UserBook
 
 def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
     raw_work_key = api_book_data.get('work_key')

@@ -1,8 +1,6 @@
-from datetime import datetime
-from models import *
-from app import create_app, db
-
-app = create_app()
+from datetime import datetime, date
+from app.models import *
+from app import app, db
 
 def populate_data():
     with app.app_context():

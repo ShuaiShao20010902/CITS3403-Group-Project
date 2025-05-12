@@ -14,12 +14,12 @@
     </div>
     <div class="buttons">
       {% if session.get('user_id') %}
-        <a href="{{ url_for('home') }}"><button>Home</button></a>
-        <a href="{{ url_for('share') }}"><button>Share</button></a>
-        <a href="{{ url_for('browse') }}"><button>Browse</button></a>
-        <a href="{{ url_for('logout') }}"><button>Log Out</button></a>
+        <a href="{{ url_for('main.home') }}"><button>Home</button></a>
+        <a href="{{ url_for('main.share') }}"><button>Share</button></a>
+        <a href="{{ url_for('main.browse') }}"><button>Browse</button></a>
+        <a href="{{ url_for('main.logout') }}"><button>Log Out</button></a>
       {% else %}
-        <a href="{{ url_for('landing') }}"><button>Home</button></a>
+        <a href="{{ url_for('main.landing') }}"><button>Home</button></a>
       {% endif %}
     </div>
   </header>

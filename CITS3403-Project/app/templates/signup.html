@@ -31,7 +31,7 @@
                 </div>
             {% endif %}
         {% endwith %}
-        <form action="{{ url_for('signup') }}" method="post">
+        <form action="{{ url_for('main.signup') }}" method="post">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Choose a username" required>
@@ -80,7 +80,7 @@
         </form>
         
         <p class="footer-text">
-            Already have an account?  <a href="{{ url_for('login') }}" class="footer-link">Log In</a>
+            Already have an account?  <a href="{{ url_for('main.login') }}" class="footer-link">Log In</a>
         </p>
         
         <p class="footer-text" style="font-size: 14px; margin-top: 20px;">

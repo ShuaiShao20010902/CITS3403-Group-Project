@@ -104,7 +104,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     // Inject globals
-    window.UPDATE_BOOK_URL = "{{ url_for('update_book', book_id=book_id) }}";
+    window.UPDATE_BOOK_URL = "{{ url_for('main.update_book', book_id=book_id) }}";
     window.readingLogs = {{ reading_logs | tojson }} || [];
   </script>
   <script src="{{ url_for('static', filename='js/bookspecific.js') }}"></script>
