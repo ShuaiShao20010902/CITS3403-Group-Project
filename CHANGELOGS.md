@@ -2,23 +2,29 @@
 
 _Track everything merged into `main`._
 
+### 12th May
+- Backend Improvements
+    - Move the backend and frontend to the app folder to make it easier to manage and looks well structured.
+    - Created blueprints to improve code organization, scalability, reusability and the URL Prefix Management.
+- Bug Fix
+    - Rating and Notes now correctly update the database.
+
 ### 11th May
 - Browse Page Functionality
     - Removed all searches relating to editions.json
     - requirement.txt flask 3.0 not able to be used with flask caching so changed to 2.3.3
-    - Updated search.js (finds books via open library api)
-    - Created utils.py to store functions that pull info from open library api back to database
+    - Updated search.js to now pull from the search endpoint
+    - Created utils.py to store functions that pull info from the API back to database
     - User manually enter information via flask forms
     - Functional manual add into database
     - Updated uploadbook to add the correct information + css
-- Udated uploadbook
+- Updated uploadbook
     - Make uploadbook look a little bit better + sort button look better
     - Deleted comments
     - Added sort function
 - Updated bookspecificpage.html (Now has 3 functional parts)
-    - First: Rating System properly updates field in database but design may need to be updated 
-    - Second: Notes System properly updates field in database but design may need to be updated 
-    - Third: Tracking reading progress is partially implemented so that it is able to retrieve and modify entries in the Reading Log table. However there are errors when trying to update the entries of existing entries.
+    - Rating System and Notes system both properly updates field in database but design may need to be updated 
+    - Tracking reading progress is partially implemented so that it is able to retrieve and modify entries in the Reading Log table. However there are errors when trying to update the entries of existing entries.
         
 
 ### 10th May
