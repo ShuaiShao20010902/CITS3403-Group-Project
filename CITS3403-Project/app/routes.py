@@ -213,6 +213,7 @@ def api_books():
 @main.route('/update_book/<string:book_id>', methods=['POST'])
 def update_book(book_id):
     # 1. Current user
+    print("form =", dict(request.form), "json =", request.get_json(silent=True))
     username = session.get('username') or abort(401)
     user = User.query.filter_by(username=username).first_or_404()
 
@@ -226,6 +227,19 @@ def update_book(book_id):
         ub = UserBook(user_id=user.user_id, book_id=book_id)
         db.session.add(ub)
 
+    if 'rating' in request.form:
+        try:
+            ub.rating = float(request.form['rating'])
+        except ValueError: #for bad inputs
+            pass                                   
+
+    status = request.form.get('status')
+    if status is not None:
+        ub.completed = (status == 'completed')
+
+    notes = request.form.get('notes')
+    if notes is not None:
+        ub.notes = notes
     # ——— handle UserBook fields (rating, status, notes) exactly as you had ——— #
 
     # 4. Handle reading-log actions -----------------------------------------
