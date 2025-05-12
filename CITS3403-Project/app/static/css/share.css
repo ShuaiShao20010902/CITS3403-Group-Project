@@ -34,11 +34,12 @@ h2 {
 }
 
 .card {
-    background: #eef2f7;
+    position: relative; /* Ensure the remove button is positioned relative to the card */
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
     width: 250px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -88,4 +89,13 @@ h2 {
 #share-message {
     margin-top: 10px;
     font-weight: bold;
+}
+
+#suggestions-box div {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+#suggestions-box div:hover {
+    background-color: #f0f0f0;
 }
