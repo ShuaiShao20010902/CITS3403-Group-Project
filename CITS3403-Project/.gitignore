@@ -1,7 +1,3 @@
-__pycache__/
-*.py[cod]
-*.pyo
-*.cache/
-.pytest_cache/
-
-instance/books.db
+/venv
+/instance
+/__pycache__
