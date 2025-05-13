@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
 import json
-from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm, LoginForm
+from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm, LoginForm, PasswordResetRequestForm
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -410,7 +410,8 @@ def logout():
 
 @main.route('/forgot-password')
 def forgot_password():
-    return render_template('forgot_password.html')
+    form = PasswordResetRequestForm()
+    return render_template('forgot_password.html', form=form)
 
 @main.route('/api/books')
 def api_books():
