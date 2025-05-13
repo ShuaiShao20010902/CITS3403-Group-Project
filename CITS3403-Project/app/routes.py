@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
 import json
-from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm 
+from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm, LoginForm, PasswordResetRequestForm
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -378,21 +378,30 @@ def signup():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+    errors = []
+    show_errors = False
+    
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
+        
         user = User.query.filter_by(email=email).first()
-        if not user or not check_password_hash(user.password, password):
-            flash('Invalid credentials', 'error')
-            return redirect(url_for('main.login'))
-
-        session.clear()
-        session['user_id'] = user.user_id
-        session['username'] = user.username
-        flash('Logged in successfully', 'success')
-        return redirect(url_for('main.home'))
-
-    return render_template('login.html')
+        
+        if not user:
+            errors.append('No account found with this email address')
+            show_errors = True
+        elif not check_password_hash(user.password, password):
+            errors.append('Incorrect password')
+            show_errors = True
+        else:
+            session.clear()
+            session['user_id'] = user.user_id
+            session['username'] = user.username
+            flash('Logged in successfully', 'success')
+            return redirect(url_for('main.home'))
+    
+    return render_template('login.html', form=form, errors=errors, show_errors=show_errors)
 
 @main.route('/logout')
 def logout():
@@ -401,7 +410,8 @@ def logout():
 
 @main.route('/forgot-password')
 def forgot_password():
-    return render_template('forgot_password.html')
+    form = PasswordResetRequestForm()
+    return render_template('forgot_password.html', form=form)
 
 @main.route('/api/books')
 def api_books():
@@ -442,7 +452,7 @@ def update_book(book_id):
         try:
             ub.rating = float(request.form['rating'])
         except ValueError: #for bad inputs
-            pass                                   
+            pass
 
     status = request.form.get('status')
     if status is not None:
