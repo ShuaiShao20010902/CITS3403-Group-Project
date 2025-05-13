@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - BookTracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/error-popup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/error_popup.css') }}">
 </head>
 <body>
     {% include 'nav.html' %}
+    
+    <!-- Include error popup template -->
+    {% include 'error_popup.html' %}
     
     <div class="signup-container">
         <div class="logo-section">
@@ -38,7 +41,7 @@
             
             <div class="form-group">
                 {{ form.username.label }}
-                {{ form.username(placeholder="Choose a username", class="form-control") }}
+                {{ form.username(placeholder="Choose a username", class="form-control", autocomplete="off") }}
                 {% if form.username.errors %}
                     {% for error in form.username.errors %}
                         <div class="error-message" style="display: none;">{{ error }}</div>
@@ -48,7 +51,7 @@
             
             <div class="form-group">
                 {{ form.email.label }}
-                {{ form.email(placeholder="Enter your email address", class="form-control") }}
+                {{ form.email(placeholder="Enter your email address", class="form-control", autocomplete="off") }}
                 {% if form.email.errors %}
                     {% for error in form.email.errors %}
                         <div class="error-message" style="display: none;">{{ error }}</div>
@@ -59,7 +62,7 @@
             <div class="form-group">
                 {{ form.password.label }}
                 <div class="password-wrapper">
-                    {{ form.password(placeholder="Create a password", class="form-control", id="password") }}
+                    {{ form.password(placeholder="Create a password", class="form-control", id="password", autocomplete="new-password") }}
                     <button type="button" class="toggle-password" aria-label="Show password">
                         <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -94,7 +97,7 @@
             <div class="form-group">
                 {{ form.confirm_password.label }}
                 <div class="password-wrapper">
-                    {{ form.confirm_password(placeholder="Confirm your password", class="form-control", id="confirm_password") }}
+                    {{ form.confirm_password(placeholder="Confirm your password", class="form-control", id="confirm_password", autocomplete="new-password") }}
                     <button type="button" class="toggle-password" aria-label="Show password">
                         <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -125,6 +128,10 @@
         </p>
     </div>
 
+    <!-- Load scripts -->
     <script src="{{ url_for('static', filename='js/hide_password.js') }}"></script>
     <script src="{{ url_for('static', filename='js/password_popup.js') }}"></script>
     <script src="{{ url_for('static', filename='js/error_popup.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/form_validation.js') }}"></script>
+</body>
+</html>
