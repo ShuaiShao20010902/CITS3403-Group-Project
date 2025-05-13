@@ -59,7 +59,7 @@
             <div class="form-group">
                 {{ form.password.label }}
                 <div class="password-wrapper">
-                    {{ form.password(placeholder="Create a password", class="form-control") }}
+                    {{ form.password(placeholder="Create a password", class="form-control", id="password") }}
                     <button type="button" class="toggle-password" aria-label="Show password">
                         <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -76,21 +76,25 @@
                         <div class="error-message" style="display: none;">{{ error }}</div>
                     {% endfor %}
                 {% endif %}
-                <div class="password-requirements">
-                    <small>
-                        Password must be at least 8 characters long and include:
+
+                <div id="password-requirements-popup" class="password-popup">
+                    <div class="popup-content">
+                        <p>Password must be at least 8 characters long and include:</p>
                         <ul>
-                            <li>At least one lowercase letter</li> <li>At least one uppercase letter</li>
-                            <li>At least one number</li> <li>At least one special character (@$!%*?&)</li>
+                            <li class="requirement" id="req-length">At least <span class="keyword">8 characters</span> long</li>
+                            <li class="requirement" id="req-lowercase">At least one <span class="keyword">lowercase</span> letter</li>
+                            <li class="requirement" id="req-uppercase">At least one <span class="keyword">uppercase</span> letter</li>
+                            <li class="requirement" id="req-number">At least one <span class="keyword">number</span></li>
+                            <li class="requirement" id="req-special">At least one <span class="keyword">special character</span> (@$!%*?&)</li>
                         </ul>
-                    </small>
+                    </div>
                 </div>
             </div>
             
             <div class="form-group">
                 {{ form.confirm_password.label }}
                 <div class="password-wrapper">
-                    {{ form.confirm_password(placeholder="Confirm your password", class="form-control") }}
+                    {{ form.confirm_password(placeholder="Confirm your password", class="form-control", id="confirm_password") }}
                     <button type="button" class="toggle-password" aria-label="Show password">
                         <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -121,9 +125,6 @@
         </p>
     </div>
 
-
-
     <script src="{{ url_for('static', filename='js/hide_password.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/password_popup.js') }}"></script>
     <script src="{{ url_for('static', filename='js/error-popup.js') }}"></script>
-</body>
-</html>
