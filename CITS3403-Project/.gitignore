@@ -8,4 +8,4 @@
 *.cache/
 .pytest_cache/
 *.log
-
+.env

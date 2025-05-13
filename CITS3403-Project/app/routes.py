@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
 import json
-from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm 
+from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm, LoginForm
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -378,21 +378,24 @@ def signup():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+    
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
+        
         if not user or not check_password_hash(user.password, password):
             flash('Invalid credentials', 'error')
             return redirect(url_for('main.login'))
-
+        
         session.clear()
         session['user_id'] = user.user_id
         session['username'] = user.username
         flash('Logged in successfully', 'success')
         return redirect(url_for('main.home'))
-
-    return render_template('login.html')
+    
+    return render_template('login.html', form=form)
 
 @main.route('/logout')
 def logout():
@@ -442,7 +445,7 @@ def update_book(book_id):
         try:
             ub.rating = float(request.form['rating'])
         except ValueError: #for bad inputs
-            pass                                   
+            pass
 
     status = request.form.get('status')
     if status is not None:
