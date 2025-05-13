@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
 import json
+from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm 
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -228,13 +229,42 @@ def search_users():
     # Return a list of matching usernames
     return jsonify([user.username for user in users])
 
-@main.route('/uploadbook.html', methods=['GET', 'POST'] )
+@main.route('/uploadbook.html', methods=['GET', 'POST'])
 def uploadbook():
     form = CombinedBookForm()
     if form.validate_on_submit():
-        status, msg = manual_book_save(form, user_id=session.get('user_id'))
+        book_data = {
+            'title': form.title.data,
+            'author': form.author.data,
+            'genres': form.genres.data,
+            'description': form.description.data,
+            'number_of_pages': form.number_of_pages.data
+        }
+        
+        user_id = session.get('user_id')
+        if not user_id:
+            flash('You must be logged in to upload a book.', 'error')
+            return redirect(url_for('main.login'))
+        
+        status, msg = manual_book_save(form, user_id=user_id)
+        
         flash(msg, "success" if status == "success" else "error")
-        return redirect(url_for('main.browse'))
+        
+        if status == "success":
+            if form.rating.data is not None or form.notes.data or form.completed.data:
+                book = Book.query.filter_by(title=form.title.data, author=form.author.data).first()
+                if book:
+                    user_book = UserBook.query.filter_by(user_id=user_id, book_id=book.work_id).first()
+                    if user_book:
+                        if form.rating.data is not None:
+                            user_book.rating = form.rating.data
+                        if form.notes.data:
+                            user_book.notes = form.notes.data
+                        if form.completed.data:
+                            user_book.completed = True
+                        db.session.commit()
+                        
+            return redirect(url_for('main.browse'))
     
     return render_template('uploadbook.html', form=form)
 
@@ -250,29 +280,101 @@ def browse():
 
 @main.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '')
-
-        if User.query.filter_by(username=username).first():
-            flash('Username already in use', 'error')
-            return redirect(url_for('main.signup'))
-        if User.query.filter_by(email=email).first():
-            flash('Email already in use', 'error')
-            return redirect(url_for('main.signup'))
-
-        hashed = generate_password_hash(password)
-        user = User(username=username, email=email, password=hashed)
-        db.session.add(user)
-        db.session.commit()
-        session.clear()
-        session['user_id'] = user.user_id
-        session['username'] = user.username
-        flash('Account created successfully', 'success')
+    # If user is already logged in, redirect to home page
+    if 'user_id' in session:
         return redirect(url_for('main.home'))
+    
+    # Create form instance
+    form = RegistrationForm()
+    errors = []
+    show_errors = False
 
-    return render_template('signup.html')
+    if request.method == 'POST':
+        # If form validation passes
+        if form.validate_on_submit():
+            # Check if username is already taken
+            if User.query.filter_by(username=form.username.data).first():
+                errors.append('Username has already been taken')
+                show_errors = True
+            # Check if email is already registered
+            elif User.query.filter_by(email=form.email.data).first():
+                errors.append('Email has already been taken')
+                show_errors = True
+            else:
+                # Create new user
+                hashed_password = generate_password_hash(form.password.data)
+                user = User(
+                    username=form.username.data,
+                    email=form.email.data,
+                    password=hashed_password
+                )
+                
+                try:
+                    # Save to database
+                    db.session.add(user)
+                    db.session.commit()
+
+                    # Set session
+                    session.clear()
+                    session['user_id'] = user.user_id
+                    session['username'] = user.username
+
+                    # Show success message
+                    flash('Account created successfully', 'success')
+                    return redirect(url_for('main.home'))
+                
+                except Exception as e:
+                    # Rollback in case of database error
+                    db.session.rollback()
+                    errors.append('An error occurred while creating your account')
+                    show_errors = True
+
+        # Form validation failed or database error occurred
+        show_errors = True
+
+        # Collect specific error messages
+        # 1. Username errors
+        if form.username.errors:
+            for error in form.username.errors:
+                if 'already taken' in error or 'already exists' in error:
+                    if 'Username has already been taken' not in errors:
+                        errors.append('Username has already been taken')
+
+        # 2. Email errors
+        if form.email.errors:
+            for error in form.email.errors:
+                if 'already registered' in error or 'already exists' in error:
+                    if 'Email has already been taken' not in errors:
+                        errors.append('Email has already been taken')
+
+        # 3. Password confirmation errors
+        if form.confirm_password.errors:
+            for error in form.confirm_password.errors:
+                if 'must match' in error or 'don\'t match' in error or 'doesn\'t match' in error:
+                    if 'Password confirmation doesn\'t match Password' not in errors:
+                        errors.append('Password confirmation doesn\'t match Password')
+
+        # 4. Password format errors
+        if form.password.errors:
+            for error in form.password.errors:
+                if 'lowercase' in error or 'uppercase' in error or 'number' in error or 'special character' in error:
+                    errors.append('Password: Must include at least one lowercase letter, one uppercase letter, one number, and one special character.')
+                    break
+
+        # 5. Other errors
+        for field, field_errors in form.errors.items():
+            for error in field_errors:
+                # Skip already specifically handled errors
+                if (field == 'username' and ('already' in error or 'taken' in error)) or \
+                   (field == 'email' and ('already' in error or 'registered' in error)) or \
+                   (field == 'confirm_password' and 'match' in error) or \
+                   (field == 'password' and any(x in error for x in ['lowercase', 'uppercase', 'number', 'special character'])):
+                    continue
+                else:
+                    errors.append(f"{field.replace('_', ' ').title()}: {error}")
+
+    # Render the signup page with form and potential errors
+    return render_template('signup.html', form=form, errors=errors, show_errors=show_errors)
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
