@@ -1,190 +1,188 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
+   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+   background-color: #f4f4f4;
+   color: #333;
+   line-height: 1.6;
 }
 
 .signup-container {
-    width: 600px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 50px;
-    text-align: center;
-    margin: 100px auto;
+   width: 600px;
+   background-color: white;
+   border-radius: 10px;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   padding: 50px;
+   text-align: center;
+   margin: 100px auto;
 }
 
 .logo-section {
-    margin-bottom: 30px;
+   margin-bottom: 30px;
 }
 
 .logo-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
+   font-size: 80px;
+   margin-bottom: 20px;
 }
 
 .welcome-text {
-    font-size: 32px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
+   font-size: 32px;
+   font-weight: bold;
+   color: #333;
+   margin-bottom: 20px;
 }
 
 .description {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 40px;
+   font-size: 18px;
+   color: #666;
+   margin-bottom: 40px;
 }
-
-.form-group {
-    margin-bottom: 25px;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 18px;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-}
-
-.auth-button {
-    padding: 15px 40px;
-    font-size: 18px;
-    font-weight: 700;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.signup-btn {
-    background-color: #1e1e2f;
-    color: white;
-}
-
-.signup-btn:hover {
-    background-color: #2a2a40;
-    transform: translateY(-2px);
-}
-
-.footer-text {
-    margin-top: 30px;
-    font-size: 16px;
-    color: #666;
-}
-
-.footer-link {
-    color: #4a90e2;
-    text-decoration: none;
-}
-
-.footer-link:hover {
-    text-decoration: underline;
-}
-
-/* For the book logo */
-.books-logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.book {
-    width: 40px;
-    height: 50px;
-    margin: 0 -5px;
-    border-radius: 3px;
-    position: relative;
-}
-
-.book:nth-child(1) {
-    background-color: #4caf50;
-    transform: rotate(-5deg);
-    z-index: 1;
-}
-
-.book:nth-child(2) {
-    background-color: #e91e63;
-    transform: rotate(3deg);
-    z-index: 2;
-}
-
-.book:nth-child(3) {
-    background-color: #2196f3;
-    transform: rotate(8deg);
-    z-index: 3;
-}
-
-.password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    transition: color 0.3s ease;
-}
-
-.toggle-password svg {
-    width: 20px;
-    height: 20px;
-}
-
-.toggle-password .eye-open {
-    display: block;
-}
-
-.toggle-password .eye-closed {
-    display: none;
-}
-
-.toggle-password.active .eye-open {
-    display: none;
-}
-
-.toggle-password.active .eye-closed {
-    display: block;
-}
-
 
 .form-group {
    position: relative;
-   margin-bottom: 15px;
+   margin-bottom: 25px;
+   text-align: left;
 }
 
+.form-group label {
+   display: block;
+   margin-bottom: 10px;
+   font-weight: bold;
+   font-size: 16px;
+}
+
+.form-group input {
+   width: 100%;
+   padding: 15px;
+   border: 1px solid #ddd;
+   border-radius: 8px;
+   font-size: 18px;
+}
+
+.form-group input:focus {
+   outline: none;
+   border-color: #4a90e2;
+   box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+}
+
+.auth-button {
+   padding: 15px 40px;
+   font-size: 18px;
+   font-weight: 700;
+   border: none;
+   border-radius: 8px;
+   cursor: pointer;
+   transition: background-color 0.3s ease, transform 0.2s ease;
+   width: 100%;
+   margin-top: 20px;
+}
+
+.signup-btn {
+   background-color: #1e1e2f;
+   color: white;
+}
+
+.signup-btn:hover {
+   background-color: #2a2a40;
+   transform: translateY(-2px);
+}
+
+.footer-text {
+   margin-top: 30px;
+   font-size: 16px;
+   color: #666;
+}
+
+.footer-link {
+   color: #4a90e2;
+   text-decoration: none;
+}
+
+.footer-link:hover {
+   text-decoration: underline;
+}
+
+/* Book logo styling */
+.books-logo {
+   display: flex;
+   justify-content: center;
+   margin-bottom: 20px;
+}
+
+.book {
+   width: 40px;
+   height: 50px;
+   margin: 0 -5px;
+   border-radius: 3px;
+   position: relative;
+}
+
+.book:nth-child(1) {
+   background-color: #4caf50;
+   transform: rotate(-5deg);
+   z-index: 1;
+}
+
+.book:nth-child(2) {
+   background-color: #e91e63;
+   transform: rotate(3deg);
+   z-index: 2;
+}
+
+.book:nth-child(3) {
+   background-color: #2196f3;
+   transform: rotate(8deg);
+   z-index: 3;
+}
+
+/* Password field styling */
+.password-wrapper {
+   position: relative;
+   display: flex;
+   align-items: center;
+}
+
+.toggle-password {
+   position: absolute;
+   right: 10px;
+   background: none;
+   border: none;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: #888;
+   transition: color 0.3s ease;
+   z-index: 100;
+}
+
+.toggle-password svg {
+   width: 20px;
+   height: 20px;
+}
+
+.toggle-password .eye-open {
+   display: block;
+}
+
+.toggle-password .eye-closed {
+   display: none;
+}
+
+.toggle-password.active .eye-open {
+   display: none;
+}
+
+.toggle-password.active .eye-closed {
+   display: block;
+}
+
+/* Password requirements popup */
 .password-popup {
    display: none;
    position: absolute;
@@ -196,10 +194,10 @@ body {
    padding: 10px;
    z-index: 1000;
    top: 100%;
-   left: 0; /* Moved to the left */
+   left: 0;
    margin-top: 5px;
    animation: fadeIn 0.2s ease-in-out;
-   font-family: "Times New Roman", Times, serif; /* Added Times New Roman font */
+   font-family: "Times New Roman", Times, serif;
 }
 
 .password-popup:before {
@@ -220,7 +218,7 @@ body {
    font-size: 0.8rem;
    margin-bottom: 5px;
    font-family: "Times New Roman", Times, serif;
-   font-weight: 600; /* Made text semi-bold */
+   font-weight: 600;
 }
 
 .popup-content ul {
@@ -229,11 +227,11 @@ body {
 }
 
 .popup-content li.requirement {
-   color: #dc3545; /* Red */
+   color: #dc3545;
    font-size: 0.75rem;
    margin-bottom: 2px;
    font-family: "Times New Roman", Times, serif;
-   font-weight: 700; /* Made text bold */
+   font-weight: 700;
 }
 
 @keyframes fadeIn {
@@ -241,40 +239,137 @@ body {
    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Style for valid requirements */
 .popup-content li.valid {
-   color: #28a745; /* Green */
-   font-weight: 700; /* Made text bold */
+   color: #28a745;
+   font-weight: 700;
 }
 
-/* Hide original password requirements */
 .password-requirements {
    display: none;
 }
 
-/* For keyword highlighting - add this class to important words in your HTML */
 .popup-content .keyword {
-   font-weight: 900; /* Extra bold for keywords */
+   font-weight: 900;
    letter-spacing: 0.5px;
 }
 
-/* Form control validation styles */
+/* Form validation styles with fixed positioning for icons */
 .form-control.is-valid {
    border-color: #28a745;
-   padding-right: calc(1.5em + 0.75rem);
-   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-   background-repeat: no-repeat;
-   background-position: right calc(0.375em + 0.1875rem) center;
-   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-   font-family: "Times New Roman", Times, serif; /* Added Times New Roman font */
+   padding-right: 4.5rem !important;
+   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+   background-repeat: no-repeat !important;
+   background-position: right 40px center !important;
+   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+   font-family: "Times New Roman", Times, serif;
 }
 
 .form-control.is-invalid {
    border-color: #dc3545;
-   padding-right: calc(1.5em + 0.75rem);
-   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-   background-repeat: no-repeat;
-   background-position: right calc(0.375em + 0.1875rem) center;
-   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-   font-family: "Times New Roman", Times, serif; /* Added Times New Roman font */
+   padding-right: 4.5rem !important;
+   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+   background-repeat: no-repeat !important;
+   background-position: right 40px center !important;
+   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+   font-family: "Times New Roman", Times, serif;
+}
+
+/* Flash messages styling */
+.flashes {
+   margin-bottom: 20px;
+}
+
+.flash {
+   padding: 10px 15px;
+   border-radius: 5px;
+   margin-bottom: 10px;
+   font-weight: 500;
+}
+
+.flash-success {
+   background-color: #d4edda;
+   color: #155724;
+   border: 1px solid #c3e6cb;
+}
+
+.flash-error {
+   background-color: #f8d7da;
+   color: #721c24;
+   border: 1px solid #f5c6cb;
+}
+
+.flash-info {
+   background-color: #d1ecf1;
+   color: #0c5460;
+   border: 1px solid #bee5eb;
+}
+
+.flash-warning {
+   background-color: #fff3cd;
+   color: #856404;
+   border: 1px solid #ffeeba;
+}
+
+/* Error message popup */
+.error-message {
+   color: #dc3545;
+   font-size: 0.875rem;
+   margin-top: 5px;
+}
+
+/* Custom error popup */
+.error-popup {
+   position: fixed;
+   top: 20px;
+   left: 50%;
+   transform: translateX(-50%);
+   z-index: 1050;
+   background-color: #a70000;
+   color: white;
+   border-radius: 5px;
+   padding: 15px 20px;
+   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+   max-width: 90%;
+   width: 500px;
+   animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+   from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
+   to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+.error-popup-header {
+   display: flex;
+   align-items: center;
+   margin-bottom: 10px;
+}
+
+.error-popup-icon {
+   margin-right: 10px;
+   font-size: 1.2rem;
+}
+
+.error-popup-title {
+   flex: 1;
+   font-size: 1.1rem;
+   margin: 0;
+}
+
+.error-popup-close {
+   background: none;
+   border: none;
+   color: white;
+   font-size: 1.2rem;
+   cursor: pointer;
+}
+
+.error-popup-list {
+   list-style-type: disc;
+   padding-left: 25px;
+   margin: 5px 0;
+}
+
+.error-popup-list li {
+   padding: 3px 0;
 }
