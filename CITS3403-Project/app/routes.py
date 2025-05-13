@@ -323,7 +323,6 @@ def api_books():
 @main.route('/update_book/<string:book_id>', methods=['POST'])
 def update_book(book_id):
     # 1. Current user
-    print("form =", dict(request.form), "json =", request.get_json(silent=True))
     username = session.get('username') or abort(401)
     user = User.query.filter_by(username=username).first_or_404()
 
