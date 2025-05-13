@@ -1,0 +1,33 @@
+{# error_popup.html - Optimized version #}
+{% if show_errors and errors %}
+<div id="error_popup" class="error_popup">
+    <div class="error_popup_content">
+        <div class="error_popup_header">
+            <span class="error_icon">&#10006;</span>
+            <span class="error_title">There were {{ errors|length }} errors with your form submission:</span>
+            <span class="close_error_popup">&times;</span>
+        </div>
+        <div class="error_popup_body">
+            <ul class="error_list">
+                {# Display specific errors first #}
+                {% for error in errors %}
+                    {% if error == 'Email has already been taken' or 
+                          error == 'Password confirmation doesn\'t match Password' or 
+                          error == 'Username has already been taken' %}
+                        <li class="error_item">{{ error }}</li>
+                    {% endif %}
+                {% endfor %}
+
+                {# Then display other errors #}
+                {% for error in errors %}
+                    {% if error != 'Email has already been taken' and 
+                          error != 'Password confirmation doesn\'t match Password' and 
+                          error != 'Username has already been taken' %}
+                        <li class="error_item">{{ error }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -92,6 +92,6 @@ body { font-family: Arial, sans-serif; }
   height: 380px;
   object-fit: cover;
   object-position: center center;
-  display: block;    
+  display: block;
   border-radius: 8px;
 }
