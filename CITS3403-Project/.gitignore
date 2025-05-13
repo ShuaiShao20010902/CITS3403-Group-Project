@@ -1,3 +1,10 @@
-/venv
-/instance
-/__pycache__
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.cache/
+.pytest_cache/
+*.log
+
+venv/
+instance/
