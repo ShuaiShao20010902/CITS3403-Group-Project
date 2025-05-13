@@ -80,14 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
             bookNote.parentElement.style.display = 'none';
             bookRating.parentElement.style.display = 'none';
 
+            // Remove previous chart if present
+            const existingChart = document.getElementById('shareStatsChart');
+            if (existingChart) existingChart.remove();
+
             // Add chart preview
             const chartCanvas = document.createElement('canvas');
             chartCanvas.id = 'shareStatsChart';
-            chartCanvas.width = 300;
-            chartCanvas.height = 150;
+            chartCanvas.width = 220;   // Match card chart width
+            chartCanvas.height = 180;  // Match card chart height
             bookDetails.appendChild(chartCanvas);
 
-            // Render the chart using the same data as on the dashboard
+            // Render the chart using the preview data
             const chartData = window.sharedStatsData['preview'] || [];
             const ctx = chartCanvas.getContext('2d');
             new Chart(ctx, {
@@ -104,7 +108,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         pointRadius: 3
                     }]
                 },
-                options: { responsive: false, maintainAspectRatio: false }
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Date' },
+                            ticks: { font: { size: 12 } }
+                        },
+                        y: {
+                            title: { display: true, text: 'Pages' },
+                            beginAtZero: true,
+                            ticks: { font: { size: 12 } }
+                        }
+                    }
+                }
             });
         } else {
             // Show book-specific fields

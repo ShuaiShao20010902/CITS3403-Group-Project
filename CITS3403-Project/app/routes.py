@@ -89,6 +89,17 @@ def share():
         flash('You must be logged in to share books.', 'error')
         return redirect(url_for('main.login'))
 
+    # Always generate chart_data for the preview chart
+    chart_data = []
+    today = datetime.utcnow().date()
+    past_30_days = [today - timedelta(days=i) for i in range(29, -1, -1)]
+    for day in past_30_days:
+        total_pages = db.session.query(db.func.sum(ReadingLog.pages_read)).filter(
+            ReadingLog.user_id == user_id,
+            db.func.date(ReadingLog.date) == day
+        ).scalar() or 0
+        chart_data.append({'date': day.strftime('%Y-%m-%d'), 'pages_read': total_pages})
+
     if request.method == 'POST':
         data = request.get_json()
         recipient_username = data.get('username')
@@ -107,22 +118,20 @@ def share():
         # Handle sharing stats
         if book_id == "stats":
             # Generate stats data for the current user (same as your dashboard)
-            today = datetime.utcnow().date()
-            past_30_days = [today - timedelta(days=i) for i in range(29, -1, -1)]
-            chart_data = []
+            stats_chart_data = []
             for day in past_30_days:
                 total_pages = db.session.query(db.func.sum(ReadingLog.pages_read)).filter(
                     ReadingLog.user_id == user_id,
                     db.func.date(ReadingLog.date) == day
                 ).scalar() or 0
-                chart_data.append({'date': day.strftime('%Y-%m-%d'), 'pages_read': total_pages})
+                stats_chart_data.append({'date': day.strftime('%Y-%m-%d'), 'pages_read': total_pages})
 
             shared_item = SharedItem(
                 user_id=user_id,
                 content_type='stats',
                 content_data=json.dumps({
                     'title': 'Reading Stats (Last 30 Days)',
-                    'chart_data': chart_data
+                    'chart_data': stats_chart_data
                 }),
                 created_at=datetime.utcnow()
             )
@@ -234,7 +243,8 @@ def share():
         'share.html',
         user_books=user_books,
         your_shared_items=your_shared_items,
-        shared_to_user=shared_to_user
+        shared_to_user=shared_to_user,
+        chart_data=chart_data
     )
 
 @main.route('/search_users', methods=['GET'])

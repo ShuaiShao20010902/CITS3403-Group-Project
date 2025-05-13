@@ -95,6 +95,7 @@
 
     <script id="shared-stats-data" type="application/json">
     {
+        "preview": {{ chart_data|tojson }}{% if your_shared_items + shared_to_user|selectattr('content_type', 'equalto', 'stats')|list %},{% endif %}
         {% for item in your_shared_items + shared_to_user if item.content_type == 'stats' %}
             "{{ item.id }}": {{ item.chart_data|tojson }}{% if not loop.last %},{% endif %}
         {% endfor %}

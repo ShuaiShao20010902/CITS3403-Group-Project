@@ -53,6 +53,15 @@ h2 {
     box-sizing: border-box;
 }
 
+#shareStatsChart {
+    width: 100% !important;
+    max-width: 220px;
+    height: 180px !important;
+    display: block;
+    margin: 12px auto 0 auto;
+    box-sizing: border-box;
+}
+
 .card img.book-cover {
     max-width: 100px;
     margin-bottom: 10px;
