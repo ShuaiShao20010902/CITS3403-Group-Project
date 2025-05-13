@@ -98,7 +98,12 @@ def share():
         recipient = User.query.filter_by(username=recipient_username).first()
         if not recipient:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
-
+         
+        # Prevent sharing to self
+        current_user = User.query.get(user_id)
+        if recipient_username == current_user.username:
+            return jsonify({'status': 'error', 'message': 'You cannot share to yourself.'}), 400
+        
         # Validate book
         book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
         if not book:
@@ -205,6 +210,23 @@ def share():
         your_shared_items=your_shared_items,
         shared_to_user=shared_to_user
     )
+
+@main.route('/search_users', methods=['GET'])
+def search_users():
+    query = request.args.get('q', '').strip()  # Get the search query from the request
+    user_id = session.get('user_id')  # Get the logged-in user's ID
+
+    if not query:
+        return jsonify([])  # Return an empty list if no query is provided
+
+    # Search for users whose usernames contain the query (case-insensitive) and exclude the current user
+    users = User.query.filter(
+        User.username.ilike(f'%{query}%'),
+        User.user_id != user_id  # Exclude the current user
+    ).all()
+
+    # Return a list of matching usernames
+    return jsonify([user.username for user in users])
 
 @main.route('/uploadbook.html', methods=['GET', 'POST'] )
 def uploadbook():
