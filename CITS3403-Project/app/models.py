@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone, date, timedelta
+from sqlalchemy import JSON
 
 db = SQLAlchemy()
 
@@ -20,7 +21,7 @@ class SharedItem(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     content_type = db.Column(db.String(50))
-    content_data = db.Column(db.Text)
+    content_data = db.Column(JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class SharedWith(db.Model):

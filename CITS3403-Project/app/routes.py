@@ -90,7 +90,6 @@ def share():
         return redirect(url_for('main.login'))
 
     if request.method == 'POST':
-        # Handle sharing logic
         data = request.get_json()
         recipient_username = data.get('username')
         book_id = data.get('book_id')
@@ -99,31 +98,50 @@ def share():
         recipient = User.query.filter_by(username=recipient_username).first()
         if not recipient:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
-         
+
         # Prevent sharing to self
         current_user = User.query.get(user_id)
         if recipient_username == current_user.username:
             return jsonify({'status': 'error', 'message': 'You cannot share to yourself.'}), 400
-        
-        # Validate book
-        book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
-        if not book:
-            return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
 
-        # Create a shared item with structured content_data
-        shared_item = SharedItem(
-            user_id=user_id,
-            content_type='book',
-            content_data=json.dumps({
-                'title': book.book.title,
-                'notes': book.notes,
-                'rating': book.rating
-            }),
-            created_at=datetime.utcnow()
-        )
+        # Handle sharing stats
+        if book_id == "stats":
+            # Generate stats data for the current user (same as your dashboard)
+            today = datetime.utcnow().date()
+            past_30_days = [today - timedelta(days=i) for i in range(29, -1, -1)]
+            chart_data = []
+            for day in past_30_days:
+                total_pages = db.session.query(db.func.sum(ReadingLog.pages_read)).filter(
+                    ReadingLog.user_id == user_id,
+                    db.func.date(ReadingLog.date) == day
+                ).scalar() or 0
+                chart_data.append({'date': day.strftime('%Y-%m-%d'), 'pages_read': total_pages})
 
-        if not shared_item.content_data:
-            return jsonify({'status': 'error', 'message': 'Invalid content_data'}), 400
+            shared_item = SharedItem(
+                user_id=user_id,
+                content_type='stats',
+                content_data=json.dumps({
+                    'title': 'Reading Stats (Last 30 Days)',
+                    'chart_data': chart_data
+                }),
+                created_at=datetime.utcnow()
+            )
+        else:
+            # Validate book
+            book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+            if not book:
+                return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
+
+            shared_item = SharedItem(
+                user_id=user_id,
+                content_type='book',
+                content_data=json.dumps({
+                    'title': book.book.title,
+                    'notes': book.notes,
+                    'rating': book.rating
+                }),
+                created_at=datetime.utcnow()
+            )
 
         db.session.add(shared_item)
         db.session.commit()
@@ -133,7 +151,7 @@ def share():
         db.session.add(shared_with)
         db.session.commit()
 
-        return jsonify({'status': 'success', 'message': 'Book shared successfully!'})
+        return jsonify({'status': 'success', 'message': 'Shared successfully!'})
 
     # Fetch books added by the user
     user_books = UserBook.query.filter_by(user_id=user_id).all()
@@ -142,68 +160,75 @@ def share():
     your_shared_items = []
     for item in SharedItem.query.filter_by(user_id=user_id).all():
         if not item.content_data:
-            print(f"Skipping SharedItem with ID {item.id} due to empty content_data")
             continue
-
         try:
-            # Parse content_data as JSON
             content_data = json.loads(item.content_data)
-        except json.JSONDecodeError as e:
-            print(f"Skipping SharedItem with ID {item.id} due to invalid JSON: {e}")
+        except json.JSONDecodeError:
             continue
 
-        book_title = content_data.get('title')
-        book = Book.query.filter_by(title=book_title).first()
-        cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
-
-        # Debugging: Log book details
-        print(f"Shared by User - Book Title: {book_title}, Book: {book}, Cover URL: {cover_url}")
-
-        your_shared_items.append({
-            'content_type': item.content_type,
-            'title': content_data.get('title'),
-            'notes': content_data.get('notes'),
-            'rating': content_data.get('rating'),
-            'created_at': item.created_at,
-            'cover_url': cover_url
-        })
+        if item.content_type == 'stats':
+            your_shared_items.append({
+                'id': item.id,
+                'content_type': item.content_type,
+                'title': content_data.get('title'),
+                'chart_data': content_data.get('chart_data'),
+                'created_at': item.created_at,
+                'notes': content_data.get('notes', None),
+            })
+        else:
+            book_title = content_data.get('title')
+            book = Book.query.filter_by(title=book_title).first()
+            cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
+            your_shared_items.append({
+                'id': item.id,
+                'content_type': item.content_type,
+                'title': content_data.get('title'),
+                'notes': content_data.get('notes'),
+                'rating': content_data.get('rating'),
+                'created_at': item.created_at,
+                'cover_url': cover_url
+            })
 
     # Fetch items shared with the user
     shared_to_user = []
     for item, user in (
         db.session.query(SharedItem, User)
         .join(SharedWith, SharedItem.id == SharedWith.shared_item_id)
-        .join(User, SharedItem.user_id == User.user_id)  # Correctly join to the user who shared the item
+        .join(User, SharedItem.user_id == User.user_id)
         .filter(SharedWith.receiver_user_id == user_id)
         .all()
     ):
         if not item.content_data:
-            print(f"Skipping SharedItem with ID {item.id} due to empty content_data")
             continue
-
         try:
-            # Parse content_data as JSON
             content_data = json.loads(item.content_data)
-        except json.JSONDecodeError as e:
-            print(f"Skipping SharedItem with ID {item.id} due to invalid JSON: {e}")
+        except json.JSONDecodeError:
             continue
 
-        book_title = content_data.get('title')
-        book = Book.query.filter_by(title=book_title).first()
-        cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
-
-        # Debugging: Log book details
-        print(f"Shared to User - Book Title: {book_title}, Book: {book}, Cover URL: {cover_url}")
-
-        shared_to_user.append({
-            'content_type': item.content_type,
-            'title': content_data.get('title'),
-            'notes': content_data.get('notes'),
-            'rating': content_data.get('rating'),
-            'created_at': item.created_at,
-            'cover_url': cover_url,
-            'shared_by': user.username  # Correctly set to the username of the person who shared the item
-        })
+        if item.content_type == 'stats':
+            shared_to_user.append({
+                'id': item.id,
+                'content_type': item.content_type,
+                'title': content_data.get('title'),
+                'chart_data': content_data.get('chart_data'),
+                'created_at': item.created_at,
+                'notes': content_data.get('notes', None),
+                'shared_by': user.username
+            })
+        else:
+            book_title = content_data.get('title')
+            book = Book.query.filter_by(title=book_title).first()
+            cover_url = f"https://covers.openlibrary.org/b/id/{book.cover_id}-L.jpg" if book and book.cover_id else "https://via.placeholder.com/150"
+            shared_to_user.append({
+                'id': item.id,
+                'content_type': item.content_type,
+                'title': content_data.get('title'),
+                'notes': content_data.get('notes'),
+                'rating': content_data.get('rating'),
+                'created_at': item.created_at,
+                'cover_url': cover_url,
+                'shared_by': user.username
+            })
 
     return render_template(
         'share.html',
