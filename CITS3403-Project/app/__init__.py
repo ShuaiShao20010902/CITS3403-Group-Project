@@ -1,12 +1,10 @@
 from flask import Flask
 from flask_migrate import Migrate
-import os
+from app.config import Config
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'this-is-the-super-secret-key'
+    app.config.from_object(Config)
 
     # Import models
     from app.models import db
