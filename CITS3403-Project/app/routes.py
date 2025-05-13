@@ -228,41 +228,6 @@ def search_users():
     # Return a list of matching usernames
     return jsonify([user.username for user in users])
 
-#@main.route('/remove_shared_item/<int:item_id>', methods=['POST'])
-    def remove_shared_item(item_id):
-    """Remove a shared item from 'You're Sharing'."""
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'status': 'error', 'message': 'You must be logged in.'}), 401
-
-    # Ensure the item belongs to the current user
-    shared_item = SharedItem.query.filter_by(id=item_id, user_id=user_id).first()
-    if not shared_item:
-        return jsonify({'status': 'error', 'message': 'Shared item not found or not owned by you.'}), 404
-
-    # Remove the shared item
-    db.session.delete(shared_item)
-    db.session.commit()
-    return jsonify({'status': 'success', 'message': 'Shared item removed successfully.'})
-
-
-#@main.route('/remove_shared_with/<int:item_id>', methods=['POST'])
-    def remove_shared_with(item_id):
-    """Remove a shared item from 'Shared with You'."""
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'status': 'error', 'message': 'You must be logged in.'}), 401
-
-    # Ensure the item is shared with the current user
-    shared_with = SharedWith.query.filter_by(shared_item_id=item_id, receiver_user_id=user_id).first()
-    if not shared_with:
-        return jsonify({'status': 'error', 'message': 'Shared item not found or not shared with you.'}), 404
-
-    # Remove the shared_with entry
-    db.session.delete(shared_with)
-    db.session.commit()
-    return jsonify({'status': 'success', 'message': 'Shared item removed successfully.'})
-
 @main.route('/uploadbook.html', methods=['GET', 'POST'] )
 def uploadbook():
     form = CombinedBookForm()
