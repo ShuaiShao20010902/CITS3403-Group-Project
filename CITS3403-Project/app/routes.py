@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
 import json
+from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm 
 
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
@@ -228,13 +229,42 @@ def search_users():
     # Return a list of matching usernames
     return jsonify([user.username for user in users])
 
-@main.route('/uploadbook.html', methods=['GET', 'POST'] )
+@main.route('/uploadbook.html', methods=['GET', 'POST'])
 def uploadbook():
     form = CombinedBookForm()
     if form.validate_on_submit():
-        status, msg = manual_book_save(form, user_id=session.get('user_id'))
+        book_data = {
+            'title': form.title.data,
+            'author': form.author.data,
+            'genres': form.genres.data,
+            'description': form.description.data,
+            'number_of_pages': form.number_of_pages.data
+        }
+        
+        user_id = session.get('user_id')
+        if not user_id:
+            flash('You must be logged in to upload a book.', 'error')
+            return redirect(url_for('main.login'))
+        
+        status, msg = manual_book_save(form, user_id=user_id)
+        
         flash(msg, "success" if status == "success" else "error")
-        return redirect(url_for('main.browse'))
+        
+        if status == "success":
+            if form.rating.data is not None or form.notes.data or form.completed.data:
+                book = Book.query.filter_by(title=form.title.data, author=form.author.data).first()
+                if book:
+                    user_book = UserBook.query.filter_by(user_id=user_id, book_id=book.work_id).first()
+                    if user_book:
+                        if form.rating.data is not None:
+                            user_book.rating = form.rating.data
+                        if form.notes.data:
+                            user_book.notes = form.notes.data
+                        if form.completed.data:
+                            user_book.completed = True
+                        db.session.commit()
+                        
+            return redirect(url_for('main.browse'))
     
     return render_template('uploadbook.html', form=form)
 
@@ -250,6 +280,7 @@ def browse():
 
 @main.route('/signup', methods=['GET', 'POST'])
 def signup():
+    form = RegistrationForm()
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         email = request.form.get('email', '').strip()
@@ -272,7 +303,8 @@ def signup():
         flash('Account created successfully', 'success')
         return redirect(url_for('main.home'))
 
-    return render_template('signup.html')
+
+    return render_template('signup.html', form=form)
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
