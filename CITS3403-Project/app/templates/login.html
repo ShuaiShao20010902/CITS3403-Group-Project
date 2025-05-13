@@ -1,82 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In – Book Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Log In – Book Tracker</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/error_popup.css') }}">
 </head>
 <body>
-    {% include 'nav.html' %}
+   {% include 'nav.html' %}
+   
+   <!-- Include error popup template -->
+   {% include 'error_popup.html' %}
 
-    <main class="login-container">
-        <section class="logo-section">
-            <div class="logo-icon">📚</div>
-            <h1 class="welcome-text">Log In</h1>
-            <p class="description">Continue your reading journey</p>
-        </section>
+   <main class="login-container">
+       <section class="logo-section">
+           <div class="logo-icon">📚</div>
+           <h1 class="welcome-text">Log In</h1>
+           <p class="description">Continue your reading journey</p>
+       </section>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flashes">
-                {% for category, message in messages %}
-                    <div class="flash flash-{{ category }}">
-                    {{ message }}
-                    </div>
-                {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+       {% with messages = get_flashed_messages(with_categories=true) %}
+           {% if messages %}
+               <div class="flashes">
+               {% for category, message in messages %}
+                   <div class="flash flash-{{ category }}">
+                   {{ message }}
+                   </div>
+               {% endfor %}
+               </div>
+           {% endif %}
+       {% endwith %}
 
-        <form id="login-form"
-                action="{{ url_for('main.login') }}"
-                method="post">
-            {{ form.csrf_token }}
+       <form id="login-form"
+               action="{{ url_for('main.login') }}"
+               method="post"
+               autocomplete="off">
+           {{ form.csrf_token }}
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
-            </div>
+           <div class="form-group">
+               <label for="email">Email</label>
+               <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+           </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                    <button
-                        type="button"
-                        class="toggle-password"
-                        aria-label="Show password">
-                        <!-- eye-open svg -->
-                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <!-- eye-closed svg -->
-                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                            <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+           <div class="form-group">
+               <label for="password">Password</label>
+               <div class="password-wrapper">
+                   <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                   <button
+                       type="button"
+                       class="toggle-password"
+                       aria-label="Show password">
+                       <!-- eye-open svg -->
+                       <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                           <circle cx="12" cy="12" r="3"></circle>
+                       </svg>
+                       <!-- eye-closed svg -->
+                       <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                           <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                           <line x1="1" y1="1" x2="23" y2="23"></line>
+                       </svg>
+                   </button>
+               </div>
+           </div>
 
-            <div class="forgot-password">
-                <a href="{{ url_for('main.forgot_password') }}">Forgot Password?</a>
-            </div>
+           <div class="forgot-password">
+               <a href="{{ url_for('main.forgot_password') }}">Forgot Password?</a>
+           </div>
 
-            <div class="button-group">
-                <button type="submit" class="auth-button login-btn">
-                    Log In
-                </button>
-            </div>
-        </form>
+           <div class="button-group">
+               <button type="submit" class="auth-button login-btn">
+                   Log In
+               </button>
+           </div>
+       </form>
 
-        <p class="footer-text">
-            Don't have an account?
-            <a href="{{ url_for('main.signup') }}" class="footer-link">Sign Up</a>
-        </p>
-    </main>
+       <p class="footer-text">
+           Don't have an account?
+           <a href="{{ url_for('main.signup') }}" class="footer-link">Sign Up</a>
+       </p>
+   </main>
 
-    <script src="{{ url_for('static', filename='js/hide_password.js') }}"></script>
+   <script src="{{ url_for('static', filename='js/hide_password.js') }}"></script>
+   <script src="{{ url_for('static', filename='js/error_popup.js') }}"></script>
 </body>
 </html>
