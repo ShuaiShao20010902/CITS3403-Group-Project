@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, abort, session, flash
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, abort, session, flash, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import *
 from sqlalchemy.exc import IntegrityError
@@ -10,8 +10,11 @@ from datetime import datetime, timedelta, date
 from app.forms import ManualBookForm, CombinedBookForm
 from app.blueprints import main
 import json
-from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm, LoginForm, PasswordResetRequestForm
+from app.forms import ManualBookForm, CombinedBookForm, RegistrationForm, LoginForm, PasswordResetRequestForm, PasswordResetForm
+import secrets
+from flask_mail import Mail, Message
 
+mail = Mail()
 # for data sanitisation
 def validate_input(value, field_name, required=True, value_type=int, min_value=None, max_value=None):
     """
@@ -99,12 +102,12 @@ def share():
         recipient = User.query.filter_by(username=recipient_username).first()
         if not recipient:
             return jsonify({'status': 'error', 'message': 'User not found'}), 404
-         
+
         # Prevent sharing to self
         current_user = User.query.get(user_id)
         if recipient_username == current_user.username:
             return jsonify({'status': 'error', 'message': 'You cannot share to yourself.'}), 400
-        
+
         # Validate book
         book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
         if not book:
@@ -240,16 +243,16 @@ def uploadbook():
             'description': form.description.data,
             'number_of_pages': form.number_of_pages.data
         }
-        
+
         user_id = session.get('user_id')
         if not user_id:
             flash('You must be logged in to upload a book.', 'error')
             return redirect(url_for('main.login'))
-        
+
         status, msg = manual_book_save(form, user_id=user_id)
-        
+
         flash(msg, "success" if status == "success" else "error")
-        
+
         if status == "success":
             if form.rating.data is not None or form.notes.data or form.completed.data:
                 book = Book.query.filter_by(title=form.title.data, author=form.author.data).first()
@@ -263,9 +266,9 @@ def uploadbook():
                         if form.completed.data:
                             user_book.completed = True
                         db.session.commit()
-                        
+
             return redirect(url_for('main.browse'))
-    
+
     return render_template('uploadbook.html', form=form)
 
 @main.route('/browse.html', methods=['GET', 'POST'])
@@ -283,7 +286,7 @@ def signup():
     # If user is already logged in, redirect to home page
     if 'user_id' in session:
         return redirect(url_for('main.home'))
-    
+
     # Create form instance
     form = RegistrationForm()
     errors = []
@@ -308,7 +311,7 @@ def signup():
                     email=form.email.data,
                     password=hashed_password
                 )
-                
+
                 try:
                     # Save to database
                     db.session.add(user)
@@ -322,7 +325,7 @@ def signup():
                     # Show success message
                     flash('Account created successfully', 'success')
                     return redirect(url_for('main.home'))
-                
+
                 except Exception as e:
                     # Rollback in case of database error
                     db.session.rollback()
@@ -408,11 +411,84 @@ def logout():
     session.clear()
     return redirect(url_for('main.landing'))
 
-@main.route('/forgot-password')
+@main.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
+    if 'user_id' in session:
+        return redirect(url_for('main.home'))
+
     form = PasswordResetRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            reset_token = secrets.token_urlsafe(32)
+
+            user.reset_token = reset_token
+            user.reset_token_expiration = datetime.utcnow() + timedelta(hours=1)
+            db.session.commit()
+
+            reset_url = url_for(
+                'main.reset_password',
+                token=reset_token,
+                _external=True
+            )
+
+            msg = Message(
+                'Password Reset Request',
+                recipients=[user.email],
+                sender=current_app.config['MAIL_DEFAULT_SENDER']
+            )
+
+
+            msg.html = render_template('reset_email.html', reset_url=reset_url, user=user)
+
+
+            msg.body = f"""
+            Click the link below to reset your password:
+            {reset_url}
+
+            If you did not request a password reset, please ignore this email.
+
+            This link will expire in 1 hour.
+            """
+
+            mail.send(msg)
+            flash('A password reset link has been sent to your email.', 'success')
+            return redirect(url_for('main.login'))
+
     return render_template('forgot_password.html', form=form)
 
+@main.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if 'user_id' in session:
+        return redirect(url_for('main.home'))
+
+    user = User.query.filter_by(reset_token=token).first()
+
+    if not user or not user.reset_token_expiration or user.reset_token_expiration < datetime.utcnow():
+        flash('Invalid or expired reset link', 'error')
+        return redirect(url_for('main.forgot_password'))
+
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        new_password = form.password.data
+
+
+        if check_password_hash(user.password, new_password):
+            flash('New password cannot be the same as the current password', 'error')
+            return render_template('reset_password.html', form=form, token=token)
+
+
+        hashed_password = generate_password_hash(new_password)
+        user.password = hashed_password
+        user.reset_token = None
+        user.reset_token_expiration = None
+
+        db.session.commit()
+
+        flash('Password reset successful. Please log in.', 'success')
+        return redirect(url_for('main.login'))
+
+    return render_template('reset_password.html', form=form, token=token)
 @main.route('/api/books')
 def api_books():
     resp = requests.get('https://openlibrary.org/search.json', params={'q': 'romance', 'limit': 10})

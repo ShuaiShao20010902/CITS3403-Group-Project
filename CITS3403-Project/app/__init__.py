@@ -1,6 +1,9 @@
 from flask import Flask
 from flask_migrate import Migrate
+from flask_mail import Mail
 from app.config import Config
+
+mail = Mail()
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +17,9 @@ def create_app():
 
     # Setup migrations
     migrate = Migrate(app, db)
+
+    # Initialize Mail
+    mail.init_app(app)
 
     # Import and register blueprints
     from app.blueprints import main

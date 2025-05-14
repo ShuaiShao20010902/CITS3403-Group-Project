@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const $actions = $('#entry-actions');
   const $editInp = $('#edit-pages');
 
-  let idx = 0;                                     
+  let idx = 0;
   readingLogs.sort((a, b) => b.date.localeCompare(a.date));
 
   /* ------------ helpers ------------ */
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $editBtn.hide();
     $actions.removeAttr('hidden');
   });
-  
+
   /* ------------ save existing entry ------------ */
   $('#save-entry').on('click', () => {
   const pages = parseInt($editInp.val(), 10) || 0;

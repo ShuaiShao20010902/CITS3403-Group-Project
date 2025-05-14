@@ -104,12 +104,12 @@ input[type="submit"]:hover {
     border-radius: 5px;
     background-color: #e8e7ee;
     cursor: pointer;
-  }
-  
-  #toggle-completed:hover {
-    background: #f0f0f0;
-  }
+    }
 
-  #toggle-completed.complete {
+#toggle-completed:hover {
+    background: #f0f0f0;
+    }
+
+#toggle-completed.complete {
     background-color: #a9a9a9;
-  }
+    }
