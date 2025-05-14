@@ -524,23 +524,28 @@ def update_book(book_id):
     if 'page_read' in request.form:
         try:
             pages = int(request.form['page_read'])
-            today = date.today()
+            # Use the date provided by the user, or default to today
+            log_date_str = request.form.get('date') or request.form.get('edit_date')
+            if log_date_str:
+                log_date = datetime.strptime(log_date_str, "%Y-%m-%d").date()
+            else:
+                log_date = date.today()
             log = (ReadingLog.query
                 .filter_by(user_id=user.user_id,
                             book_id=book_id,
-                            date=today)
+                            date=log_date)
                 .first())
             if not log:
                 log = ReadingLog(user_id=user.user_id,
                                 book_id=book_id,
-                                date=today,
+                                date=log_date,
                                 pages_read=pages)
                 db.session.add(log)
             else:
                 log.pages_read = pages
             db.session.commit()
             return jsonify(success=True,
-                        new_log={'date': today.isoformat(),
+                        new_log={'date': log_date.isoformat(),
                                     'pages_read': pages})
         except (TypeError, ValueError):
             pass
