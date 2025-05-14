@@ -9,10 +9,10 @@
 </head>
 <body>
     {% include 'nav.html' %}
-    
+
     <!-- Include error popup template -->
     {% include 'error_popup.html' %}
-    
+
     <div class="signup-container">
         <div class="logo-section">
             <div class="books-logo">
@@ -23,7 +23,7 @@
             <h1 class="welcome-text">Sign Up</h1>
             <p class="description">Start your reading journey with us</p>
         </div>
-        
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flashes">
@@ -35,10 +35,10 @@
                 </div>
             {% endif %}
         {% endwith %}
-        
+
         <form action="{{ url_for('main.signup') }}" method="post">
             {{ form.hidden_tag() }}
-            
+
             <div class="form-group">
                 {{ form.username.label }}
                 {{ form.username(placeholder="Choose a username", class="form-control", autocomplete="off") }}
@@ -48,7 +48,7 @@
                     {% endfor %}
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 {{ form.email.label }}
                 {{ form.email(placeholder="Enter your email address", class="form-control", autocomplete="off") }}
@@ -58,7 +58,7 @@
                     {% endfor %}
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 {{ form.password.label }}
                 <div class="password-wrapper">
@@ -93,7 +93,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-group">
                 {{ form.confirm_password.label }}
                 <div class="password-wrapper">
@@ -115,14 +115,14 @@
                     {% endfor %}
                 {% endif %}
             </div>
-            
+
             {{ form.submit(class="auth-button signup-btn") }}
         </form>
-        
+
         <p class="footer-text">
             Already have an account?  <a href="{{ url_for('main.login') }}" class="footer-link">Log In</a>
         </p>
-        
+
         <p class="footer-text" style="font-size: 14px; margin-top: 20px;">
             By signing up, you agree to our <a href="#" class="footer-link">Terms of Service</a> and <a href="#" class="footer-link">Privacy Policy</a>
         </p>

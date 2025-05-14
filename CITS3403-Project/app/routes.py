@@ -463,32 +463,61 @@ def reset_password(token):
         return redirect(url_for('main.home'))
 
     user = User.query.filter_by(reset_token=token).first()
+    errors = []
+    show_errors = False
 
     if not user or not user.reset_token_expiration or user.reset_token_expiration < datetime.utcnow():
         flash('Invalid or expired reset link', 'error')
         return redirect(url_for('main.forgot_password'))
 
     form = PasswordResetForm()
-    if form.validate_on_submit():
-        new_password = form.password.data
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_password = form.password.data
 
+            if check_password_hash(user.password, new_password):
+                flash('New password cannot be the same as the current password', 'error')
+                errors.append('New password cannot be the same as the current password')
+                show_errors = True
+                return render_template('reset_password.html', form=form, token=token, errors=errors, show_errors=show_errors)
 
-        if check_password_hash(user.password, new_password):
-            flash('New password cannot be the same as the current password', 'error')
-            return render_template('reset_password.html', form=form, token=token)
+            hashed_password = generate_password_hash(new_password)
+            user.password = hashed_password
+            user.reset_token = None
+            user.reset_token_expiration = None
 
+            db.session.commit()
 
-        hashed_password = generate_password_hash(new_password)
-        user.password = hashed_password
-        user.reset_token = None
-        user.reset_token_expiration = None
+            flash('Password reset successful. Please log in.', 'success')
+            return redirect(url_for('main.login'))
+        else:
+            # Form validation errors
+            show_errors = True
+            # Password errors
+            if form.password.errors:
+                for error in form.password.errors:
+                    if 'lowercase' in error or 'uppercase' in error or 'number' in error or 'special character' in error:
+                        errors.append('Password: Must include at least one lowercase letter, one uppercase letter, one number, and one special character.')
+                        break
 
-        db.session.commit()
+            # Password confirmation errors
+            if form.confirm_password.errors:
+                for error in form.confirm_password.errors:
+                    if 'match' in error:
+                        errors.append('Password confirmation doesn\'t match Password')
+                        break
 
-        flash('Password reset successful. Please log in.', 'success')
-        return redirect(url_for('main.login'))
+            # Other errors
+            for field, field_errors in form.errors.items():
+                for error in field_errors:
+                    # Skip already processed errors
+                    if (field == 'password' and any(x in error for x in ['lowercase', 'uppercase', 'number', 'special character'])) or \
+                        (field == 'confirm_password' and 'match' in error):
+                        continue
+                    else:
+                        errors.append(f"{field.replace('_', ' ').title()}: {error}")
 
-    return render_template('reset_password.html', form=form, token=token)
+    return render_template('reset_password.html', form=form, token=token, errors=errors, show_errors=show_errors)
 @main.route('/api/books')
 def api_books():
     resp = requests.get('https://openlibrary.org/search.json', params={'q': 'romance', 'limit': 10})
@@ -542,7 +571,7 @@ def update_book(book_id):
     # 4. Handle reading-log actions -----------------------------------------
     # (A) delete-latest takes priority over add/update
     # inside update_book, before handling page_read
-    
+
     if 'delete_date' in request.form:
         d = request.form['delete_date']
         ReadingLog.query.filter_by(user_id=user.user_id,
