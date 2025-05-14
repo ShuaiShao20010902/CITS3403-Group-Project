@@ -117,3 +117,18 @@ h2 {
 #suggestions-box div:hover {
     background-color: #f0f0f0;
 }
+
+.stat-card {
+    width: 100%;
+    max-width: 340px;
+}
+
+.stat-card canvas {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 310 / 220;
+    max-width: 310px;
+    display: block;
+    margin: 12px auto 0 auto;
+    box-sizing: border-box;
+}

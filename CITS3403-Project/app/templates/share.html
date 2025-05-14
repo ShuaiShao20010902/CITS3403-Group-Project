@@ -45,11 +45,11 @@
             <h2>You're Sharing</h2>
             <div class="shared-cards">
                 {% for item in your_shared_items %}
-                    <div class="card" data-item-id="{{ item.id }}">
+                    <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
                         {% if item.content_type == 'stats' %}
                             <h3>{{ item.title }}</h3>
                             <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <canvas id="sharedChart-{{ item.id }}" width="220" height="180"></canvas>
+                            <canvas id="sharedChart-{{ item.id }}" width="310" height="220"></canvas>
                         {% else %}
                             {% if item.cover_url %}
                                 <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
@@ -70,12 +70,12 @@
             <h2>Shared with You</h2>
             <div class="shared-cards">
                 {% for item in shared_to_user %}
-                    <div class="card" data-item-id="{{ item.id }}">
+                    <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
                         {% if item.content_type == 'stats' %}
                             <h3>{{ item.title }}</h3>
                             <p><strong>From:</strong> {{ item.shared_by }}</p>
                             <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <canvas id="sharedChart-{{ item.id }}" width="220" height="180"></canvas>
+                            <canvas id="sharedChart-{{ item.id }}" width="310" height="220"></canvas>
                         {% else %}
                             {% if item.cover_url %}
                                 <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
