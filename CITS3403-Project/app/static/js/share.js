@@ -201,8 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Loop through all stats cards and render the chart
     document.querySelectorAll('canvas[id^="sharedChart-"]').forEach(canvas => {
         const itemId = canvas.id.split('-')[1];
-        // You need to make sure stats data is available for each item, e.g.:
-        // window.sharedStatsData = { "123": [...], "124": [...] }
         const chartData = window.sharedStatsData[itemId];
         if (!chartData) return;
         new Chart(canvas.getContext('2d'), {
@@ -219,7 +217,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     pointRadius: 3
                 }]
             },
-            options: { responsive: false, maintainAspectRatio: false }
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Pages' },
+                        ticks: { font: { size: 12 } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Date' },
+                        ticks: { font: { size: 12 } }
+                    }
+                }
+            }
         });
     });
 });
