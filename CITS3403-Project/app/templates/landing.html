@@ -3,28 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Tracker</title>
+    <title>BookTracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
 </head>
 <body>
-    {% include 'nav.html' %}
-
-    <div class="signup-container">
-        <div class="logo-section">
-            <div class="logo-icon">📚</div>
-            <h1 class="welcome-text">Welcome to BookTracker</h1>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </a>
+            </div>
         </div>
 
-        <p class="description">Track your reading progress. Analyze your reading habits. Share your favorite books.</p>
+        <div class="content">
+            <div class="text-section">
+                <h2 class="title-small">The</h2>
+                <h1 class="title-large">BookTracker</h1>
+                <p class="tagline"><strong>Because life's too short for a book you're not in the mood for.</strong></p>
 
-        <div class="button-group">
-            <a href="{{ url_for('main.signup') }}"><button class="auth-button signup-btn">Sign Up</button></a>
-            <a href="{{ url_for('main.login') }}"><button class="auth-button login-btn">Log In</button></a>
+                <div class="buttons">
+                    <a href="{{ url_for('main.signup') }}" class="signup-btn">Sign up</a>
+                    <a href="{{ url_for('main.login') }}" class="login-link">Log in</a>
+                </div>
+            </div>
+
+            <div class="books-section">
+                <div class="book-grid">
+                    <!-- First row -->
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img1.png') }}" alt="The Naruto">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img2.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img3.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img4.png') }}" alt="The Midnight Library">
+                    </div>
+
+                    <!-- Second row -->
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img5.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img6.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img7.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img8.png') }}" alt="The Midnight Library">
+                    </div>
+
+                    <!-- Third row -->
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img9.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img10.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img11.png') }}" alt="The Midnight Library">
+                    </div>
+                    <div class="book-item">
+                        <img src="{{ url_for('static', filename='images/img12.png') }}" alt="The Midnight Library">
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="divider">or</div>
-
-        <p class="footer-text">By signing up, you agree to our <a href="#" class="footer-link">Terms</a> and <a href="#" class="footer-link">Privacy Policy</a>.</p>
     </div>
+
+    <div class="summary-section">
+    <p>
+        We'll help you track your reading and
+        <strong>choose your next book</strong>
+    </p>
+</div>
+    <div class="features-section">
+    <div class="feature-container">
+        <div class="feature-content">
+            <div class="feature-icon">
+
+                <svg viewBox="0 0 24 24" width="36" height="36" stroke="#19a99d" stroke-width="2" fill="none">
+                    <path d="M12 22V3"></path>
+                    <path d="M5 12H2l3-9 3 9H5z"></path>
+                    <path d="M19 12h-3l3-9 3 9h-3z"></path>
+                    <path d="M5 12v10"></path>
+                    <path d="M19 12v10"></path>
+                </svg>
+            </div>
+
+            <div class="feature-text">
+                <h2>Simple tracking and insightful stats</h2>
+                <p>Easily track your reading stats of last 30 days and show the chart of this data.</p>
+                <p class="feature-highlight">Can help you better organize your reading frequency for a period of time.</p>
+            </div>
+        </div>
+
+        <div class="feature-image">
+            <img src="{{ url_for('static', filename='images/dashboard.png') }}" alt="Reading dashboard">
+        </div>
+    </div>
+</div>
+
+<div class="share-section">
+    <div class="share-container">
+
+        <div class="share-image">
+            <img src="{{ url_for('static', filename='images/dashboard2.png') }}" alt="Sharing dashboard">
+        </div>
+
+
+        <div class="share-content">
+            <div class="share-icon">
+                <svg viewBox="0 0 24 24" width="36" height="36" stroke="#ffffff" stroke-width="2" fill="none">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="9" cy="10" r="1" fill="white"></circle>
+                    <circle cx="15" cy="10" r="1" fill="white"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+            </div>
+
+            <div class="share-text">
+                <h2>Share data with your friend</h2>
+                <p>Easily select or share your books and reading data with friends, and similarly receive data shared by other users</p>
+                <p class="share-highlight">Can let you effortlessly share your reading journey with friends and explore data they've shared with you." </p>
+            </div>
+        </div>
+    </div>
+</div>
+<p class="footer-text">By signing up, you agree to our <a href="#" class="footer-link">Terms</a> and <a href="#" class="footer-link">Privacy Policy</a>.</p>
 </body>
 </html>
