@@ -67,12 +67,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle book selection and display details
     bookDropdown.addEventListener('change', function () {
-        const selectedValue = this.value;
+        // Always enable the share button and clear message
+        shareButton.disabled = false;
+        message.textContent = '';
+
+        // Always show the details card
         bookDetails.style.display = 'block';
 
         // Remove any previous chart preview
         const existingChart = document.getElementById('shareStatsChart');
         if (existingChart) existingChart.remove();
+
+        // Reset book cover, note, and rating
+        bookCover.src = '';
+        bookNote.textContent = '';
+        bookRating.textContent = '';
+        bookCover.style.display = '';
+        bookNote.parentElement.style.display = '';
+        bookRating.parentElement.style.display = '';
+
+        const selectedValue = this.value;
 
         if (selectedValue === 'stats') {
             // Hide book-specific fields
@@ -80,15 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
             bookNote.parentElement.style.display = 'none';
             bookRating.parentElement.style.display = 'none';
 
-            // Remove previous chart if present
-            const existingChart = document.getElementById('shareStatsChart');
-            if (existingChart) existingChart.remove();
-
             // Add chart preview
             const chartCanvas = document.createElement('canvas');
             chartCanvas.id = 'shareStatsChart';
-            chartCanvas.width = 220;   // Match card chart width
-            chartCanvas.height = 180;  // Match card chart height
+            chartCanvas.width = 220;
+            chartCanvas.height = 180;
             bookDetails.appendChild(chartCanvas);
 
             // Render the chart using the preview data
@@ -129,10 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
             bookCover.style.display = '';
             bookNote.parentElement.style.display = '';
             bookRating.parentElement.style.display = '';
-
-            // Remove chart if present
-            const chartCanvas = document.getElementById('shareStatsChart');
-            if (chartCanvas) chartCanvas.remove();
 
             // Existing logic for book preview...
             const selectedOption = bookDropdown.options[bookDropdown.selectedIndex];

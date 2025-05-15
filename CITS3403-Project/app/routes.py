@@ -143,25 +143,7 @@ def share():
         if recipient_username == current_user.username:
             return jsonify({'status': 'error', 'message': 'You cannot share to yourself.'}), 400
 
-        # Validate book
-        book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
-        if not book:
-            return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
-
-        # Create a shared item with structured content_data
-        shared_item = SharedItem(
-            user_id=user_id,
-            content_type='book',
-            content_data=json.dumps({
-                'title': book.book.title,
-                'notes': book.notes,
-                'rating': book.rating
-            }),
-            created_at=datetime.utcnow()
-        )
-
-
-        # Handle sharing stats
+        # --- Handle sharing stats ---
         if book_id == "stats":
             # Generate stats data for the current user (same as your dashboard)
             stats_chart_data = []
@@ -181,23 +163,31 @@ def share():
                 }),
                 created_at=datetime.utcnow()
             )
-        else:
-            # Validate book
-            book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
-            if not book:
-                return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
+            db.session.add(shared_item)
+            db.session.commit()
 
-            shared_item = SharedItem(
-                user_id=user_id,
-                content_type='book',
-                content_data=json.dumps({
-                    'title': book.book.title,
-                    'notes': book.notes,
-                    'rating': book.rating
-                }),
-                created_at=datetime.utcnow()
-            )
+            # Link the shared item to the recipient
+            shared_with = SharedWith(shared_item_id=shared_item.id, receiver_user_id=recipient.user_id)
+            db.session.add(shared_with)
+            db.session.commit()
 
+            return jsonify({'status': 'success', 'message': 'Stats shared successfully!'})
+
+        # --- Handle sharing a book ---
+        book = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+        if not book:
+            return jsonify({'status': 'error', 'message': 'Book not found or not owned by you'}), 404
+
+        shared_item = SharedItem(
+            user_id=user_id,
+            content_type='book',
+            content_data=json.dumps({
+                'title': book.book.title,
+                'notes': book.notes,
+                'rating': book.rating
+            }),
+            created_at=datetime.utcnow()
+        )
         db.session.add(shared_item)
         db.session.commit()
 
@@ -206,7 +196,7 @@ def share():
         db.session.add(shared_with)
         db.session.commit()
 
-        return jsonify({'status': 'success', 'message': 'Shared successfully!'})
+        return jsonify({'status': 'success', 'message': 'Book shared successfully!'})
 
     # Fetch books added by the user
     user_books = UserBook.query.filter_by(user_id=user_id).all()
@@ -285,12 +275,22 @@ def share():
                 'shared_by': user.username
             })
 
+    # --- Build shared_stats_data dict for template ---
+    shared_stats_data = {
+        "preview": chart_data
+    }
+    # Add stats for all shared items (both yours and shared to you)
+    for item in your_shared_items + shared_to_user:
+        if item.get('content_type') == 'stats':
+            shared_stats_data[str(item['id'])] = item.get('chart_data', [])
+
     return render_template(
         'share.html',
         user_books=user_books,
         your_shared_items=your_shared_items,
         shared_to_user=shared_to_user,
-        chart_data=chart_data
+        chart_data=chart_data,
+        shared_stats_data=shared_stats_data
     )
 
 @main.route('/search_users', methods=['GET'])

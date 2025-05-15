@@ -49,7 +49,7 @@
                         {% if item.content_type == 'stats' %}
                             <h3>{{ item.title }}</h3>
                             <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <canvas id="sharedChart-{{ item.id }}" width="310" height="220"></canvas>
+                            <canvas id="sharedChart-{{ item.id }}" width="360" height="220"></canvas>
                         {% else %}
                             {% if item.cover_url %}
                                 <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
@@ -75,7 +75,7 @@
                             <h3>{{ item.title }}</h3>
                             <p><strong>From:</strong> {{ item.shared_by }}</p>
                             <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <canvas id="sharedChart-{{ item.id }}" width="310" height="220"></canvas>
+                            <canvas id="sharedChart-{{ item.id }}" width="360" height="220"></canvas>
                         {% else %}
                             {% if item.cover_url %}
                                 <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
@@ -94,12 +94,7 @@
     </div>
 
     <script id="shared-stats-data" type="application/json">
-    {
-        "preview": {{ chart_data|tojson }}{% if your_shared_items + shared_to_user|selectattr('content_type', 'equalto', 'stats')|list %},{% endif %}
-        {% for item in your_shared_items + shared_to_user if item.content_type == 'stats' %}
-            "{{ item.id }}": {{ item.chart_data|tojson }}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    }
+    {{ shared_stats_data|tojson }}
     </script>
 </body>
 </html>

@@ -1,134 +1,222 @@
+/* General layout */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
+  background: #f7f9fa;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #2d3a4a;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
+  max-width: 900px;
+  margin: 2em auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 2em 1.5em;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-h2 {
-    color: #333;
-}
-
-.section {
-    margin-top: 30px;
-}
-
-.shared-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.card {
-    position: relative; /* Ensure the remove button is positioned relative to the card */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-    width: 250px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.card canvas {
-    width: 100% !important;
-    max-width: 220px;
-    height: 180px !important; /* Match the new height */
-    display: block;
-    margin: 12px auto 0 auto;
-    box-sizing: border-box;
-}
-
-#shareStatsChart {
-    width: 100% !important;
-    max-width: 220px;
-    height: 180px !important;
-    display: block;
-    margin: 12px auto 0 auto;
-    box-sizing: border-box;
-}
-
-.card img.book-cover {
-    max-width: 100px;
-    margin-bottom: 10px;
-}
-
-.timestamp {
-    font-size: 0.9em;
-    color: #666;
+h1, h2 {
+  color: #2563eb;
+  margin-bottom: 0.7em;
 }
 
 .share-form {
-    margin-bottom: 30px;
+  background: #f0f4fa;
+  border-radius: 10px;
+  padding: 1.5em 1em 1.5em 1em;
+  margin-bottom: 2em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .share-form label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
+  font-weight: 500;
+  margin-bottom: 0.7em;
 }
 
-.share-form select,
-.share-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+#book-dropdown {
+  width: 100%;
+  max-width: 350px;
+  padding: 0.5em;
+  margin-bottom: 1em;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 1em;
 }
 
-.share-form button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+#share-username {
+  width: 100%;
+  max-width: 350px;
+  padding: 0.6em 1em;
+  margin: 1em 0 0.5em 0;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border 0.2s;
 }
 
-.share-form button:hover {
-    background-color: #0056b3;
+#share-username:focus {
+  border: 1.5px solid #2563eb;
+  outline: none;
+}
+
+#share-button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6em 2em;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 0.5em;
+  transition: background 0.2s;
+}
+
+#share-button:hover {
+  background: #1d4ed8;
 }
 
 #share-message {
-    margin-top: 10px;
-    font-weight: bold;
+  min-height: 1.2em;
+  color: #16a34a;
+  font-size: 1em;
+  margin-top: 0.5em;
 }
 
-#suggestions-box div {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 1.2em 1em;
+  margin: 0.7em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+  max-width: 340px;
+  width: 100%;
+  transition: box-shadow 0.2s;
 }
 
-#suggestions-box div:hover {
-    background-color: #f0f0f0;
+.card:hover {
+  box-shadow: 0 4px 16px rgba(37,99,235,0.10);
+}
+
+.book-cover {
+  width: 110px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 7px;
+  margin-bottom: 0.7em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 .stat-card {
-    width: 100%;
-    max-width: 340px;
+  background: #f0f7ff;
+  min-width: 320px;
+  max-width: 420px;
+  width: 100%;
+  padding: 2em 1.5em 2em 1.5em;
 }
 
-.stat-card canvas {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 310 / 220;
-    max-width: 310px;
-    display: block;
-    margin: 12px auto 0 auto;
-    box-sizing: border-box;
+.section {
+  margin-bottom: 2em;
+}
+
+.shared-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2em;
+  justify-content: flex-start;
+}
+
+.card p, .card h3 {
+  margin: 0.3em 0;
+  text-align: center;
+}
+
+.timestamp {
+  font-size: 0.95em;
+  color: #64748b;
+  margin-top: 0.5em;
+}
+
+/* Chart.js canvas in cards */
+canvas[id^="sharedChart-"] {
+  max-width: 360px;
+  width: 100%;
+  height: 220px;
+  min-height: 220px;
+  display: block;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: #f0f7ff;
+  border-radius: 8px;
+}
+
+/* Center content in the preview card */
+#book-details.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center the book cover image */
+#book-cover.book-cover {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* Responsive design */
+@media (max-width: 700px) {
+  .container {
+    padding: 1em 0.3em;
+  }
+  .shared-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+  .card {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 1em 0.5em;
+  }
+  .book-cover {
+    width: 90px;
+    height: 130px;
+  }
+  canvas[id^="sharedChart-"] {
+    max-width: 95vw;
+    height: 140px !important;
+  }
+  #book-dropdown, #share-username {
+    max-width: 98vw;
+  }
+  .stat-card {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 1em 0.5em;
+  }
+  canvas[id^="sharedChart-"] {
+    max-width: 95vw;
+    height: 160px !important;
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 400px) {
+  .container {
+    padding: 0.3em 0.1em;
+  }
+  .card {
+    padding: 0.7em 0.2em;
+  }
 }
