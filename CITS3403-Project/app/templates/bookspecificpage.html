@@ -32,8 +32,9 @@
         <img src="{{ book.cover_url }}" alt="Book cover for {{ book.title }}"/>
         <div class="user-stats">
           <p><strong>Status:</strong><span id="status-text">{{ user_data.status or "No status yet" }}</span></p>
-          <p><strong>Current Page:</strong> <span id="current-total">{{ pages_read_total or 0 }}</span> / {{ book.pages }}</p>
-          <button type="button" class="generic-btn" onclick="openForm()">Edit Read Progress</button>
+          <p><strong>Current Page:</strong> <span id="current-total">{{ pages_read_total or 0 }}</span> / <span id="book-pages-total">{{ book.pages }}</span></p>
+          <button type="button" class="generic-btn" onclick="openForm()">Edit Read Progress</button> <br>
+          <button type="button" class="generic-btn" onclick="openPagesModal()">Edit Page Number</button>  
         </div>
       </div>
     </div>
@@ -117,6 +118,17 @@
         <button id="add-entry" class="generic-btn">Add Entry</button>
 
         <div id="log-message" class="log-message"></div>
+    </div>
+  </div>
+
+  <!-- Edit total-pages modal -->
+  <div id="pagesModal" class="log-modal" hidden>
+    <div class="modal-content">
+      <button class="close-log generic-btn-light" onclick="closePagesModal()">×</button>
+      <h2>Edit Total Pages</h2>
+      <input id="pages-input" type="number" min="1" style="width:120px;">
+      <button id="pages-save" class="generic-btn">Update</button>
+      <p id="pages-msg" class="log-message"></p>
     </div>
   </div>
 

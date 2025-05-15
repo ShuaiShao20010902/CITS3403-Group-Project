@@ -600,71 +600,91 @@ def api_books():
 
 @main.route('/update_book/<string:book_id>', methods=['POST'])
 def update_book(book_id):
-    # 1. current user
+    from datetime import date
+
+    # --- 1. current user --------------------------------------------------
     username = session.get('username') or abort(401)
     user = User.query.filter_by(username=username).first_or_404()
-    # 2. book exists?
+
+    # --- 2. book exists? ---------------------------------------------------
     Book.query.filter_by(work_id=book_id).first_or_404()
 
-    # 3. get / create UserBook
-    ub = UserBook.query.filter_by(user_id=user.user_id, book_id=book_id).first()
+    # --- 3. get / create UserBook -----------------------------------------
+    ub = UserBook.query.filter_by(user_id=user.user_id,
+                                  book_id=book_id).first()
     if not ub:
         ub = UserBook(user_id=user.user_id, book_id=book_id)
         db.session.add(ub)
 
-    # ───── handle simple fields ────────────────────────────────────────────
+    # ---------- helper: recalc completion flag ----------------------------
+    def _recalc_completion():
+        if not ub.number_of_pages:           # unknown length
+            return
+        total = (db.session.query(db.func.coalesce(
+                    db.func.sum(ReadingLog.pages_read), 0))
+                 .filter_by(user_id=user.user_id, book_id=book_id)
+                 .scalar())
+        ub.completed = (total >= ub.number_of_pages)
+
+    # ---------- simple fields (rating / status / notes) -------------------
     modified = False
 
     if 'rating' in request.form:
         try:
-            ub.rating = float(request.form['rating'])
-            modified = True
-        except ValueError:
-            pass                                   # ignore bad floats
+            ub.rating = float(request.form['rating']); modified = True
+        except ValueError: pass
 
     status = request.form.get('status')
     if status is not None:
-        ub.completed = (status == 'completed')
-        modified = True
+        ub.completed = (status == 'completed'); modified = True
 
     notes = request.form.get('notes')
     if notes is not None:
-        ub.notes = notes
-        modified = True
+        ub.notes = notes; modified = True
     
-    # This is a helper function 
-    def _recalc_completion(user_id, book_id, ub, book):
-        """Set ub.completed depending on summed pages."""
-        if not book.number_of_pages:
-            return  # unknown length → leave flag as-is
-        total = (db.session.query(db.func.coalesce(
-                    db.func.sum(ReadingLog.pages_read), 0))
-                .filter_by(user_id=user_id, book_id=book_id)
-                .scalar())
-        ub.completed = (total >= book.number_of_pages)
-        
-    # ───── reading-log actions --------------------------------------------
-    # delete takes priority
+    # --- pages_total update ---------------------------------------------------
+    if 'pages_total' in request.form:
+        try:
+            new_pages = int(request.form['pages_total'])
+            if new_pages <= 0:
+                return jsonify(success=False, message="Pages must be > 0"), 400
+
+            # guard – cannot be less than pages already read
+            current_total = (db.session.query(db.func.coalesce(
+                            db.func.sum(ReadingLog.pages_read), 0))
+                            .filter_by(user_id=user.user_id, book_id=book_id)
+                            .scalar())
+            if current_total > new_pages:
+                return jsonify(success=False,
+                            message="New total cannot be less than pages already read."), 400
+
+            ub.number_of_pages = new_pages
+            _recalc_completion()            # update completed flag
+            db.session.commit()
+            return jsonify(success=True, new_pages=new_pages)
+
+        except ValueError:
+            return jsonify(success=False, message="Bad page number"), 400
+
+    
+
+    # ---------- reading-log actions ---------------------------------------
+    # delete
     if 'delete_date' in request.form:
-        d = request.form['delete_date']
         ReadingLog.query.filter_by(user_id=user.user_id,
                                    book_id=book_id,
-                                   date=d).delete()
-        _recalc_completion(user.user_id, book_id, ub,
-                       Book.query.filter_by(work_id=book_id).first())
+                                   date=request.form['delete_date']).delete()
+        _recalc_completion()
         db.session.commit()
         return jsonify(success=True)
 
     # edit existing
     if 'edit_date' in request.form and 'page_read' in request.form:
-        d     = request.form['edit_date']
-        pages = int(request.form['page_read'])
-        log   = ReadingLog.query.filter_by(user_id=user.user_id,
-                                           book_id=book_id,
-                                           date=d).first_or_404()
-        log.pages_read = pages
-        _recalc_completion(user.user_id, book_id, ub,
-                       Book.query.filter_by(work_id=book_id).first())
+        log = ReadingLog.query.filter_by(user_id=user.user_id,
+                                         book_id=book_id,
+                                         date=request.form['edit_date']).first_or_404()
+        log.pages_read = int(request.form['page_read'])
+        _recalc_completion()
         db.session.commit()
         return jsonify(success=True)
 
@@ -674,24 +694,23 @@ def update_book(book_id):
             pages_to_add = int(request.form['page_read'])
             log_date     = date.fromisoformat(request.form['date'])
 
-            # Guard A – future date
+            # A. future date
             if log_date > date.today():
                 return jsonify(success=False,
                                message="That day is yet to come."), 400
 
-            # Guard B – pages overflow
-            book = Book.query.filter_by(work_id=book_id).first()
-            if book.number_of_pages:
+            # B. overflow guard (uses ub.number_of_pages)
+            if ub.number_of_pages:
                 current_total = (db.session.query(db.func.coalesce(
                                    db.func.sum(ReadingLog.pages_read), 0))
                                  .filter_by(user_id=user.user_id,
                                             book_id=book_id)
                                  .scalar())
-                if current_total + pages_to_add > book.number_of_pages:
+                if current_total + pages_to_add > ub.number_of_pages:
                     return jsonify(success=False,
                                    message="Book doesn't have that many pages."), 400
 
-            # Guard C – duplicate date
+            # C. duplicate date
             if ReadingLog.query.filter_by(user_id=user.user_id,
                                           book_id=book_id,
                                           date=log_date).first():
@@ -699,11 +718,12 @@ def update_book(book_id):
                                message="Entry for this date already exists. "
                                        "Delete or edit it instead."), 409
 
-            # insert
-            new_log = ReadingLog(user_id=user.user_id, book_id=book_id,
-                                 date=log_date, pages_read=pages_to_add)
+            new_log = ReadingLog(user_id=user.user_id,
+                                 book_id=book_id,
+                                 date=log_date,
+                                 pages_read=pages_to_add)
             db.session.add(new_log)
-            _recalc_completion(user.user_id, book_id, ub, book)
+            _recalc_completion()
             db.session.commit()
             return jsonify(success=True,
                            new_log={'date': log_date.isoformat(),
@@ -711,7 +731,7 @@ def update_book(book_id):
         except (ValueError, TypeError):
             return jsonify(success=False, message="Bad input"), 400
 
-    # ───── commit & return for rating / notes-only paths ───────────────────
+    # ---------- commit for rating / notes-only ----------------------------
     if modified:
         db.session.commit()
     return jsonify(success=True)
@@ -719,94 +739,99 @@ def update_book(book_id):
 
 
 
-@main.route('/book/<string:book_id>', methods=['GET', 'POST'])
+
+@main.route('/book/<string:book_id>', methods=['GET'])
 def book_specific_page(book_id):
-    # Fallback in case book not found
+    # ---------- 1. Fallback  ----------
     fallback = {
-        'title': 'Unknown Title',
-        'author': 'Unknown Author',
-        'pages': 0,
+        'title'      : 'Unknown Title',
+        'author'     : 'Unknown Author',
+        'pages'      : 0,
         'description': 'No description available.',
-        'cover_url': 'https://covers.openlibrary.org/b/id/255844-M.jpg',
-        'genres': []
+        'cover_url'  : 'https://covers.openlibrary.org/b/id/255844-M.jpg',
+        'genres'     : []
     }
 
-    # Fetch the book from DB
+    # ---------- 2. Book row (still has title, author, etc.) ----------
     book_row = Book.query.filter_by(work_id=book_id).first()
     if not book_row:
-        return render_template(
-            'bookspecificpage.html',
-            book=fallback,
-            user_data={},
-            book_id=book_id,
-            community_notes=[],
-            pages_read_total=0
-        )
+        return render_template('bookspecificpage.html',
+                               book=fallback,
+                               user_data={},
+                               book_id=book_id,
+                               community_notes=[],
+                               pages_read_total=0,
+                               reading_logs=[])
 
-    # Build the book dict
+    # ---------- 3. Current user & UserBook ----------
+    username = session.get('username')
+    user = User.query.filter_by(username=username).first()
+
+    ub = None
+    if user:
+        ub = UserBook.query.filter_by(user_id=user.user_id,
+                                      book_id=book_id).first()
+
+    # ---------- 4. Build book dict ----------
+    pages_for_user = ub.number_of_pages if ub and ub.number_of_pages else 0
     book = {
-        'title': book_row.title,
-        'author': book_row.author,
-        'pages': book_row.number_of_pages,
+        'title'      : book_row.title,
+        'author'     : book_row.author,
+        'pages'      : pages_for_user,
         'description': book_row.description or fallback['description'],
-        'cover_url': f"https://covers.openlibrary.org/b/id/{book_row.cover_id}-L.jpg" if book_row.cover_id else fallback['cover_url'],
-        'genres': []
+        'cover_url'  : f"https://covers.openlibrary.org/b/id/{book_row.cover_id}-L.jpg"
+                       if book_row.cover_id else fallback['cover_url'],
+        'genres'     : []
     }
 
-    # Parse subjects into genres (JSON or CSV)
+    # subjects → genres
     if book_row.subjects:
         try:
             import json
             subs = json.loads(book_row.subjects)
-            book['genres'] = subs[:5] if isinstance(subs, list) else [s.strip() for s in book_row.subjects.split(',')][:5]
-        except:
+            book['genres'] = subs[:5] if isinstance(subs, list) else [
+                s.strip() for s in book_row.subjects.split(',')
+            ][:5]
+        except Exception:
             book['genres'] = [s.strip() for s in book_row.subjects.split(',')][:5]
 
-    # Fetch user and user-specific data
-    username = session.get('username')
-    user = User.query.filter_by(username=username).first()
-    user_data = {}
+    # ---------- 5. User-specific aggregates ----------
+    user_data        = {}
     pages_read_total = 0
+    reading_logs     = []
 
     if user:
-        # UserBook info
-        ub = UserBook.query.filter_by(user_id=user.user_id, book_id=book_id).first()
         if ub:
             user_data = {
-                'rating': ub.rating,
-                'status': 'Completed' if ub.completed else 'Reading',
-                'notes': ub.notes,
+                'rating' : ub.rating,
+                'status' : 'Completed' if ub.completed else 'Reading',
+                'notes'  : ub.notes
             }
 
-        # Sum pages_read from ReadingLog
         pages_read_total = db.session.query(
             db.func.coalesce(db.func.sum(ReadingLog.pages_read), 0)
         ).filter_by(user_id=user.user_id, book_id=book_id).scalar()
 
-    reading_logs = []
-    if user:
-        logs = (ReadingLog
-                .query
-                .filter_by(user_id=user.user_id, book_id=book_id)
-                .order_by(ReadingLog.date.asc())
-                .all())
-        # serialize to simple dicts
-        for l in logs:
+        # serialise logs → list[dict]
+        for l in (ReadingLog.query
+                  .filter_by(user_id=user.user_id, book_id=book_id)
+                  .order_by(ReadingLog.date.asc())
+                  .all()):
             reading_logs.append({
-                'id': l.id,
-                'date': l.date.isoformat(),
+                'id'        : l.id,
+                'date'      : l.date.isoformat(),
                 'pages_read': l.pages_read
             })
 
-    return render_template(
-        'bookspecificpage.html',
-        book=book,
-        user_data=user_data,
-        book_id=book_id,
-        community_notes=[],
-        pages_read_total=pages_read_total,
-        reading_logs=reading_logs
-    )
+    # ---------- 6. Render ----------
+    return render_template('bookspecificpage.html',
+                           book=book,
+                           user_data=user_data,
+                           book_id=book_id,
+                           community_notes=[],
+                           pages_read_total=pages_read_total,
+                           reading_logs=reading_logs)
+
 
 #endpoint to add book to dashboard (utils.py, browse.html, search)
 @main.route("/add_book", methods=["POST"])    

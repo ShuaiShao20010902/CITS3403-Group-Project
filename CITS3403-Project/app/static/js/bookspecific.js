@@ -270,6 +270,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+
+  const $pagesModal = $('#pagesModal');
+  const $pagesInp   = $('#pages-input');
+  const $pagesMsg   = $('#pages-msg');
+
+  window.openPagesModal = () => {
+    $pagesInp.val(window.BOOK_PAGES || 0);
+    $pagesMsg.text('');
+    $pagesModal.removeAttr('hidden');
+  };
+  window.closePagesModal = () => $pagesModal.attr('hidden', true);
+
+  $('#pages-save').on('click', () => {
+    const val = +$pagesInp.val() || 0;
+    if (val <= 0) { $pagesMsg.text('Enter a positive number'); return; }
+
+    $.ajax({
+      url : UPDATE_BOOK_URL,
+      type: 'POST',
+      data: { pages_total: val },
+      success(resp){
+        // backend returns {"new_pages": val}
+        window.BOOK_PAGES = resp.new_pages;
+        $('#book-pages-total').text(val);
+        recalcTotal();                // may flip Completed flag
+        buildOrUpdateChart();         // y-axis max changes
+        closePagesModal();
+      },
+      error(xhr){
+        $pagesMsg.text(xhr.responseJSON?.message || 'Error updating');
+      }
+    });
+  });
+
   // initial load
   recalcTotal();
   buildOrUpdateChart();

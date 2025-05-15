@@ -1,5 +1,4 @@
 """This one addes a few fields to the users table for password reset functionality. 
-Also currently the latest one.
 
 Revision ID: 07b460742caf
 Revises: e2c4f6b1a7c0
