@@ -2,6 +2,43 @@
 
 _Track everything merged into `main`._
 
+### 15th May
+- Updated bookspecificpage
+    - Added charts for the individual book
+    - Fixed various bugs regarding editing the reading log entry
+    - Duplicate (reading log) entries are no longer possible
+    - Added a "completed" section for books that are finished
+    - Updated the rating system
+- Updated Security 
+    - Emails are now correctly sent to the user's email address for the reset password feature
+- Other 
+    - Migrations scripts updated
+    - Changelogs updated
+    - Script for sample data removed now (no longer needed)
+
+### 14th May
+- Updated share page
+    - Now able to share total book reading progress with other users
+    - Various bug fixes regarding the share page and charts
+- Updated Security 
+    - Password reset confirmation is now sent to the email
+
+### 13th May
+- Updated share page
+    - Now able to share books (with rating and notes) with other users
+    - Implemented AJAX with a suggestions box that appears when you start typing a user name and will autocomplete the name if you select it
+    - User cannot share to themself + various bug fixes
+- Updated Security 
+    - WTForms are now used for the signup page and password validation
+    - Made a popup for passwords requirements
+    - Multiple fixes to error pop-up messages
+    - Added the use of csrf_token in the login page and forgot password page
+    - Secured session key by using a config file to receive security key from the .env file. And then using init file to import the config.
+- Other
+    - Various merge conflicts resolved
+    - Migrations scripts updated
+    - .gitignore was modified
+
 ### 12th May
 - Backend Improvements
     - Move the backend and frontend to the app folder to make it easier to manage and looks well structured.
@@ -26,7 +63,6 @@ _Track everything merged into `main`._
     - Rating System and Notes system both properly updates field in database but design may need to be updated 
     - Tracking reading progress is partially implemented so that it is able to retrieve and modify entries in the Reading Log table. However there are errors when trying to update the entries of existing entries.
         
-
 ### 10th May
 - Updated Backend
     - Authors and Books table added (requires API data from editions.json)
