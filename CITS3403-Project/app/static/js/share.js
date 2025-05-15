@@ -256,5 +256,26 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Carousel arrows
+    document.querySelectorAll('.carousel-container').forEach(container => {
+        const track = container.querySelector('.carousel-track');
+        container.querySelector('.carousel-arrow.left').onclick = () => {
+            track.scrollBy({ left: -300, behavior: 'smooth' });
+        };
+        container.querySelector('.carousel-arrow.right').onclick = () => {
+            track.scrollBy({ left: 300, behavior: 'smooth' });
+        };
+    });
 });
 

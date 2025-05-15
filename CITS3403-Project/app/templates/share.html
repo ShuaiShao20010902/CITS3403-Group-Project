@@ -40,63 +40,75 @@
             <p id="share-message"></p>
         </div>
 
-        <!-- You're Sharing Section -->
-        <div class="section">
-            <h2>You're Sharing</h2>
-            <div class="shared-cards">
-                {% for item in your_shared_items %}
-                    <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
-                        {% if item.content_type == 'stats' %}
-                            <h3>{{ item.title }}</h3>
-                            <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <canvas id="sharedChart-{{ item.id }}" width="360" height="220"></canvas>
-                        {% else %}
-                            {% if item.cover_url %}
-                                <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+        <!-- Tabs -->
+        <div class="share-tabs">
+            <button class="tab-btn active" data-tab="sharing">You're Sharing</button>
+            <button class="tab-btn" data-tab="sharedwith">Shared with You</button>
+        </div>
+
+        <!-- You're Sharing Carousel -->
+        <div class="tab-content active" id="tab-sharing">
+            <div class="carousel-container">
+                <button class="carousel-arrow left" aria-label="Scroll left">&#8592;</button>
+                <div class="carousel-track">
+                    {% for item in your_shared_items %}
+                        <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
+                            {% if item.content_type == 'stats' %}
+                                <h3>{{ item.title }}</h3>
+                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <canvas id="sharedChart-{{ item.id }}" width="380" height="220"></canvas>
+                            {% else %}
+                                {% if item.cover_url %}
+                                    <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                                {% endif %}
+                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p><strong>Title:</strong> {{ item.title }}</p>
+                                <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
+                                <p><strong>Rating:</strong> {{ item.rating }}</p>
+                                <p class="timestamp">Shared on {{ item.created_at }}</p>
                             {% endif %}
-                            <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <p><strong>Title:</strong> {{ item.title }}</p>
-                            <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
-                            <p><strong>Rating:</strong> {{ item.rating }}</p>
-                            <p class="timestamp">Shared on {{ item.created_at }}</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-arrow right" aria-label="Scroll right">&#8594;</button>
             </div>
         </div>
 
-        <!-- Shared with You Section -->
-        <div class="section">
-            <h2>Shared with You</h2>
+        <!-- Shared with You Carousel -->
+        <div class="tab-content" id="tab-sharedwith">
             <div class="share-info-tip">
                 <strong>Tip:</strong> If you see a title you like, hit the <b>Copy</b> button and head over to our
                 <a href="{{ url_for('main.browse') }}">Browse</a> page to find and add it to your dashboard!
             </div>
-            <div class="shared-cards">
-                {% for item in shared_to_user %}
-                    <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
-                        {% if item.content_type == 'stats' %}
-                            <h3>{{ item.title }}</h3>
-                            <p><strong>From:</strong> {{ item.shared_by }}</p>
-                            <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <canvas id="sharedChart-{{ item.id }}" width="360" height="220"></canvas>
-                        {% else %}
-                            {% if item.cover_url %}
-                                <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+            <div class="carousel-container">
+                <button class="carousel-arrow left" aria-label="Scroll left">&#8592;</button>
+                <div class="carousel-track">
+                    {% for item in shared_to_user %}
+                        <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
+                            {% if item.content_type == 'stats' %}
+                                <h3>{{ item.title }}</h3>
+                                <p><strong>From:</strong> {{ item.shared_by }}</p>
+                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <canvas id="sharedChart-{{ item.id }}" width="380" height="220"></canvas>
+                            {% else %}
+                                {% if item.cover_url %}
+                                    <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                                {% endif %}
+                                <p><strong>From:</strong> {{ item.shared_by }}</p>
+                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p><strong>Title:</strong> {{ item.title }}</p>
+                                <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
+                                <p><strong>Rating:</strong> {{ item.rating }}</p>
+                                <p class="timestamp">Shared on {{ item.created_at }}</p>
+                                <button class="copy-title-btn" data-title="{{ item.title }}">
+                                    <svg viewBox="0 0 20 20"><path d="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6zm0 2h8v12H6V4zm2 2v2h4V6H8z"/></svg>
+                                    Copy Title to Clipboard
+                                </button>
                             {% endif %}
-                            <p><strong>From:</strong> {{ item.shared_by }}</p>
-                            <p><strong>Type:</strong> {{ item.content_type }}</p>
-                            <p><strong>Title:</strong> {{ item.title }}</p>
-                            <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
-                            <p><strong>Rating:</strong> {{ item.rating }}</p>
-                            <p class="timestamp">Shared on {{ item.created_at }}</p>
-                            <button class="copy-title-btn" data-title="{{ item.title }}">
-                                <svg viewBox="0 0 20 20"><path d="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6zm0 2h8v12H6V4zm2 2v2h4V6H8z"/></svg>
-                                Copy Title to Clipboard
-                            </button>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-arrow right" aria-label="Scroll right">&#8594;</button>
             </div>
         </div>
     </div>
