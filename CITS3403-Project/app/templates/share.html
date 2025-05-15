@@ -68,6 +68,10 @@
         <!-- Shared with You Section -->
         <div class="section">
             <h2>Shared with You</h2>
+            <div class="share-info-tip">
+                <strong>Tip:</strong> If you see a title you like, hit the <b>Copy</b> button and head over to our
+                <a href="{{ url_for('main.browse') }}">Browse</a> page to find and add it to your dashboard!
+            </div>
             <div class="shared-cards">
                 {% for item in shared_to_user %}
                     <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
@@ -86,6 +90,10 @@
                             <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
                             <p><strong>Rating:</strong> {{ item.rating }}</p>
                             <p class="timestamp">Shared on {{ item.created_at }}</p>
+                            <button class="copy-title-btn" data-title="{{ item.title }}">
+                                <svg viewBox="0 0 20 20"><path d="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6zm0 2h8v12H6V4zm2 2v2h4V6H8z"/></svg>
+                                Copy Title to Clipboard
+                            </button>
                         {% endif %}
                     </div>
                 {% endfor %}

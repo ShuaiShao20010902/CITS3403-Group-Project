@@ -88,6 +88,19 @@ h1, h2 {
   margin-top: 0.5em;
 }
 
+.share-info-tip {
+  margin-bottom: 1.2em;
+  color: #2563eb;
+  background: #e8f0fe;
+  border-radius: 8px;
+  padding: 1em;
+  font-size: 1.05em;
+}
+.share-info-tip a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
 .card {
   background: #fff;
   border-radius: 10px;
@@ -219,4 +232,35 @@ canvas[id^="sharedChart-"] {
   .card {
     padding: 0.7em 0.2em;
   }
+}
+
+.copy-title-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5em 1.5em;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 0.7em;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.copy-title-btn:hover, .copy-title-btn:focus {
+  background: #1d4ed8;
+  outline: none;
+}
+.copy-title-btn.copied {
+  background: #16a34a;
+  color: #fff;
+}
+.copy-title-btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: middle;
+  fill: currentColor;
 }

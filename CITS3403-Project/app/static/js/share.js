@@ -240,4 +240,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    document.querySelectorAll('.copy-title-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const title = btn.getAttribute('data-title');
+            navigator.clipboard.writeText(title).then(function() {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = `<svg viewBox="0 0 20 20"><path d="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6zm0 2h8v12H6V4zm2 2v2h4V6H8z"/></svg> Copy Title to Clipboard`;
+                    btn.classList.remove('copied');
+                }, 1500);
+            }, function() {
+                alert('Failed to copy!');
+            });
+        });
+    });
 });
+
