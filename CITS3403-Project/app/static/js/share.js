@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     suggestionsBox.style.display = 'none';
     document.body.appendChild(suggestionsBox);
 
+    // Parse the shared stats data from the HTML data block
+    const statsDataScript = document.getElementById('shared-stats-data');
+    window.sharedStatsData = statsDataScript ? JSON.parse(statsDataScript.textContent) : {};
+
     // Get the current user's username (optional: pass it from the backend)
     const currentUser = "{{ session.get('username') }}";
 
@@ -63,30 +67,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle book selection and display details
     bookDropdown.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const coverUrl = selectedOption.getAttribute('data-cover');
-        const note = selectedOption.getAttribute('data-note');
-        const rating = selectedOption.getAttribute('data-rating');
-
-        if (coverUrl) {
-            bookCover.src = coverUrl;
-        } else {
-            bookCover.src = ''; // Fallback if no cover URL
-        }
-
-        if (note) {
-            bookNote.textContent = note;
-        } else {
-            bookNote.textContent = 'No notes available.';
-        }
-
-        if (rating) {
-            bookRating.textContent = `Rating: ${rating}`;
-        } else {
-            bookRating.textContent = 'No rating available.';
-        }
-
+        const selectedValue = this.value;
         bookDetails.style.display = 'block';
+
+        // Remove any previous chart preview
+        const existingChart = document.getElementById('shareStatsChart');
+        if (existingChart) existingChart.remove();
+
+        if (selectedValue === 'stats') {
+            // Hide book-specific fields
+            bookCover.style.display = 'none';
+            bookNote.parentElement.style.display = 'none';
+            bookRating.parentElement.style.display = 'none';
+
+            // Remove previous chart if present
+            const existingChart = document.getElementById('shareStatsChart');
+            if (existingChart) existingChart.remove();
+
+            // Add chart preview
+            const chartCanvas = document.createElement('canvas');
+            chartCanvas.id = 'shareStatsChart';
+            chartCanvas.width = 220;   // Match card chart width
+            chartCanvas.height = 180;  // Match card chart height
+            bookDetails.appendChild(chartCanvas);
+
+            // Render the chart using the preview data
+            const chartData = window.sharedStatsData['preview'] || [];
+            const ctx = chartCanvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(item => item.date),
+                    datasets: [{
+                        label: 'Pages Read',
+                        data: chartData.map(item => item.pages_read),
+                        fill: true,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.2,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Date' },
+                            ticks: { font: { size: 12 } }
+                        },
+                        y: {
+                            title: { display: true, text: 'Pages' },
+                            beginAtZero: true,
+                            ticks: { font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        } else {
+            // Show book-specific fields
+            bookCover.style.display = '';
+            bookNote.parentElement.style.display = '';
+            bookRating.parentElement.style.display = '';
+
+            // Remove chart if present
+            const chartCanvas = document.getElementById('shareStatsChart');
+            if (chartCanvas) chartCanvas.remove();
+
+            // Existing logic for book preview...
+            const selectedOption = bookDropdown.options[bookDropdown.selectedIndex];
+            bookCover.src = selectedOption.getAttribute('data-cover');
+            bookNote.textContent = selectedOption.getAttribute('data-note');
+            bookRating.textContent = selectedOption.getAttribute('data-rating');
+        }
     });
 
     // Handle username input and display suggestions
@@ -143,5 +196,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!shareUsername.contains(event.target) && !suggestionsBox.contains(event.target)) {
             suggestionsBox.style.display = 'none';
         }
+    });
+
+    // Loop through all stats cards and render the chart
+    document.querySelectorAll('canvas[id^="sharedChart-"]').forEach(canvas => {
+        const itemId = canvas.id.split('-')[1];
+        const chartData = window.sharedStatsData[itemId];
+        if (!chartData) return;
+        new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartData.map(item => item.date),
+                datasets: [{
+                    label: 'Pages Read',
+                    data: chartData.map(item => item.pages_read),
+                    fill: true,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.2,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Pages' },
+                        ticks: { font: { size: 12 } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Date' },
+                        ticks: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
     });
 });
