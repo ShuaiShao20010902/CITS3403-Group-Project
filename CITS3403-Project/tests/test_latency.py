@@ -1,4 +1,4 @@
-# run from terminal using python3 static/tests/test_latency.py
+# run from terminal
 # This script tests the latency of Open Library's API endpoint by sending a GET request and measuring the time taken to receive a response.
 
 import requests
