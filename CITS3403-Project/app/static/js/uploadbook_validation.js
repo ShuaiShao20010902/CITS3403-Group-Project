@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const pagesField        = document.getElementById('number_of_pages');
     const requiredFields    = [titleField, authorField];
   
-    // Shared popup builder
+    // Popup HTML
     function showErrors(errors) {
       const html = `
         <div id="error_popup" class="error_popup show">
@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', function() {
       return valid;
     }
   
-    // Real-time feedback
+    // Realtime
     [titleField, authorField, pagesField].forEach(f => {
       f.addEventListener('input', () => validateField(f));
       f.addEventListener('blur',  () => validateField(f));
     });
   
-    // On submit, collect errors & show popup if any
+    // On submit, collect errors + show popup if any
     form.addEventListener('submit', function(event) {
       const errors = [];
   
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!validateField(authorField)) errors.push('Author is required');
       if (!validateField(pagesField))  errors.push('Number of pages must be a positive number');
   
-      
+
       if (errors.length) {
         event.preventDefault();
         showErrors(errors);

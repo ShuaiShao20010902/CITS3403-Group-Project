@@ -1,7 +1,9 @@
+/* General Style */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { font-family: Arial, sans-serif; }
 
+/* Page Layout */
 .browse-page {
     max-width: 1000px;
     margin: 40px auto;
@@ -34,9 +36,14 @@ body { font-family: Arial, sans-serif; }
     border: 1px solid #ccc;
     background-color: rgb(215, 215, 215);  
   }
-  
+
+  .custom-select-wrapper select:hover {
+    border-color: #999;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
   .custom-select-wrapper::after {
-    content: '⇅';
+    content: '▾';
     position: absolute;
     top: 50%;
     right: 14px;
@@ -54,6 +61,7 @@ body { font-family: Arial, sans-serif; }
     background-color: white;
   }
   
+  /* Book cards */
   .book-list {
     display: flex;
     flex-direction: column;
@@ -143,73 +151,6 @@ body { font-family: Arial, sans-serif; }
     background-color: #2f2f4f;
     transform: translateY(-2px);
   }
-
-.import-box {
-  max-width: 600px;
-  margin: 20px auto; 
-  padding: 40px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  font-family: Arial, sans-serif;
-}
-
-.import-box h2 {
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  text-align: center;
-  color: #2c2c2c;
-}
-
-.import-box p {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.import-box label {
-  font-weight: bold;
-  font-size: 14px;
-  display: block;
-  margin-bottom: 6px;
-  margin-top: 16px;
-}
-
-.import-box input,
-.import-box select,
-.import-box textarea {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: #f8f8f8;
-}
-
-.import-box textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.import-box .import-btn {
-  margin-top: 10px;
-  background-color: #1c1c2b;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s ease;
-}
-
-.import-box .import-btn:hover {
-  background-color: #2f2f4f;
-}
 
 /* Modal Styles */
 

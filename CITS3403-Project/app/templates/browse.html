@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/browse.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/import_book.css') }}">
 
-    <title>🔎 Browse page</title>
+    <title>Browse page</title>
 </head>
 <body>
     <div class="browse-page">
         {% include "nav.html" %}
+
         <div class = "top-bars">
+            <!--Filter bar content-->
             <div class="filter-bar">
                 <input type="text" placeholder="Search all books..." class="search-input">
                 <div class="custom-select-wrapper">
@@ -22,13 +25,15 @@
                 </div>
             </div>
             <a href="{{ url_for('main.uploadbook') }}"><button class ="add-book-btn"> Add book</button></a>
-            <p id = "no-matches" style = "display: none;">No matches.</p>
+            <p id = "no-matches" style = "display: none;"><span class="no-match-text">No matches.</span></p>
         </div>
     
         <div class="book-list" id="book-results">
+            <!-- Book results will be dynamically inserted here -->
         </div>
 
         <div class="import-box" id = "import-box" style = "display: none;">
+            <!-- Import form -->
             <h2>Import a book</h2>
             <p>Can not find the book? Manually import a book into the database.</p>
         
@@ -39,12 +44,15 @@
                 {{ form.genres.label }} {{ form.genres() }}
                 {{ form.description.label }} {{ form.description() }}
                 {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
-                {{ form.submit() }}
+                <div class="form-submit">
+                    {{ form.submit() }}
+                </div>
               </form>              
         </div>
     </div>
 
     <div id="modals" class="modals" style="display: none;">
+        <!-- Modal for adding number of pages -->
         <div class="modal">
           <h3>Enter Number of Pages</h3>
           <input type="number" id="pageInput" placeholder="e.g. 250" min="1">

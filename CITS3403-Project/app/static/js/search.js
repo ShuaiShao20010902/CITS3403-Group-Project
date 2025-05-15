@@ -1,9 +1,13 @@
+// ──────────────────────────────────────────────────────────────
+// Elements
+// ──────────────────────────────────────────────────────────────
+
 const titleInput = document.querySelector('.search-input');
 const resultsContainer = document.getElementById('book-results');
 const noMatches = document.getElementById('no-matches');
 const importBox = document.getElementById('import-box');
 
-//modal
+//Modal
 const modal = document.getElementById('modals');
 const pageInput = document.getElementById('pageInput');
 const confirmBtn = document.getElementById('confirmAddButton');
@@ -28,7 +32,9 @@ const sortMap = {
   'old': 'old'
 };
 
-//Search bar
+// ──────────────────────────────────────────────────────────────
+// Live Search
+// ──────────────────────────────────────────────────────────────
 titleInput.addEventListener('input', () => {
   const query = titleInput.value.trim();
   latestquery = query;
@@ -49,12 +55,15 @@ titleInput.addEventListener('input', () => {
   fetch(url) 
     .then(res => res.json())
     .then(data => {
+      // Check if latest query matches the fetch query
       if (latestquery !== fetchquery) return;
 
       resultsContainer.innerHTML = '';
 
+      // No matches, show fallback message
       if (!data.docs || data.docs.length === 0) {
         resultsContainer.innerHTML = '';
+        noMatches.innerHTML = `No matches for: <strong>"${query}"</strong>`;
         noMatches.style.display = 'block';
         importBox.style.display = 'block';
         return;
@@ -74,6 +83,7 @@ titleInput.addEventListener('input', () => {
           ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
           : 'https://via.placeholder.com/120x180?text=No+Cover';
 
+        // Create a card for each book
         const card = document.createElement('div');
         card.className = 'book-card';
         card.innerHTML = `
@@ -89,7 +99,7 @@ titleInput.addEventListener('input', () => {
         `;
         resultsContainer.appendChild(card);
 
-        //addd to dashboard button
+        // Add to dashboard button
         const addBtn = card.querySelector('button');
 
         addBtn.addEventListener('click', () => {
@@ -108,7 +118,9 @@ titleInput.addEventListener('input', () => {
   });
 });
 
-//Page number adding
+// ──────────────────────────────────────────────────────────────
+// Add Pages Modal
+// ──────────────────────────────────────────────────────────────
 confirmBtn.addEventListener('click', () => {
   const pagesStr = pageInput.value.trim();
   const pages = parseInt(pagesStr, 10);
