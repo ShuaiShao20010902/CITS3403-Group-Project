@@ -11,18 +11,18 @@
             <ul class="error_list">
                 {# Display specific errors first #}
                 {% for error in errors %}
-                    {% if error == 'Email has already been taken' or 
-                          error == 'Password confirmation doesn\'t match Password' or 
-                          error == 'Username has already been taken' %}
+                    {% if error == 'Email has already been taken' or
+                            error == 'Password confirmation doesn\'t match Password' or
+                            error == 'Username has already been taken' %}
                         <li class="error_item">{{ error }}</li>
                     {% endif %}
                 {% endfor %}
 
                 {# Then display other errors #}
                 {% for error in errors %}
-                    {% if error != 'Email has already been taken' and 
-                          error != 'Password confirmation doesn\'t match Password' and 
-                          error != 'Username has already been taken' %}
+                    {% if error != 'Email has already been taken' and
+                            error != 'Password confirmation doesn\'t match Password' and
+                            error != 'Username has already been taken' %}
                         <li class="error_item">{{ error }}</li>
                     {% endif %}
                 {% endfor %}
