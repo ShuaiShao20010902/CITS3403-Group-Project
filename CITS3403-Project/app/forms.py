@@ -76,6 +76,23 @@ class PasswordResetRequestForm(FlaskForm):
         if not user:
             raise ValidationError('There is no account with that email. You must register first.')
 
+class PasswordResetForm(FlaskForm):
+    password = PasswordField('New Password', validators=[
+        DataRequired(message="Password is required."),
+        Length(min=8, message="Password must be at least 8 characters."),
+        Regexp(
+            '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+            message='Password must include at least one lowercase letter, one uppercase letter, one number, and one special character.'
+        )
+    ])
+
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(message="Please confirm your password."),
+        EqualTo('password', message="Passwords must match.")
+    ])
+
+    submit = SubmitField('Reset Password')
+
 
 class ManualBookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()], render_kw={"placeholder": "Enter title, e.g. The Hobbit"})

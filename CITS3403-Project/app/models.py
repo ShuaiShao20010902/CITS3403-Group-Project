@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone, date, timedelta
+import secrets
 
 db = SQLAlchemy()
 
@@ -10,10 +11,23 @@ class User(db.Model):
     username = db.Column(db.String(80), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
+    reset_token = db.Column(db.String(100), unique=True, nullable=True)
+    reset_token_expiration = db.Column(db.DateTime, nullable=True)
 
     books = db.relationship('UserBook', backref='user', cascade="all, delete-orphan")
     reading_logs = db.relationship('ReadingLog', backref='user', cascade="all, delete-orphan")
     shared_items = db.relationship('SharedItem', backref='user', cascade="all, delete-orphan")
+def generate_reset_token(self):
+    """Generate a secure reset token"""
+    self.reset_token = secrets.token_urlsafe(32)
+    self.reset_token_expiration = datetime.utcnow() + timedelta(hours=1)
+    return self.reset_token
+
+def verify_reset_token(self, token):
+    """Check if token is valid and not expired"""
+    return (self.reset_token == token and
+            self.reset_token_expiration and
+            self.reset_token_expiration > datetime.utcnow())
 
 class SharedItem(db.Model):
     __tablename__ = 'shared_items'
@@ -33,6 +47,7 @@ class UserBook(db.Model):
     __tablename__ = 'user_books'
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
     book_id = db.Column(db.String, db.ForeignKey('books.work_id'), primary_key=True)
+    number_of_pages = db.Column(db.Integer)
     rating = db.Column(db.Float, default=0.0)
     notes = db.Column(db.Text)
     completed = db.Column(db.Boolean, default=False)
@@ -58,7 +73,6 @@ class Book(db.Model):
     author = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     subjects = db.Column(db.Text)
-    number_of_pages = db.Column(db.Integer)
     cover_id = db.Column(db.Integer)
     last_fetched = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 

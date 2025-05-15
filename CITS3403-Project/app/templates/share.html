@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Share Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='js/share.js') }}" defer></script>
 </head>
 <body>
@@ -13,7 +14,7 @@
 
         <!-- Share with someone -->
         <div class="share-form">
-            <label for="book-dropdown">Select a Book to Share:</label>
+            <label for="book-dropdown">Select a Book or Stat to Share:</label>
             <select id="book-dropdown">
                 <option value="" disabled selected>Select a book</option>
                 {% for book in user_books %}
@@ -25,6 +26,7 @@
                         {{ book.book.title }}
                     </option>
                 {% endfor %}
+                <option value="stats" data-type="stats">📈 Your Reading Stats (Last 30 Days)</option>
             </select>
 
             <div id="book-details" class="card" style="display: none;">
@@ -43,15 +45,21 @@
             <h2>You're Sharing</h2>
             <div class="shared-cards">
                 {% for item in your_shared_items %}
-                    <div class="card" data-item-id="{{ item.id }}">
-                        {% if item.cover_url %}
-                            <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                    <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
+                        {% if item.content_type == 'stats' %}
+                            <h3>{{ item.title }}</h3>
+                            <p><strong>Type:</strong> {{ item.content_type }}</p>
+                            <canvas id="sharedChart-{{ item.id }}" width="310" height="220"></canvas>
+                        {% else %}
+                            {% if item.cover_url %}
+                                <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                            {% endif %}
+                            <p><strong>Type:</strong> {{ item.content_type }}</p>
+                            <p><strong>Title:</strong> {{ item.title }}</p>
+                            <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
+                            <p><strong>Rating:</strong> {{ item.rating }}</p>
+                            <p class="timestamp">Shared on {{ item.created_at }}</p>
                         {% endif %}
-                        <p><strong>Type:</strong> {{ item.content_type }}</p>
-                        <p><strong>Title:</strong> {{ item.title }}</p>
-                        <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
-                        <p><strong>Rating:</strong> {{ item.rating }}</p>
-                        <p class="timestamp">Shared on {{ item.created_at }}</p>
                     </div>
                 {% endfor %}
             </div>
@@ -62,20 +70,36 @@
             <h2>Shared with You</h2>
             <div class="shared-cards">
                 {% for item in shared_to_user %}
-                    <div class="card" data-item-id="{{ item.id }}">
-                        {% if item.cover_url %}
-                            <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                    <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
+                        {% if item.content_type == 'stats' %}
+                            <h3>{{ item.title }}</h3>
+                            <p><strong>From:</strong> {{ item.shared_by }}</p>
+                            <p><strong>Type:</strong> {{ item.content_type }}</p>
+                            <canvas id="sharedChart-{{ item.id }}" width="310" height="220"></canvas>
+                        {% else %}
+                            {% if item.cover_url %}
+                                <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
+                            {% endif %}
+                            <p><strong>From:</strong> {{ item.shared_by }}</p>
+                            <p><strong>Type:</strong> {{ item.content_type }}</p>
+                            <p><strong>Title:</strong> {{ item.title }}</p>
+                            <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
+                            <p><strong>Rating:</strong> {{ item.rating }}</p>
+                            <p class="timestamp">Shared on {{ item.created_at }}</p>
                         {% endif %}
-                        <p><strong>From:</strong> {{ item.shared_by }}</p>
-                        <p><strong>Type:</strong> {{ item.content_type }}</p>
-                        <p><strong>Title:</strong> {{ item.title }}</p>
-                        <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
-                        <p><strong>Rating:</strong> {{ item.rating }}</p>
-                        <p class="timestamp">Shared on {{ item.created_at }}</p>
                     </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+
+    <script id="shared-stats-data" type="application/json">
+    {
+        "preview": {{ chart_data|tojson }}{% if your_shared_items + shared_to_user|selectattr('content_type', 'equalto', 'stats')|list %},{% endif %}
+        {% for item in your_shared_items + shared_to_user if item.content_type == 'stats' %}
+            "{{ item.id }}": {{ item.chart_data|tojson }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    }
+    </script>
 </body>
 </html>

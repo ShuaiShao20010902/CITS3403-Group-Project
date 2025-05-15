@@ -22,6 +22,14 @@ body {
     padding: 30px;
 }
 
+/* bookspecificpage.css */
+.user-stats{
+  display:flex;          /* turn on flexbox */
+  flex-direction:column; /* stack items top-to-bottom */
+  gap:10px;              /* optional spacing between buttons/labels */
+  align-items:flex-start;/* keep left-aligned; use center if preferred */
+}
+
 /* Book Container */
 
 .book-cover img {
@@ -235,3 +243,5 @@ input[type="date"] {
 }
 .generic-btn-light:hover { background:#d4d4d8; }
 
+.msg-success { color:#0a0; }  
+.msg-error   { color:#c00; }  
