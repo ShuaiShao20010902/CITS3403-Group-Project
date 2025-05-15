@@ -61,6 +61,10 @@ def home():
     completed_books  = []        
     chart_data       = []
 
+    total_pages_read = 0
+    books_in_progress = 0
+    books_completed = 0
+
     if user:
         continue_reading = [
             ub.book for ub in UserBook.query
@@ -74,6 +78,14 @@ def home():
                      .all()
         ]
 
+        total_pages_read = db.session.query(
+            db.func.coalesce(db.func.sum(ReadingLog.pages_read), 0)
+        ).filter_by(user_id=user.user_id).scalar() or 0
+
+        books_in_progress = UserBook.query.filter_by(user_id=user.user_id, completed=False).count()
+
+        books_completed = UserBook.query.filter_by(user_id=user.user_id, completed=True).count()
+
         today = datetime.utcnow().date()
         past_30_days = [today - timedelta(days=i) for i in range(29, -1, -1)]
 
@@ -85,11 +97,16 @@ def home():
             chart_data.append({'date': day.strftime('%Y-%m-%d'),
                                'pages_read': total_pages})
 
-    return render_template('home.html',
-                           username=username,
-                           continue_reading=continue_reading,
-                           completed_books=completed_books,   
-                           chart_data=chart_data)
+    return render_template(
+        'home.html',
+        username=username,
+        continue_reading=continue_reading,
+        completed_books=completed_books,   
+        chart_data=chart_data,
+        total_pages_read=total_pages_read,
+        books_in_progress=books_in_progress,
+        books_completed=books_completed
+    )
 
 
 

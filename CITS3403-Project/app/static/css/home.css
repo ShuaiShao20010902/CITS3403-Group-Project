@@ -60,3 +60,53 @@ body { font-family: Arial, sans-serif; }
   object-fit:cover; object-position:center;
   border-radius:8px; display:block;
 }
+
+/* --------- Welcome section -------- */
+.welcome-section {
+  background: #f7f9fa;
+  border-radius: 12px;
+  padding: 2em 2em 1em 2em;
+  margin-bottom: 2em;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.welcome-section h1 {
+  margin-bottom: 0.3em;
+  font-size: 2em;
+  color: #2d3a4a;
+}
+
+.welcome-section p {
+  margin-bottom: 1.5em;
+  color: #4a5a6a;
+}
+
+.quick-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+  margin-top: 1em;
+}
+
+.stat {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1em 2em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  min-width: 120px;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2em;
+  font-weight: bold;
+  color: #3b82f6;
+}
+
+.stat-label {
+  display: block;
+  margin-top: 0.3em;
+  color: #6b7280;
+  font-size: 1em;
+}
