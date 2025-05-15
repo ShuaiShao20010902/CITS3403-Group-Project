@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleButtons.forEach((button, index) => {
         button.addEventListener('click', function() {
             const passwordInput = passwordInputs[index];
-            
+
             if (passwordInput.type === 'password') {
                 // Change to text
                 passwordInput.type = 'text';
