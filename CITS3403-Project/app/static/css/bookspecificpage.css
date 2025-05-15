@@ -235,3 +235,5 @@ input[type="date"] {
 }
 .generic-btn-light:hover { background:#d4d4d8; }
 
+.msg-success { color:#0a0; }  
+.msg-error   { color:#c00; }  

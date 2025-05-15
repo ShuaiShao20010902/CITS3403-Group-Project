@@ -16,7 +16,7 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
     if book:
         # print("[DEBUG]: Book already exists in DB.")
         if UserBook.query.filter_by(user_id=user_id, book_id=book.work_id).first():
-            return {'status': 'error', 'message': 'You have already added this book!'}
+            return {'status': 'error', 'message': 'You have already added this book!'} # I think currently this (the error msg) gets overwritten in the route - will check o this later 
         db.session.add(UserBook(user_id=user_id, book_id=book.work_id))
         db.session.commit()
         return {'status': 'success', 'message': f"Book '{book.title}' linked to dashboard."}
