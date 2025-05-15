@@ -11,7 +11,7 @@
   {% include 'nav.html' %}
 
   <div class="main-content">
-    <section class="continue-reading">
+    <section class="cr">
       <h2>Continue Reading</h2>
       {% if continue_reading %}
         <div class="cr-container">
@@ -40,8 +40,32 @@
         <canvas id="readingChart"></canvas>
       </div>
     </section>
-  </div>
 
+    <section class="cr">
+      <h2>Completed Books</h2>
+      {% if completed_books %}
+        <div class="cr-container">
+          <button class="cr-arrow cr2-left">&#10094;</button>
+          <div class="cr-track" id="completed-track">
+            {% for b in completed_books %}
+              <div class="cr-item">
+                <a href="/book/{{ b.work_id }}">
+                  <img src="https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg"
+                      alt="{{ b.title }}" class="cover-img"/>
+                  <h4>{{ b.title }}</h4>
+                  <p class="cr-authors">{{ b.author }}</p>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+          <button class="cr-arrow cr2-right">&#10095;</button>
+        </div>
+      {% else %}
+        <p class="no-books">Finish a book to see it here!</p>
+      {% endif %}
+    </section>
+  </div>
+  
   <script>
     (function(){
       const track = document.getElementById('continue-track');
@@ -61,6 +85,28 @@
         });
       }
     })();
+
+
+  (function(){
+    const track = document.getElementById('completed-track');
+    if (!track) return;                          // no completed books yet
+
+    const left   = document.querySelector('.cr2-left');
+    const right  = document.querySelector('.cr2-right');
+    const width  = 220;          // same item width
+    let pos = 0;
+
+    left.addEventListener('click', () => {
+      pos = (pos - width * 3 + track.scrollWidth) % track.scrollWidth;
+      track.style.transform = `translateX(-${pos}px)`;
+    });
+    right.addEventListener('click', () => {
+      pos = (pos + width * 3) % track.scrollWidth;
+      track.style.transform = `translateX(-${pos}px)`;
+    });
+  })();
+
+
 
     // Reading stats chart
     const ctx = document.getElementById('readingChart').getContext('2d');

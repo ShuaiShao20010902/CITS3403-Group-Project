@@ -47,6 +47,7 @@ class UserBook(db.Model):
     __tablename__ = 'user_books'
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
     book_id = db.Column(db.String, db.ForeignKey('books.work_id'), primary_key=True)
+    number_of_pages = db.Column(db.Integer)
     rating = db.Column(db.Float, default=0.0)
     notes = db.Column(db.Text)
     completed = db.Column(db.Boolean, default=False)
@@ -72,7 +73,6 @@ class Book(db.Model):
     author = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     subjects = db.Column(db.Text)
-    number_of_pages = db.Column(db.Integer)
     cover_id = db.Column(db.Integer)
     last_fetched = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
