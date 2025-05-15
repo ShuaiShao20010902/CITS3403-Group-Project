@@ -56,7 +56,7 @@ def add_book_to_dashboard_database(api_book_data: dict, user_id : int):
         'book_id': book.work_id
     }
 
-#helper functions
+#Helper Functions
 
 #try + check for errors (make sure json is ok)
 def _error_check(url: str):

@@ -23,7 +23,7 @@ sortSelect.addEventListener('change', () => {
 });
 
 const sortMap = {
-  'relevance': '', //cause default
+  'relevance': '', // default
   'new': 'new',
   'old': 'old'
 };
@@ -33,7 +33,7 @@ titleInput.addEventListener('input', () => {
   const query = titleInput.value.trim();
   latestquery = query;
 
-  if (query.length < 3) {
+  if (query.length < 0) { //how much words to be typed into search bar before search results show up
     resultsContainer.innerHTML = '';
     return;
   }
@@ -126,7 +126,7 @@ confirmBtn.addEventListener('click', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
       work_key: selectedBook.key,
-      number_of_pages: pages 
+      number_of_pages: pages, 
       })
   })
   .then(r => r.json())
@@ -149,5 +149,3 @@ confirmBtn.addEventListener('click', () => {
 cancelBtn.addEventListener('click', () => {
   modal.style.display = 'none';
 });
-
-// need to add edit user information
