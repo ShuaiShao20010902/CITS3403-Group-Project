@@ -14,8 +14,11 @@
 
         <div class = "top-bars">
             <!--Filter bar content-->
+            <h1 class="spacing"> Search for books </h1>
+            <p class="spacing"> Search for books via the OpenLibrary to quickly add to dashboard or click the "Add Book" to manually add one</p>
             <div class="filter-bar">
-                <input type="text" placeholder="Search all books..." class="search-input">
+                <input type="text" placeholder="Search all books by title, author or ISBN..." class="search-input">
+                <button id="clear-search" class="clear-search-btn" style="display: none;">&times;</button>
                 <div class="custom-select-wrapper">
                     <select id = "sort-select">
                         <option value="relevance">Relevance</option>
@@ -26,6 +29,12 @@
             </div>
             <a href="{{ url_for('main.uploadbook') }}"><button class ="add-book-btn"> Add book</button></a>
             <p id = "no-matches" style = "display: none;"><span class="no-match-text">No matches.</span></p>
+        </div>
+
+        <!--Spinning loading-->
+        <div class="loading-container" id="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Fetching books...</p>
         </div>
     
         <div class="book-list" id="book-results">

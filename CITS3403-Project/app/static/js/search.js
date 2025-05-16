@@ -6,6 +6,8 @@ const titleInput = document.querySelector('.search-input');
 const resultsContainer = document.getElementById('book-results');
 const noMatches = document.getElementById('no-matches');
 const importBox = document.getElementById('import-box');
+const loadingIndicator = document.getElementById('loading-indicator');
+const clearSearchBtn = document.getElementById('clear-search');
 
 //Modal
 const modal = document.getElementById('modals');
@@ -26,6 +28,16 @@ sortSelect.addEventListener('change', () => {
   titleInput.dispatchEvent(new Event('input')); // re-trigger search
 });
 
+// Clear button
+clearSearchBtn.addEventListener('click', function() {
+  titleInput.value = '';
+  titleInput.focus();
+  clearSearchBtn.style.display = 'none';
+  
+  // Trigger the input event to update results
+  titleInput.dispatchEvent(new Event('input'));
+});
+
 const sortMap = {
   'relevance': '', // default
   'new': 'new',
@@ -39,10 +51,19 @@ titleInput.addEventListener('input', () => {
   const query = titleInput.value.trim();
   latestquery = query;
 
+  // Hide both messages at start of any new searches
+  noMatches.style.display = 'none';
+  importBox.style.display = 'none';
+  clearSearchBtn.style.display = query ? 'block' : 'none';
+
   if (query.length < 0) { //how much words to be typed into search bar before search results show up
     resultsContainer.innerHTML = '';
+    loadingIndicator.style.display = 'none';
     return;
   }
+
+  // Show loading indicator
+  loadingIndicator.style.display = 'flex';
 
   const fetchquery = query;
 
@@ -55,6 +76,10 @@ titleInput.addEventListener('input', () => {
   fetch(url) 
     .then(res => res.json())
     .then(data => {
+
+      // Hide loading indicator
+      loadingIndicator.style.display = 'none';
+      
       // Check if latest query matches the fetch query
       if (latestquery !== fetchquery) return;
 
@@ -112,6 +137,7 @@ titleInput.addEventListener('input', () => {
       });
     })
     .catch(err => {
+      loadingIndicator.style.display = 'none';
       console.error('Can not fetch books:', err);
       noMatches.style.display = 'none';
       importBox.style.display = 'none';
