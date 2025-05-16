@@ -130,38 +130,38 @@
 }
 
 .toggle-password {
-   position: absolute;
-   right: 10px;
-   background: none;
-   border: none;
-   cursor: pointer;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   color: #888;
-   transition: color 0.3s ease;
-   z-index: 100;
+   position: absolute !important;
+   right: 0.5px !important;
+   background: none !important;
+   border: none !important;
+   cursor: pointer !important;
+   display: flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   color: #888 !important;
+   transition: color 0.3s ease !important;
+   z-index: 100 !important;
 }
 
 .toggle-password svg {
-   width: 20px;
-   height: 20px;
+   width: 20px !important;
+   height: 20px !important;
 }
 
 .toggle-password .eye-open {
-   display: block;
+   display: block !important;
 }
 
 .toggle-password .eye-closed {
-   display: none;
+   display: none !important;
 }
 
 .toggle-password.active .eye-open {
-   display: none;
+   display: none !important;
 }
 
 .toggle-password.active .eye-closed {
-   display: block;
+   display: block !important;
 }
 
 /* Password requirements popup */
