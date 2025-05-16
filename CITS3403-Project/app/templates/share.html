@@ -50,7 +50,9 @@
         <!-- You're Sharing Carousel -->
         <div class="tab-content active" id="tab-sharing">
             <div class="carousel-container">
-                <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
+                {% if your_shared_items|length > 0 %}
+                    <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
+                {% endif %}
                 <div class="carousel-track">
                     {% for item in your_shared_items %}
                         <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
@@ -71,7 +73,9 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
+                {% if your_shared_items|length > 0 %}
+                    <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
+                {% endif %}
             </div>
         </div>
 
@@ -82,7 +86,9 @@
                 <a href="{{ url_for('main.browse') }}">Browse</a> page to find and add it to your dashboard!
             </div>
             <div class="carousel-container">
-                <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
+                {% if shared_to_user|length > 0 %}
+                    <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
+                {% endif %}
                 <div class="carousel-track">
                     {% for item in shared_to_user %}
                         <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
@@ -109,7 +115,9 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
+                {% if shared_to_user|length > 0 %}
+                    <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
+                {% endif %}
             </div>
         </div>
     </div>
