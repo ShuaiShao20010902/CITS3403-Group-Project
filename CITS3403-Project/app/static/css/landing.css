@@ -1,37 +1,21 @@
-
-/* Navigation bar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 30px 0 10px;
-    margin-bottom: 0;
-}
-
 /* --- Logo + titles row --- */
-.title-wrap{
-  display:flex;
-  align-items:center;          /* vertical-align logo and text */
-  gap:18px;                    /* space between logo and text block */
-  margin-bottom:1rem;          /* same separation the h1 originally had */
+.title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 1rem;
 }
 
-.logo{
-  width:140px;   /* tweak to taste; keep 1:1 aspect */
-  height:140px;
+.logo {
+  width: 140px;
+  height: 140px;
 }
 
-/* stack h2 + h1 vertically next to logo */
-.titles{
-  display:flex;
-  flex-direction:column;
-  line-height:1;               /* tighter vertical spacing */
+.titles {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
 }
-
-
-@media(max-width:480px){
-  .logo{ width:56px; height:56px; }
-}
-
 
 /* Content section */
 .content {
@@ -45,7 +29,7 @@
     max-width: 35%;
     margin-bottom: 30px;
     padding-left: 500px;
-    padding-top: 120px; /* Move BookTracker down */
+    padding-top: 120px;
 }
 
 .title-small {
@@ -73,7 +57,6 @@
 .buttons {
     margin-top: 40px;
 }
-
 
 /* Books section on the right */
 .books-section {
@@ -105,7 +88,6 @@
     object-fit: cover;
 }
 
-
 .summary-section {
     text-align: center;
     padding: 60px 20px;
@@ -124,48 +106,6 @@
     display: block;
     margin-top: 10px;
     font-size: 30px;
-}
-
-/* Add a wrapper to control the height of green section */
-.green-section {
-    background-color: #2168b9;
-    padding-bottom: 20px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .content {
-        flex-direction: column;
-        margin-left: 0;
-    }
-
-    .text-section {
-        max-width: 100%;
-        padding-left: 20px;
-    }
-
-    .books-section {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .book-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(6, 1fr);
-    }
-
-    .book-item {
-        width: 130px;
-        height: 195px;
-    }
-
-    .tagline {
-        font-size: 24px;
-    }
-
-    .title-large {
-        font-size: 60px;
-    }
 }
 
 /* Features section */
@@ -204,7 +144,6 @@
     margin-bottom: 25px;
     font-weight: 700;
     line-height: 1.2;
-    font-weight: bold;
 }
 
 .feature-text p {
@@ -231,34 +170,11 @@
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
-@media (max-width: 768px) {
-    .feature-container {
-        flex-direction: column;
-    }
-
-    .feature-content {
-        margin-bottom: 40px;
-    }
-
-    .feature-text h2 {
-        font-size: 28px;
-    }
-
-    .feature-text p {
-        max-width: 100%;
-    }
-
-    .feature-image img {
-        width: 100%;
-    }
-}
-
 /* Share section */
 .share-section {
     padding: 80px 0;
     background-color: #ffffff;
 }
-
 
 .share-container {
     max-width: 1200px;
@@ -268,7 +184,6 @@
     padding: 0 20px;
     gap: 40px;
 }
-
 
 .share-image {
     flex: 1.5;
@@ -282,7 +197,6 @@
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
-
 
 .share-content {
     flex: 1;
@@ -320,8 +234,61 @@
     color: #444;
 }
 
-
+/* Responsive adjustments */
 @media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+        margin-left: 0;
+    }
+
+    .text-section {
+        max-width: 100%;
+        padding-left: 20px;
+    }
+
+    .books-section {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .book-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(6, 1fr);
+    }
+
+    .book-item {
+        width: 130px;
+        height: 195px;
+    }
+
+    .tagline {
+        font-size: 24px;
+    }
+
+    .title-large {
+        font-size: 60px;
+    }
+    
+    .feature-container {
+        flex-direction: column;
+    }
+
+    .feature-content {
+        margin-bottom: 40px;
+    }
+
+    .feature-text h2 {
+        font-size: 28px;
+    }
+
+    .feature-text p {
+        max-width: 100%;
+    }
+
+    .feature-image img {
+        width: 100%;
+    }
+    
     .share-container {
         flex-direction: column;
     }
@@ -337,4 +304,9 @@
     }
 }
 
-
+@media(max-width: 480px) {
+    .logo { 
+        width: 56px; 
+        height: 56px; 
+    }
+}

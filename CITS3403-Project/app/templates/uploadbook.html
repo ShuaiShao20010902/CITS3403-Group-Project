@@ -54,11 +54,11 @@
           <small class="error-message">{{ form.number_of_pages.errors[0] }}</small>
         {% endif %}
       </div>
-    
+
       <button type="button" id = "user-button" onclick="toggleUserInfo(this)">
         Add User Info (Optional) ▼
       </button>
-    
+
       <div id="user-info" style="display: none; margin-top: 20px;">
         <div class="form-group">
           {{ form.rating.label }} {{ form.rating() }}
@@ -74,7 +74,7 @@
           {% endif %}
         </div>
         {{ form.completed(type="hidden", id="completed-field") }}
-    
+
       {{ form.submit() }}
     </form>
   </div>
@@ -83,10 +83,10 @@
     function toggleUserInfo(btn){
         const box  = document.getElementById('user-info');
         const open = box.style.display !== 'block';
-  
+
         box.style.display = open ? 'block' : 'none';
-        btn.innerText     = open 
-            ? 'Hide User Info ▲' 
+        btn.innerText     = open
+            ? 'Hide User Info ▲'
             : 'Add User Info (Optional) ▼';
     }
   </script>
