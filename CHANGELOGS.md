@@ -2,6 +2,25 @@
 
 _Track everything merged into `main`._
 
+### 16th May
+- Unit testing with Selenium has now been implemented
+- Updates to CSS
+    - Introduced a logo
+    - Introduced a global.css which is now loaded first in all templates
+    - Removed some CSS due to redundancy though more work will have to be done on this 
+    - Data validation css in share page (red box on error, reused the error pop up used from the signup page to keep same style)
+    - Landing page completely revamped
+- Security Implemented
+    - Session key is now implemented so follow the setup on how to get it working
+- Updated Browse Page
+    - Changed query to 0 so user doesn't have to type 3 letters before search shows up
+- Other
+    - "Mark as Complete" button removed from manual book upload as it could cause issues
+    - Removed unused templates
+    - Home page JS now moved into its js file
+    - Terms and Policies have been deleted
+    - README.md has now been updated
+
 ### 15th May
 - Updated bookspecificpage
     - Added charts for the individual book

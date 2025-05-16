@@ -1,23 +1,3 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #11afa5;
-    min-height: auto;
-    margin-top: -30px;
-    overflow-x: hidden;
-}
-
-.container {
-    width: 100%;
-    min-height: auto;
-    padding: 0 20px;
-    position: relative;
-}
 
 /* Navigation bar */
 .navbar {
@@ -27,31 +7,45 @@ body {
     margin-bottom: 0;
 }
 
-.logo {
-    display: inline-block;
-    background-color: transparent;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
+/* --- Logo + titles row --- */
+.title-wrap{
+  display:flex;
+  align-items:center;          /* vertical-align logo and text */
+  gap:18px;                    /* space between logo and text block */
+  margin-bottom:1rem;          /* same separation the h1 originally had */
 }
+
+.logo{
+  width:140px;   /* tweak to taste; keep 1:1 aspect */
+  height:140px;
+}
+
+/* stack h2 + h1 vertically next to logo */
+.titles{
+  display:flex;
+  flex-direction:column;
+  line-height:1;               /* tighter vertical spacing */
+}
+
+
+@media(max-width:480px){
+  .logo{ width:56px; height:56px; }
+}
+
 
 /* Content section */
 .content {
     display: flex;
-    margin-top: -40px;
     justify-content: space-between;
-    margin-left: 80px; /* Move everything to the right */
+    background-color: #3f78f5;
 }
 
 /* Text section on the left */
 .text-section {
     max-width: 35%;
     margin-bottom: 30px;
-    padding-left: 60px;
-    padding-top: 60px; /* Move BookTracker down */
+    padding-left: 500px;
+    padding-top: 120px; /* Move BookTracker down */
 }
 
 .title-small {
@@ -80,24 +74,6 @@ body {
     margin-top: 40px;
 }
 
-.signup-btn {
-    display: inline-block;
-    background-color: black;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    padding: 16px 40px;
-    border-radius: 4px;
-    text-decoration: none;
-    margin-right: 25px;
-}
-
-.login-link {
-    color: white;
-    text-decoration: underline;
-    font-weight: bold;
-    font-size: 18px;
-}
 
 /* Books section on the right */
 .books-section {
@@ -152,7 +128,7 @@ body {
 
 /* Add a wrapper to control the height of green section */
 .green-section {
-    background-color: #11afa5;
+    background-color: #2168b9;
     padding-bottom: 20px;
 }
 
@@ -315,7 +291,7 @@ body {
 
 .share-icon {
     margin-bottom: 25px;
-    background-color: #19a99d;
+    background-color: #3f78f5;
     width: 70px;
     height: 70px;
     border-radius: 12px;
