@@ -28,6 +28,16 @@ In the root directory, create a file named **.env** and in it define the session
 ```
 SECRET_KEY=somelongandsecurekey123
 ```
+Also in the **.env** file, you need to put following code to let the reset password function worked
+```
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USE_SSL=False
+MAIL_USERNAME=booktracker00@gmail.com
+MAIL_PASSWORD=rhlw kjwh purj ihqe
+MAIL_DEFAULT_SENDER=booktracker00@gmail.com
+```
 
 5. **Run the Program**
 In the root directory run this:
