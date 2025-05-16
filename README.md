@@ -1,14 +1,60 @@
-## Book Tracker 
-A book tracking website that allows users to search for books and track their reading progress and thoughts on it. Also includes a social aspect where users can share data with one another. 
+## Book Tracker
+A book tracking website that allows users to search for books and track their reading progress and thoughts on it. Also includes a social aspect where users can share data with one another.
 
 ## Installation
 Run: python3 app.py
 
 ## CITS3403 Group 80 Members
-- 24006703 Raynard Djauhari
-- 22921802 Melissa Lam
-- 23701834 Shuai Shao
-- 23994848 Jonathan Clyde
+
+| Student Number | Name             | GitHub user       |
+| -------------- | ---------------- | ----------------- |
+| 24006703       | Raynard Djauhari | IIEnat            |
+| 22921802       | Melissa Lam      | melmelissa-lam    |
+| 23701834       | Shuai Shao       | ShuaiShao20010902 |
+| 23994848       | Jonathan Clyde   | Jonno421          |
+
+
+## How to run the "Book Tracker"
+
+
+1. **Unzip or clone the app data onto your local device**:  
+   ```bash
+   git clone https://github.com/ShuaiShao20010902/CITS3403-Group-Project.git
+2. **Create a Virtual Environment**
+   **For MacOS/Linux:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+   **For Windows:**
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   ```
+   Once activated the terminal prompt should show (venv).
+2. **Installing the necessary packages**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Initalise the database**
+   ```bash
+   flask db init
+   flask db migrate
+   flask db upgrade
+   ```
+4. **Setting up your own secret key to run the web app in your local environment**
+
+   ***Note**: Make sure to replace the "this-is-the-super-secret-key" to your own secret key message.
+
+   **For MacOS/Linux:**
+   ```bash
+   export SECRET_KEY='this-is-the-super-secret-key'
+    ```
+
+   **For Windows:**
+   ```bash
+   $env:SECRET_KEY = "this-is-the-super-secret-key"
+   ```
 
 ## Automated Testing
 
@@ -34,7 +80,7 @@ If Chrome is not installed, Selenium tests will fail.
 
 #### Installing Google Chrome
 
-- **Windows/Mac:**  
+- **Windows/Mac:** 
   Download and install from [https://www.google.com/chrome/](https://www.google.com/chrome/)
 
 - **Ubuntu/Debian Linux:**
