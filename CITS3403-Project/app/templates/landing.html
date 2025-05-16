@@ -4,30 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookTracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
 </head>
 <body>
-    <div class="container">
-        <div class="navbar">
-            <div class="logo">
-                <a href="#">
-                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                </a>
-            </div>
-        </div>
-
+    
         <div class="content">
             <div class="text-section">
-                <h2 class="title-small">The</h2>
-                <h1 class="title-large">BookTracker</h1>
-                <p class="tagline"><strong>Because life's too short for a book you're not in the mood for.</strong></p>
+
+                <!-- logo + titles wrapper -->
+                <div class="title-wrap">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}"
+                        alt="BookTracker logo"
+                        class="logo"/>
+
+                    <div class="titles">
+                        <h2 class="title-small"> <br>The</h2>
+                        <h1 class="title-large">BookTracker</h1>
+                    </div>
+                </div>
+
+                <p class="tagline"><strong>Because a book is better when it is tracked.</strong></p>
 
                 <div class="buttons">
-                    <a href="{{ url_for('main.signup') }}" class="signup-btn">Sign up</a>
-                    <a href="{{ url_for('main.login') }}" class="login-link">Log in</a>
+                    <a href="{{ url_for('main.signup') }}"><button>Sign up</button></a>
+                    <a href="{{ url_for('main.login') }}"><button>Log in</button></a>
                 </div>
             </div>
 
@@ -90,7 +91,7 @@
         <div class="feature-content">
             <div class="feature-icon">
 
-                <svg viewBox="0 0 24 24" width="36" height="36" stroke="#19a99d" stroke-width="2" fill="none">
+                <svg viewBox="0 0 24 24" width="36" height="36" stroke="#3f78f5" stroke-width="2" fill="none">
                     <path d="M12 22V3"></path>
                     <path d="M5 12H2l3-9 3 9H5z"></path>
                     <path d="M19 12h-3l3-9 3 9h-3z"></path>
