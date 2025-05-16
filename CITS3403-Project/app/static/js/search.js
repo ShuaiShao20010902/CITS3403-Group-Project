@@ -106,7 +106,7 @@ titleInput.addEventListener('input', () => {
         const coverId = doc.cover_i;
         const coverUrl = coverId
           ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
-          : 'https://covers.openlibrary.org/b/id/14627509-M.jpg';
+          : '/static/images/cover-unavailable.png';
 
         // Create a card for each book
         const card = document.createElement('div');

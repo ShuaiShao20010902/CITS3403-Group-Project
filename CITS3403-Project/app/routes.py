@@ -765,7 +765,7 @@ def book_specific_page(book_id):
         'author'     : 'Unknown Author',
         'pages'      : 0,
         'description': 'No description available.',
-        'cover_url'  : 'https://covers.openlibrary.org/b/id/255844-M.jpg',
+        'cover_url'  : '/static/images/cover-unavailable.png',
         'genres'     : []
     }
 
