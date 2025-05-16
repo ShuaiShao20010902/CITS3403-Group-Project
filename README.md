@@ -45,19 +45,21 @@ Key features include:
    flask db migrate
    flask db upgrade
    ```
-4. **Setting up your own secret key to run the web app in your local environment**
-
-   ***Note**: Make sure to replace the "this-is-the-super-secret-key" to your own secret key message.
-
-   **For MacOS/Linux:**
-   ```bash
-   export SECRET_KEY='this-is-the-super-secret-key'
-    ```
-
-   **For Windows:**
-   ```bash
-   $env:SECRET_KEY = "this-is-the-super-secret-key"
-   ```
+4. **Setup Session Key**
+In the root directory, create a file named **.env** and in it define the session key
+```
+SECRET_KEY=somelongandsecurekey123
+```
+Also in the **.env** file, you need to put following code to let the reset password function worked
+```
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USE_SSL=False
+MAIL_USERNAME=booktracker00@gmail.com
+MAIL_PASSWORD=rhlw kjwh purj ihqe
+MAIL_DEFAULT_SENDER=booktracker00@gmail.com
+```
 
 ## Automated Testing
 
