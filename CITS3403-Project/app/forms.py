@@ -112,4 +112,4 @@ class CombinedBookForm(FlaskForm):
     rating = FloatField('Rating (out of 5)', validators=[Optional(), NumberRange(min=0.0, max=5.0)], render_kw={"placeholder": "Enter rating 1 out of 5, e.g. 3"})
     notes = TextAreaField('Notes', validators=[Optional()], render_kw={"placeholder": "Enter user notes, e.g. This book was amazing!"})
     completed = BooleanField('Mark as Completed')
-    submit = SubmitField('Import Book')
+    submit = SubmitField('Import Book', render_kw={"type": "submit"})
