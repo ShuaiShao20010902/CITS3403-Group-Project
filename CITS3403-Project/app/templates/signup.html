@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - BookTracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/error_popup.css') }}">
 </head>
@@ -123,9 +124,6 @@
             Already have an account?  <a href="{{ url_for('main.login') }}" class="footer-link">Log In</a>
         </p>
 
-        <p class="footer-text" style="font-size: 14px; margin-top: 20px;">
-            By signing up, you agree to our <a href="#" class="footer-link">Terms of Service</a> and <a href="#" class="footer-link">Privacy Policy</a>
-        </p>
     </div>
 
     <!-- Load scripts -->

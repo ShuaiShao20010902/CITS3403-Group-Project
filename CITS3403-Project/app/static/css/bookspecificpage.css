@@ -1,18 +1,15 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    margin: 0; /* Reset all margins */
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
+/* Overwrite the global one */
+.container {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+  width: 900px;
+  margin: 50px auto;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
 }
 
 .card {
@@ -38,14 +35,6 @@ body {
     border-radius: 10px;
 }
 
-.book-container {
-    width: 900px;
-    margin: 50px auto;
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
-}
-
 .book-details {
     flex: 1;
     word-break: break-word; /* Sometimes Openlibrary contain long url */
@@ -69,15 +58,6 @@ body {
     font-size: 18px;
     margin-bottom: 10px;
     color: #555;
-}
-
-.metadata {
-    margin-top: 30px;
-    font-size: 12px;
-    color: #777;
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
 }
 
 .genre-tags {
@@ -162,30 +142,6 @@ body {
 }
 .entry-text { flex: 1; }
 
-/* ---------- Buttons ---------- */
-.generic-btn, .generic-btn-light, .nav-btn {
-  cursor: pointer;
-  border: none;
-  font: inherit;
-  padding: .5rem 1rem;
-  border-radius: .4rem;
-  transition: background .25s, transform .15s;
-}
-.generic-btn        { background:#1e1e2f; color:#fff; }
-.generic-btn:hover  { background:#2f2f4f; transform:translateY(-2px); }
-
-.generic-btn.danger { background:#b91c1c; }
-.generic-btn.danger:hover { background:#991b1b; }
-
-.generic-btn-light  { background:transparent; color:#666; }
-.generic-btn-light:hover { color:#000; }
-
-.nav-btn {
-  background:#e5e7eb;
-  width:2.5rem;
-  aspect-ratio:1;
-}
-.nav-btn:disabled   { opacity:.4; cursor:default; }
 
 /* ---------- Inputs & message ---------- */
 input[type="number"],

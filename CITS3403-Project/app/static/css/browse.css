@@ -1,9 +1,3 @@
-/* General Style */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body { font-family: Arial, sans-serif; }
-
-/* Page Layout */
 .browse-page {
     max-width: 1000px;
     margin: 40px auto;

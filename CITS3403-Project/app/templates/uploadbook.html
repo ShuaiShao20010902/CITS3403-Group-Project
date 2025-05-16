@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Book</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/uploadbook.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/error_popup.css') }}">
 </head>
@@ -73,19 +74,23 @@
           {% endif %}
         </div>
         {{ form.completed(type="hidden", id="completed-field") }}
-
-        <button type="button" id="toggle-completed">
-          {% if form.completed.data %}
-            Mark as Incomplete
-          {% else %}
-            Mark as Complete
-          {% endif %}
-        </button>
-      </div>
     
       {{ form.submit() }}
     </form>
   </div>
+
+  <script>
+    function toggleUserInfo(btn){
+        const box  = document.getElementById('user-info');
+        const open = box.style.display !== 'block';
+  
+        box.style.display = open ? 'block' : 'none';
+        btn.innerText     = open 
+            ? 'Hide User Info ▲' 
+            : 'Add User Info (Optional) ▼';
+    }
+  </script>
+
 
   <!-- Error Popup -->
   {% with show_errors=True, errors=form.errors.values()|sum(start=[])|map('string')|list %}
