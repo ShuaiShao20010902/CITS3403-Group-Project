@@ -78,20 +78,6 @@
       {{ form.submit() }}
     </form>
   </div>
-
-  <script>
-    function toggleUserInfo(btn){
-        const box  = document.getElementById('user-info');
-        const open = box.style.display !== 'block';
-
-        box.style.display = open ? 'block' : 'none';
-        btn.innerText     = open
-            ? 'Hide User Info ▲'
-            : 'Add User Info (Optional) ▼';
-    }
-  </script>
-
-
   <!-- Error Popup -->
   {% with show_errors=True, errors=form.errors.values()|sum(start=[])|map('string')|list %}
     {% include "error_popup.html" %}

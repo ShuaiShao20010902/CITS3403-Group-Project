@@ -342,7 +342,7 @@ def uploadbook():
                         if form.notes.data:
                             user_book.notes = form.notes.data
                         if form.completed.data:
-                            user_book.completed = True
+                            user_book.completed = False
                         db.session.commit()
 
             return redirect(url_for('main.browse'))
