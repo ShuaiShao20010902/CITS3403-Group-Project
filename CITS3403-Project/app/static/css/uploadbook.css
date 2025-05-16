@@ -113,3 +113,21 @@ input[type="submit"]:hover {
 #toggle-completed.complete {
     background-color: #a9a9a9;
     }
+
+/* Form validation */
+.error-message {
+    color: #ff3333;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-group input.is-invalid,
+  .form-group textarea.is-invalid {
+    border-color: #ff3333;
+    background-color: #fff8f8;
+  }

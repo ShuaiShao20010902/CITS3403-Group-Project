@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Book</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/uploadbook.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/error_popup.css') }}">
 </head>
 <body>
   {% include "nav.html" %}
@@ -18,19 +19,59 @@
       <p class="helper-text">Can’t find the book? Add it manually below!</p>
 
       {{ form.hidden_tag() }}
-      {{ form.title.label }} {{ form.title() }}
-      {{ form.author.label }} {{ form.author() }}
-      {{ form.genres.label }} {{ form.genres() }}
-      {{ form.description.label }} {{ form.description() }}
-      {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
+      <div class="form-group">
+        {{ form.title.label }} {{ form.title() }}
+        {% if form.title.errors %}
+          <small class="error-message">{{ form.title.errors[0] }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        {{ form.author.label }} {{ form.author() }}
+        {% if form.author.errors %}
+          <small class="error-message">{{ form.author.errors[0] }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        {{ form.genres.label }} {{ form.genres() }}
+        {% if form.genres.errors %}
+          <small class="error-message">{{ form.genres.errors[0] }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        {{ form.description.label }} {{ form.description() }}
+        {% if form.description.errors %}
+          <small class="error-message">{{ form.description.errors[0] }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        {{ form.number_of_pages.label }} {{ form.number_of_pages() }}
+        {% if form.number_of_pages.errors %}
+          <small class="error-message">{{ form.number_of_pages.errors[0] }}</small>
+        {% endif %}
+      </div>
     
       <button type="button" id = "user-button" onclick="toggleUserInfo(this)">
         Add User Info (Optional) ▼
       </button>
     
       <div id="user-info" style="display: none; margin-top: 20px;">
-        {{ form.rating.label }} {{ form.rating() }}
-        {{ form.notes.label }} {{ form.notes() }}
+        <div class="form-group">
+          {{ form.rating.label }} {{ form.rating() }}
+          {% if form.rating.errors %}
+            <small class="error-message">{{ form.rating.errors[0] }}</small>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.notes.label }} {{ form.notes() }}
+          {% if form.notes.errors %}
+            <small class="error-message">{{ form.notes.errors[0] }}</small>
+          {% endif %}
+        </div>
         {{ form.completed(type="hidden", id="completed-field") }}
 
         <button type="button" id="toggle-completed">
@@ -45,30 +86,15 @@
       {{ form.submit() }}
     </form>
   </div>
-  <script>
-    function toggleUserInfo(btn){
-        const box  = document.getElementById('user-info');
-        const open = box.style.display !== 'block';
-  
-        box.style.display = open ? 'block' : 'none';
-        btn.innerText     = open 
-            ? 'Hide User Info ▲' 
-            : 'Add User Info (Optional) ▼';
-    }
-  
-    document.addEventListener('DOMContentLoaded', () => {
-        const hidden = document.getElementById('completed-field');
-        const btn    = document.getElementById('toggle-completed');
-  
-        btn.addEventListener('click', () => {
-          const newDone = !(hidden.value === 'True' || hidden.value === 'true');
-          hidden.value = newDone.toString();
-          btn.textContent = newDone
-            ? 'Mark as Incomplete ❌'
-            : 'Mark as Complete ✅';
-          btn.classList.toggle('complete', newDone);
-        });
-      });
-  </script>
+
+  <!-- Error Popup -->
+  {% with show_errors=True, errors=form.errors.values()|sum(start=[])|map('string')|list %}
+    {% include "error_popup.html" %}
+  {% endwith %}
+
+<!-- Scripts -->
+<script src="{{ url_for('static', filename='js/uploadbook.js') }}"></script>
+<script src="{{ url_for('static', filename='js/error_popup.js') }}"></script>
+<script src="{{ url_for('static', filename='js/uploadbook_validation.js') }}"></script>
 </body>
 </html>
