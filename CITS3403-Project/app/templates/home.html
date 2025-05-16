@@ -43,7 +43,7 @@
             {% for b in continue_reading %}
               <div class="cr-item">
                 <a href="/book/{{ b.work_id }}">
-                  <img src="https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg" alt="{{ b.title }}" class="cover-img"/>
+                  <img src="{% if b.cover_id %}https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg{% else %}/static/images/cover-unavailable.png{% endif %}" alt="{{ b.title }}" class="cover-img"/>
                   <h4>{{ b.title }}</h4>
                   <p class="cr-authors">{{ b.author }}</p>
                 </a>
@@ -73,7 +73,7 @@
             {% for b in completed_books %}
               <div class="cr-item">
                 <a href="/book/{{ b.work_id }}">
-                  <img src="https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg"
+                  <img src="{% if b.cover_id %}https://covers.openlibrary.org/b/id/{{ b.cover_id }}-M.jpg{% else %}/static/images/cover-unavailable.png{% endif %}"
                       alt="{{ b.title }}" class="cover-img"/>
                   <h4>{{ b.title }}</h4>
                   <p class="cr-authors">{{ b.author }}</p>
