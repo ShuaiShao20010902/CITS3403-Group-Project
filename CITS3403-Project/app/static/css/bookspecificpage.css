@@ -21,10 +21,10 @@
 
 /* bookspecificpage.css */
 .user-stats{
-  display:flex;          /* turn on flexbox */
-  flex-direction:column; /* stack items top-to-bottom */
-  gap:10px;              /* optional spacing between buttons/labels */
-  align-items:flex-start;/* keep left-aligned; use center if preferred */
+  display:flex;          
+  flex-direction:column; 
+  gap:10px;              
+  align-items:flex-start;
 }
 
 /* Book Container */
@@ -193,11 +193,23 @@ input[type="date"] {
 
 #entry-actions[hidden] { display:none; }
 
-.generic-btn-light {
+.entry-btn {
   background:#e5e7eb;
   color:#333;
 }
-.generic-btn-light:hover { background:#d4d4d8; }
+.entry-btn:hover { background:#d4d4d8; }
+
+.save-btn {
+  background:#0eff4a;
+  color:#ffffff;
+}
+.save-btn:hover { background:#00742c; }
+
+.del-btn {
+  background:#ff0000;
+  color:#ffffff;
+}
+.del-btn:hover { background:#8b0000; }
 
 .msg-success { color:#0a0; }  
 .msg-error   { color:#c00; }  

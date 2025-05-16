@@ -50,19 +50,19 @@
         <!-- You're Sharing Carousel -->
         <div class="tab-content active" id="tab-sharing">
             <div class="carousel-container">
-                <button class="carousel-arrow left" aria-label="Scroll left">&#8592;</button>
+                <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
                 <div class="carousel-track">
                     {% for item in your_shared_items %}
                         <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
                             {% if item.content_type == 'stats' %}
                                 <h3>{{ item.title }}</h3>
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p>Reading stats you have shared!</p>
                                 <canvas id="sharedChart-{{ item.id }}" width="380" height="220"></canvas>
                             {% else %}
                                 {% if item.cover_url %}
                                     <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
                                 {% endif %}
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p>Book you have shared!</p>
                                 <p><strong>Title:</strong> {{ item.title }}</p>
                                 <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
                                 <p><strong>Rating:</strong> {{ item.rating }}</p>
@@ -71,7 +71,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow right" aria-label="Scroll right">&#8594;</button>
+                <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
             </div>
         </div>
 
@@ -82,21 +82,21 @@
                 <a href="{{ url_for('main.browse') }}">Browse</a> page to find and add it to your dashboard!
             </div>
             <div class="carousel-container">
-                <button class="carousel-arrow left" aria-label="Scroll left">&#8592;</button>
+                <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
                 <div class="carousel-track">
                     {% for item in shared_to_user %}
                         <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
                             {% if item.content_type == 'stats' %}
                                 <h3>{{ item.title }}</h3>
                                 <p><strong>From:</strong> {{ item.shared_by }}</p>
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p>Reading stats shared with you!</p>
                                 <canvas id="sharedChart-{{ item.id }}" width="380" height="220"></canvas>
                             {% else %}
                                 {% if item.cover_url %}
                                     <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
                                 {% endif %}
                                 <p><strong>From:</strong> {{ item.shared_by }}</p>
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p class="shared-msg">A book shared with you!</p>
                                 <p><strong>Title:</strong> {{ item.title }}</p>
                                 <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
                                 <p><strong>Rating:</strong> {{ item.rating }}</p>
@@ -109,7 +109,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow right" aria-label="Scroll right">&#8594;</button>
+                <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
             </div>
         </div>
     </div>
