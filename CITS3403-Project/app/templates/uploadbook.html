@@ -12,7 +12,7 @@
   {% include "nav.html" %}
 
   <div class="form-container">
-
+    <!-- Book upload form -->
     <form method="POST" action="{{ url_for('main.uploadbook') }}">
 
       <h1>Upload a Book</h1>
@@ -54,7 +54,8 @@
           <small class="error-message">{{ form.number_of_pages.errors[0] }}</small>
         {% endif %}
       </div>
-    
+  
+      <!-- Toggle for optional user info -->
       <button type="button" id = "user-button" onclick="toggleUserInfo(this)">
         Add User Info (Optional) ▼
       </button>
