@@ -80,3 +80,37 @@ button:hover {
   margin-bottom: 20px;
   width: 900px;
 }
+
+/* ================================
+   Carousel Arrow Buttons (Global)
+   ================================ */
+.carousel-arrow, .cr-arrow {
+  background: rgba(31,42,201,0.8); /* blue with opacity for hover, overridden below for default */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 10px 18px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(1px);
+  z-index: 1;
+  background: rgba(255,255,255,0.8); /* default: slightly opaque white */
+}
+
+.carousel-arrow:hover,
+.carousel-arrow:focus,
+.cr-arrow:hover,
+.cr-arrow:focus {
+  background: #1f2ac9; /* solid blue on hover */
+  color: #fff;
+  transform: translateY(1px);
+  outline: none;
+}
