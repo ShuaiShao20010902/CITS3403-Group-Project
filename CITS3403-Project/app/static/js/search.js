@@ -106,7 +106,7 @@ titleInput.addEventListener('input', () => {
         const coverId = doc.cover_i;
         const coverUrl = coverId
           ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
-          : 'https://via.placeholder.com/120x180?text=No+Cover';
+          : 'https://covers.openlibrary.org/b/id/14627509-M.jpg';
 
         // Create a card for each book
         const card = document.createElement('div');
@@ -119,7 +119,7 @@ titleInput.addEventListener('input', () => {
                 <p><strong>Year:</strong> ${year}</p>
             </div>
             <div class="book-actions">
-                <button>Add to Dashboard</button>
+                <button class="add-book-btn">Add to Dashboard</button>
             </div>
         `;
         resultsContainer.appendChild(card);
