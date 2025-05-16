@@ -44,12 +44,7 @@
 .cr-item h4{ margin-top:10px; }
 .cr-authors{ font-size:.9rem; color:#666; }
 
-.cr-arrow{
-  position:absolute;
-  top:50%; transform:translateY(-50%);
-  background:rgba(255,255,255,.8);
-  border:none; font-size:2rem; cursor:pointer; z-index:1;
-}
+
 .cr-left { left:0; }
 .cr-right{ right:0; }
 
