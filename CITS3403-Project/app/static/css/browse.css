@@ -1,6 +1,6 @@
 .browse-page {
     max-width: 1000px;
-    margin: 40px auto;
+    margin: 0px auto;
     padding: 20px;
   }
   
@@ -15,6 +15,10 @@
 
   .top-bars {
     margin: 20px 0;
+  }
+
+  .top-bars.container {
+    width: 100% !important;
   }
 
   .custom-select-wrapper {
@@ -44,15 +48,6 @@
     transform: translateY(-50%);
     pointer-events: none;
     font-size: 15px;
-  }
-
-  .filter-bar button {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: white;
   }
   
   /* Book cards */
@@ -105,20 +100,6 @@
   .book-list:empty {
     display: none;
   }
-  
-  .book-actions select,
-  .book-actions button {
-    padding: 8px;
-    font-size: 13px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-  }
-  
-  .book-actions button:hover {
-    background-color: #ddd;
-  }
 
   .search-input {
     padding: 10px;
@@ -127,23 +108,6 @@
     border: 1px solid #ccc;
     flex: 1;
     max-width: 100%;
-  }
-  
-  .add-book-btn {
-    background-color: #7a7a7b;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .add-book-btn:hover {
-    background-color: #2f2f4f;
-    transform: translateY(-2px);
   }
 
 /* Modal Styles */
@@ -165,7 +129,6 @@
   background-color: white;
   padding: 30px;
   width: 400px;
-  border-radius: 10px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.3);
   text-align: center;
 }
