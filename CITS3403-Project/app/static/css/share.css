@@ -1,4 +1,6 @@
-/* General layout */
+/* ===========================
+   General Layout & Typography
+   =========================== */
 body {
   background: #f7f9fa;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -26,10 +28,13 @@ h2 {
   margin-bottom: 0.7em;
 }
 
+/* ===========================
+   Share Form
+   =========================== */
 .share-form {
   background: #f0f4fa;
   border-radius: 10px;
-  padding: 1.5em 1em 1.5em 1em;
+  padding: 1.5em 1em;
   margin-bottom: 2em;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   display: flex;
@@ -42,7 +47,8 @@ h2 {
   margin-bottom: 0.7em;
 }
 
-#book-dropdown {
+#book-dropdown,
+#share-username {
   width: 100%;
   max-width: 350px;
   padding: 0.5em;
@@ -50,17 +56,12 @@ h2 {
   border-radius: 6px;
   border: 1px solid #cbd5e1;
   font-size: 1em;
+  box-sizing: border-box;
 }
 
 #share-username {
-  width: 100%;
-  max-width: 350px;
   padding: 0.6em 1em;
   margin: 1em 0 0.5em 0;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  font-size: 1em;
-  box-sizing: border-box;
   transition: border 0.2s;
 }
 
@@ -93,6 +94,9 @@ h2 {
   margin-top: 0.5em;
 }
 
+/* ===========================
+   Info Tip
+   =========================== */
 .share-info-tip {
   margin-bottom: 1.2em;
   color: #2563eb;
@@ -106,6 +110,9 @@ h2 {
   text-decoration: underline;
 }
 
+/* ===========================
+   Card Styles
+   =========================== */
 .card {
   background: #fff;
   border-radius: 10px;
@@ -134,25 +141,20 @@ h2 {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
+#book-details .book-cover,
+#book-cover {
+  display: block;
+  margin: 0 auto;
+}
+
 .stat-card {
   background: #f0f7ff;
   min-width: 320px;
   max-width: 420px;
   width: 100%;
-  padding: 2em 1.5em 2em 1.5em;
-  overflow-x: auto; /* Prevents chart overflow */
+  padding: 2em 1.5em;
+  overflow-x: auto;
   box-sizing: border-box;
-}
-
-.section {
-  margin-bottom: 2em;
-}
-
-.shared-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.2em;
-  justify-content: flex-start;
 }
 
 .card p, .card h3 {
@@ -166,7 +168,9 @@ h2 {
   margin-top: 0.5em;
 }
 
-/* Chart.js canvas in cards */
+/* ===========================
+   Chart.js Canvas
+   =========================== */
 canvas[id^="sharedChart-"] {
   display: block;
   margin: 0 auto;
@@ -176,68 +180,9 @@ canvas[id^="sharedChart-"] {
   box-sizing: border-box;
 }
 
-/* Center content in the preview card */
-#book-details.card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Center the book cover image */
-#book-cover.book-cover {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-}
-
-/* Responsive design */
-@media (max-width: 700px) {
-  .container {
-    padding: 1em 0.3em;
-  }
-  .shared-cards {
-    flex-direction: column;
-    align-items: center;
-    gap: 1em;
-  }
-  .card {
-    max-width: 98vw;
-    min-width: 0;
-    padding: 1em 0.5em;
-  }
-  .book-cover {
-    width: 90px;
-    height: 130px;
-  }
-  canvas[id^="sharedChart-"] {
-    max-width: 95vw;
-    height: 140px !important;
-  }
-  #book-dropdown, #share-username {
-    max-width: 98vw;
-  }
-  .stat-card {
-    max-width: 98vw;
-    min-width: 0;
-    padding: 1em 0.5em;
-  }
-  canvas[id^="sharedChart-"] {
-    max-width: 95vw;
-    height: 160px !important;
-    min-height: 160px;
-  }
-}
-
-@media (max-width: 400px) {
-  .container {
-    padding: 0.3em 0.1em;
-  }
-  .card {
-    padding: 0.7em 0.2em;
-  }
-}
-
+/* ===========================
+   Copy to Clipboard Button
+   =========================== */
 .copy-title-btn {
   background: #2563eb;
   color: #fff;
@@ -269,7 +214,9 @@ canvas[id^="sharedChart-"] {
   fill: currentColor;
 }
 
-/* Tabs styles */
+/* ===========================
+   Tabs
+   =========================== */
 .share-tabs {
   display: flex;
   gap: 1em;
@@ -297,7 +244,9 @@ canvas[id^="sharedChart-"] {
   display: block;
 }
 
-/* Carousel styles */
+/* ===========================
+   Carousel
+   =========================== */
 .carousel-container {
   display: flex;
   align-items: center;
@@ -327,4 +276,38 @@ canvas[id^="sharedChart-"] {
 }
 .carousel-arrow:hover {
   background: #1d4ed8;
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+@media (max-width: 700px) {
+  .container {
+    padding: 1em 0.3em;
+  }
+  .card, .stat-card {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 1em 0.5em;
+  }
+  .book-cover {
+    width: 90px;
+    height: 130px;
+  }
+  canvas[id^="sharedChart-"] {
+    height: 160px !important;
+    min-height: 160px;
+  }
+  #book-dropdown, #share-username {
+    max-width: 98vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .container {
+    padding: 0.3em 0.1em;
+  }
+  .card {
+    padding: 0.7em 0.2em;
+  }
 }
