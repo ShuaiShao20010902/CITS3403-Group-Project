@@ -11,7 +11,7 @@
 <body>
   {% include "nav.html" %}
 
-  <div class="form-container" style="margin: 120px auto 0;">
+  <div class="form-container">
 
     <form method="POST" action="{{ url_for('main.uploadbook') }}">
 
@@ -59,7 +59,7 @@
         Add User Info (Optional) ▼
       </button>
 
-      <div id="user-info" style="display: none; margin-top: 20px;">
+      <div id="user-info" style="display: none;">
         <div class="form-group">
           {{ form.rating.label }} {{ form.rating() }}
           {% if form.rating.errors %}
