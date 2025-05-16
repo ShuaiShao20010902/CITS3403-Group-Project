@@ -362,18 +362,3 @@ body {
 }
 
 
-.footer-text {
-    font-size: 16px;  /* Larger font */
-    color: #888;
-    margin-top: -120px;
-}
-
-.footer-link {
-    color: #1e1e2f;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.footer-link:hover {
-    text-decoration: underline;
-}
