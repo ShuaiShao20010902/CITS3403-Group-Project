@@ -11,6 +11,27 @@
   {% include 'nav.html' %}
 
   <div class="main-content">
+    <div class="welcome-section">
+      <h1>Welcome, {{ username }}!</h1>
+      <p>
+        See your books below, or <a href="{{ url_for('main.browse') }}">browse</a> to get started.
+      </p>
+      <div class="quick-stats">
+        <div class="stat">
+          <span class="stat-number">{{ total_pages_read }}</span>
+          <span class="stat-label">Total Pages Read</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">{{ books_in_progress }}</span>
+          <span class="stat-label">Books In Progress</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">{{ books_completed }}</span>
+          <span class="stat-label">Books Completed</span>
+        </div>
+      </div>
+    </div>
+
     <section class="cr">
       <h2>Continue Reading</h2>
       {% if continue_reading %}
