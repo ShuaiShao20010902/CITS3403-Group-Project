@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Reading Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -11,7 +12,8 @@
   {% include 'nav.html' %}
 
   <div class="main-content">
-    <div class="welcome-section">
+
+    <div class="welcome-section section-box">
       <h1>Welcome, {{ username }}!</h1>
       <p>
         See your books below, or <a href="{{ url_for('main.browse') }}">browse</a> to get started.
@@ -32,7 +34,7 @@
       </div>
     </div>
 
-    <section class="cr">
+    <div class="section-box">
       <h2>Continue Reading</h2>
       {% if continue_reading %}
         <div class="cr-container">
@@ -53,16 +55,16 @@
       {% else %}
         <p class="no-books">Start tracking a book to see it here!</p>
       {% endif %}
-    </section>
+      </div>
 
-    <section class="stats">
+    <div class="section-box">
       <h2>Your Reading Stats (Last 30 Days)</h2>
       <div class="chart-container">
         <canvas id="readingChart"></canvas>
       </div>
-    </section>
+    </div>
 
-    <section class="cr">
+    <div class="section-box">
       <h2>Completed Books</h2>
       {% if completed_books %}
         <div class="cr-container">
@@ -84,7 +86,8 @@
       {% else %}
         <p class="no-books">Finish a book to see it here!</p>
       {% endif %}
-    </section>
+      </div>
+
   </div>
   
   <script>

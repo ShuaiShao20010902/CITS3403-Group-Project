@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Specific Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bookspecificpage.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -12,7 +13,7 @@
   {% include "nav.html" %}
 
   <!-- Main Book Info -->
-  <div class="book-container card">
+  <div class="container">
     <div class="book-details">
       <h1>{{ book.title }}</h1>
       <h2>{{ book.author or "Author name unavailable" }}</h2>
@@ -22,9 +23,6 @@
         {% endfor %}
       </div>
       <p><strong>Description:</strong> {{ book.description or "No description available." }}</p>
-      <div class="metadata">
-        <span><strong>Pages:</strong> {{ book.pages or "Pages unavailable" }}</span>
-      </div>
     </div>
 
     <div class="book-right">

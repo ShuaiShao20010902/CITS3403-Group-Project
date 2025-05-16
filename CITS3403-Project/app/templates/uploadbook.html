@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Book</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/uploadbook.css') }}">
 </head>
 <body>
@@ -32,15 +33,6 @@
         {{ form.rating.label }} {{ form.rating() }}
         {{ form.notes.label }} {{ form.notes() }}
         {{ form.completed(type="hidden", id="completed-field") }}
-
-        <button type="button" id="toggle-completed">
-          {% if form.completed.data %}
-            Mark as Incomplete
-          {% else %}
-            Mark as Complete
-          {% endif %}
-        </button>
-      </div>
     
       {{ form.submit() }}
     </form>
@@ -55,20 +47,6 @@
             ? 'Hide User Info ▲' 
             : 'Add User Info (Optional) ▼';
     }
-  
-    document.addEventListener('DOMContentLoaded', () => {
-        const hidden = document.getElementById('completed-field');
-        const btn    = document.getElementById('toggle-completed');
-  
-        btn.addEventListener('click', () => {
-          const newDone = !(hidden.value === 'True' || hidden.value === 'true');
-          hidden.value = newDone.toString();
-          btn.textContent = newDone
-            ? 'Mark as Incomplete ❌'
-            : 'Mark as Complete ✅';
-          btn.classList.toggle('complete', newDone);
-        });
-      });
   </script>
 </body>
 </html>
