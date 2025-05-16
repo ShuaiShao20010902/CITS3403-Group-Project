@@ -92,6 +92,18 @@ flask run
 ### Unit Tests
 
 Unit tests are provided in the `tests/` directory and use `pytest`.  
+All required testing packages, including `pytest`, should be installed automatically when you run:
+
+```sh
+pip install -r requirements.txt
+```
+
+If for any reason `pytest` is not installed, you can install it manually:
+
+```sh
+pip install pytest
+```
+
 To run all unit tests:
 
 ```sh
@@ -100,7 +112,13 @@ pytest
 
 ### Selenium Browser Tests
 
-Selenium tests simulate real user interactions in a browser.
+Selenium tests simulate real user interactions in a browser.  
+All required packages, including `selenium`, should also be installed via `requirements.txt`.  
+If not, you can install it manually:
+
+```sh
+pip install selenium
+```
 
 **Google Chrome must be installed** on your system for these tests to work.
 
@@ -111,7 +129,7 @@ If Chrome is not installed, Selenium tests will fail.
 
 #### Installing Google Chrome
 
-- **Windows/Mac:** 
+- **Windows/Mac:**  
   Download and install from [https://www.google.com/chrome/](https://www.google.com/chrome/)
 
 - **Ubuntu/Debian Linux:**
