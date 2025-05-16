@@ -1,39 +1,11 @@
 
 ## Book Tracker 
-A book tracking website that allows users to search for books and track their reading progress and thoughts on it. Mian feature allows users to create reading log entries for each book and see the progress on a graph. Book information is also retrieved from an API so users do not have to type in so much data which helps with the user experience. Also includes a social aspect where users can share data with one another. 
+A web application that allows users to search for books, track their reading progress, and log their thoughts.  
+Key features include:
+- **Reading Progress Tracking** with daily log entries and graph visualization.
+- **Automatic Book Details** fetched from Open Library API.
+- **Social Features** for sharing your reading activity with others.
 
-
-
-## Setup Guide
-
-1. **Clone this repository**
-   ```sh
-   git clone https://github.com/ShuaiShao20010902/CITS3403-Group-Project
-   cd <repository_folder>
-   ```
-
-2. **Create a Virtual Environment**
-```
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install Requirements**
-```
-pip install -r requirements.txt
-```
-
-4. **Setup Session Key**
-In the root directory, create a file named **.env** and in it define the session key
-```
-SECRET_KEY=somelongandsecurekey123
-```
-
-5. **Run the Program**
-In the root directory run this:
-```
-flask run
-```
 
 ## CITS3403 Group 80 Members
 

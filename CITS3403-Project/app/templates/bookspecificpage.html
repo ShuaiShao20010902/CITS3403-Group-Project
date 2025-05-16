@@ -31,8 +31,8 @@
         <div class="user-stats">
           <p><strong>Status:</strong><span id="status-text">{{ user_data.status or "No status yet" }}</span></p>
           <p><strong>Current Page:</strong> <span id="current-total">{{ pages_read_total or 0 }}</span> / <span id="book-pages-total">{{ book.pages }}</span></p>
-          <button type="button" class="generic-btn" onclick="openForm()">Edit Read Progress</button> <br>
-          <button type="button" class="generic-btn" onclick="openPagesModal()">Edit Page Number</button>  
+          <button type="button" onclick="openForm()">Edit Read Progress</button> <br>
+          <button type="button" onclick="openPagesModal()">Edit Page Number</button>  
         </div>
       </div>
     </div>
@@ -42,7 +42,6 @@
   <div class="rating-container card">
     <h3>Your Rating</h3>
 
-    <!-- persistent status sentence -->
     <p id="rating-status">
       {% if user_data.rating and user_data.rating > 0 %}
         You rated this book {{ '%.1f' % user_data.rating }}/5
@@ -56,7 +55,7 @@
         <span class="star" data-index="{{ i }}"></span>
       {% endfor %}
     </div>
-    <button id="rate-button" class="generic-btn">Rate</button>
+    <button id="rate-button" >Rate</button>
     <div id="rating-message" class="rating-message"></div>
   </div>
 
@@ -66,8 +65,8 @@
     <div id="notes-display" class="notes-display">{{ user_data.notes or "No notes yet. Click here to start typing." }}</div>
     <textarea id="notes-editor" class="notes-editor" style="display:none;"></textarea>
     <div id="notes-actions" class="notes-actions" style="display:none;">
-      <button id="save-notes" class="generic-btn">Save</button>
-      <button id="discard-notes" class="generic-btn">Discard</button>
+      <button id="save-notes">Save</button>
+      <button id="discard-notes">Discard</button>
       <span id="notes-message" style="margin-left:1em;"></span>
     </div>
   </div>
@@ -91,19 +90,19 @@
         <p>You have read <strong id="pages-read-total">{{ pages_read_total or 0 }}</strong> / <strong>{{ book.pages }}</strong> pages.</p>
 
         <div class="entry-view">
-        <button id="prev-entry" class="nav-btn"  title="Previous">&larr;</button>
+        <button id="prev-entry" title="Previous">&larr;</button>
 
         <div id="single-entry" class="entry-text">No entries yet</div>
 
-        <button id="edit-button" class="generic-btn-light" title="Edit">Edit</button>
+        <button id="edit-button" class="entry-btn" title="Edit">Edit</button>
 
-        <button id="next-entry" class="nav-btn"  title="Next">&rarr;</button>
+        <button id="next-entry" title="Next">&rarr;</button>
         </div>
 
         <div id="entry-actions" class="entry-actions" hidden>
         <input id="edit-pages" type="number" min="1" max="{{ book.pages }}">
-        <button id="save-entry"   class="generic-btn">Save</button>
-        <button id="delete-entry" class="generic-btn danger">Delete</button>
+        <button id="save-entry"   class="save-btn">Save</button>
+        <button id="delete-entry" class="del-btn">Delete</button>
         </div>
 
         <hr>
@@ -134,7 +133,8 @@
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    // Inject globals
+// @ts-nocheck
+
     window.UPDATE_BOOK_URL = "{{ url_for('main.update_book', book_id=book_id) }}";
     window.readingLogs = {{ reading_logs | tojson }} || [];
     window.initialRating   = {{ user_data.rating or 0 }};

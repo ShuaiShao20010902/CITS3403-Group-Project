@@ -43,9 +43,7 @@
 /* Text section on the left */
 .text-section {
     max-width: 35%;
-    margin-bottom: 30px;
-    padding-left: 500px;
-    padding-top: 120px; /* Move BookTracker down */
+    padding: 120px 10% 30px 10%;
 }
 
 .title-small {
