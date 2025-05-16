@@ -67,12 +67,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle book selection and display details
     bookDropdown.addEventListener('change', function () {
-        const selectedValue = this.value;
+        // Always enable the share button and clear message
+        shareButton.disabled = false;
+        message.textContent = '';
+
+        // Always show the details card
         bookDetails.style.display = 'block';
 
         // Remove any previous chart preview
         const existingChart = document.getElementById('shareStatsChart');
         if (existingChart) existingChart.remove();
+
+        // Reset book cover, note, and rating
+        bookCover.src = '';
+        bookNote.textContent = '';
+        bookRating.textContent = '';
+        bookCover.style.display = '';
+        bookNote.parentElement.style.display = '';
+        bookRating.parentElement.style.display = '';
+
+        const selectedValue = this.value;
 
         if (selectedValue === 'stats') {
             // Hide book-specific fields
@@ -80,15 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
             bookNote.parentElement.style.display = 'none';
             bookRating.parentElement.style.display = 'none';
 
-            // Remove previous chart if present
-            const existingChart = document.getElementById('shareStatsChart');
-            if (existingChart) existingChart.remove();
-
             // Add chart preview
             const chartCanvas = document.createElement('canvas');
             chartCanvas.id = 'shareStatsChart';
-            chartCanvas.width = 220;   // Match card chart width
-            chartCanvas.height = 180;  // Match card chart height
+            chartCanvas.width = 220;
+            chartCanvas.height = 180;
             bookDetails.appendChild(chartCanvas);
 
             // Render the chart using the preview data
@@ -129,10 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
             bookCover.style.display = '';
             bookNote.parentElement.style.display = '';
             bookRating.parentElement.style.display = '';
-
-            // Remove chart if present
-            const chartCanvas = document.getElementById('shareStatsChart');
-            if (chartCanvas) chartCanvas.remove();
 
             // Existing logic for book preview...
             const selectedOption = bookDropdown.options[bookDropdown.selectedIndex];
@@ -234,4 +240,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    document.querySelectorAll('.copy-title-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const title = btn.getAttribute('data-title');
+            navigator.clipboard.writeText(title).then(function() {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = `<svg viewBox="0 0 20 20"><path d="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6zm0 2h8v12H6V4zm2 2v2h4V6H8z"/></svg> Copy Title to Clipboard`;
+                    btn.classList.remove('copied');
+                }, 1500);
+            }, function() {
+                alert('Failed to copy!');
+            });
+        });
+    });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Carousel arrows
+    document.querySelectorAll('.carousel-container').forEach(container => {
+        const track = container.querySelector('.carousel-track');
+        container.querySelector('.carousel-arrow.left').onclick = () => {
+            track.scrollBy({ left: -300, behavior: 'smooth' });
+        };
+        container.querySelector('.carousel-arrow.right').onclick = () => {
+            track.scrollBy({ left: 300, behavior: 'smooth' });
+        };
+    });
 });
+

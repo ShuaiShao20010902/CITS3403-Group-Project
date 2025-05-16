@@ -21,7 +21,7 @@ class RegistrationForm(FlaskForm):
                                 DataRequired(message="Password is required."),
                                 Length(min=8, message="Password must be at least 8 characters."),
                                 Regexp(
-                                    '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+                                    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
                                     message='Password must include at least one lowercase letter, one uppercase letter, one number, and one special character.'
                                 )
                             ])
@@ -81,7 +81,7 @@ class PasswordResetForm(FlaskForm):
         DataRequired(message="Password is required."),
         Length(min=8, message="Password must be at least 8 characters."),
         Regexp(
-            '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
             message='Password must include at least one lowercase letter, one uppercase letter, one number, and one special character.'
         )
     ])
