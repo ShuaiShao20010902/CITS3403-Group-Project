@@ -19,10 +19,10 @@
             <select id="book-dropdown">
                 <option value="" disabled selected>Select a book</option>
                 {% for book in user_books %}
-                    <option 
-                        value="{{ book.book_id }}" 
-                        data-cover="https://covers.openlibrary.org/b/id/{{ book.book.cover_id }}-L.jpg" 
-                        data-note="{{ book.notes }}" 
+                    <option
+                        value="{{ book.book_id }}"
+                        data-cover="https://covers.openlibrary.org/b/id/{{ book.book.cover_id }}-L.jpg"
+                        data-note="{{ book.notes }}"
                         data-rating="{{ book.rating }}">
                         {{ book.book.title }}
                     </option>
@@ -50,19 +50,21 @@
         <!-- You're Sharing Carousel -->
         <div class="tab-content active" id="tab-sharing">
             <div class="carousel-container">
-                <button class="carousel-arrow left" aria-label="Scroll left">&#8592;</button>
+                {% if your_shared_items|length > 0 %}
+                    <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
+                {% endif %}
                 <div class="carousel-track">
                     {% for item in your_shared_items %}
                         <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
                             {% if item.content_type == 'stats' %}
                                 <h3>{{ item.title }}</h3>
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p>Reading stats you have shared!</p>
                                 <canvas id="sharedChart-{{ item.id }}" width="380" height="220"></canvas>
                             {% else %}
                                 {% if item.cover_url %}
                                     <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
                                 {% endif %}
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p>Book you have shared!</p>
                                 <p><strong>Title:</strong> {{ item.title }}</p>
                                 <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
                                 <p><strong>Rating:</strong> {{ item.rating }}</p>
@@ -71,7 +73,9 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow right" aria-label="Scroll right">&#8594;</button>
+                {% if your_shared_items|length > 0 %}
+                    <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
+                {% endif %}
             </div>
         </div>
 
@@ -82,21 +86,23 @@
                 <a href="{{ url_for('main.browse') }}">Browse</a> page to find and add it to your dashboard!
             </div>
             <div class="carousel-container">
-                <button class="carousel-arrow left" aria-label="Scroll left">&#8592;</button>
+                {% if shared_to_user|length > 0 %}
+                    <button class="carousel-arrow left" aria-label="Scroll left">&#10094;</button>
+                {% endif %}
                 <div class="carousel-track">
                     {% for item in shared_to_user %}
                         <div class="card{% if item.content_type == 'stats' %} stat-card{% endif %}" data-item-id="{{ item.id }}">
                             {% if item.content_type == 'stats' %}
                                 <h3>{{ item.title }}</h3>
                                 <p><strong>From:</strong> {{ item.shared_by }}</p>
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p>Reading stats shared with you!</p>
                                 <canvas id="sharedChart-{{ item.id }}" width="380" height="220"></canvas>
                             {% else %}
                                 {% if item.cover_url %}
                                     <img src="{{ item.cover_url }}" alt="Book Cover" class="book-cover">
                                 {% endif %}
                                 <p><strong>From:</strong> {{ item.shared_by }}</p>
-                                <p><strong>Type:</strong> {{ item.content_type }}</p>
+                                <p class="shared-msg">A book shared with you!</p>
                                 <p><strong>Title:</strong> {{ item.title }}</p>
                                 <p><strong>Notes:</strong> {{ item.notes or "No notes" }}</p>
                                 <p><strong>Rating:</strong> {{ item.rating }}</p>
@@ -109,7 +115,9 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button class="carousel-arrow right" aria-label="Scroll right">&#8594;</button>
+                {% if shared_to_user|length > 0 %}
+                    <button class="carousel-arrow right" aria-label="Scroll right">&#10095;</button>
+                {% endif %}
             </div>
         </div>
     </div>

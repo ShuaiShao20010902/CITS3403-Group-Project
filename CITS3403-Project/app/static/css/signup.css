@@ -12,11 +12,6 @@
    margin-bottom: 30px;
 }
 
-.logo-icon {
-   font-size: 80px;
-   margin-bottom: 20px;
-}
-
 .welcome-text {
    font-size: 32px;
    font-weight: bold;
@@ -135,38 +130,38 @@
 }
 
 .toggle-password {
-   position: absolute;
-   right: 10px;
-   background: none;
-   border: none;
-   cursor: pointer;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   color: #888;
-   transition: color 0.3s ease;
-   z-index: 100;
+   position: absolute !important;
+   right: 0.5px !important;
+   background: none !important;
+   border: none !important;
+   cursor: pointer !important;
+   display: flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   color: #888 !important;
+   transition: color 0.3s ease !important;
+   z-index: 100 !important;
 }
 
 .toggle-password svg {
-   width: 20px;
-   height: 20px;
+   width: 20px !important;
+   height: 20px !important;
 }
 
 .toggle-password .eye-open {
-   display: block;
+   display: block !important;
 }
 
 .toggle-password .eye-closed {
-   display: none;
+   display: none !important;
 }
 
 .toggle-password.active .eye-open {
-   display: none;
+   display: none !important;
 }
 
 .toggle-password.active .eye-closed {
-   display: block;
+   display: block !important;
 }
 
 /* Password requirements popup */
@@ -184,7 +179,6 @@
    left: 0;
    margin-top: 5px;
    animation: fadeIn 0.2s ease-in-out;
-   font-family: "Times New Roman", Times, serif;
 }
 
 .password-popup:before {
@@ -204,7 +198,6 @@
    color: #333;
    font-size: 0.8rem;
    margin-bottom: 5px;
-   font-family: "Times New Roman", Times, serif;
    font-weight: 600;
 }
 
@@ -217,7 +210,6 @@
    color: #dc3545;
    font-size: 0.75rem;
    margin-bottom: 2px;
-   font-family: "Times New Roman", Times, serif;
    font-weight: 700;
 }
 
@@ -231,16 +223,12 @@
    font-weight: 700;
 }
 
-.password-requirements {
-   display: none;
-}
-
 .popup-content .keyword {
    font-weight: 900;
    letter-spacing: 0.5px;
 }
 
-/* Form validation styles with fixed positioning for icons */
+/* Form validation styles */
 .form-control.is-valid {
    border-color: #28a745;
    padding-right: 4.5rem !important;
@@ -248,7 +236,6 @@
    background-repeat: no-repeat !important;
    background-position: right 40px center !important;
    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
-   font-family: "Times New Roman", Times, serif;
 }
 
 .form-control.is-invalid {
@@ -258,7 +245,6 @@
    background-repeat: no-repeat !important;
    background-position: right 40px center !important;
    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
-   font-family: "Times New Roman", Times, serif;
 }
 
 /* Flash messages styling */
@@ -302,61 +288,4 @@
    color: #dc3545;
    font-size: 0.875rem;
    margin-top: 5px;
-}
-
-/* Custom error popup */
-.error-popup {
-   position: fixed;
-   top: 20px;
-   left: 50%;
-   transform: translateX(-50%);
-   z-index: 1050;
-   background-color: #a70000;
-   color: white;
-   border-radius: 5px;
-   padding: 15px 20px;
-   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-   max-width: 90%;
-   width: 500px;
-   animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-   from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
-   to { transform: translateX(-50%) translateY(0); opacity: 1; }
-}
-
-.error-popup-header {
-   display: flex;
-   align-items: center;
-   margin-bottom: 10px;
-}
-
-.error-popup-icon {
-   margin-right: 10px;
-   font-size: 1.2rem;
-}
-
-.error-popup-title {
-   flex: 1;
-   font-size: 1.1rem;
-   margin: 0;
-}
-
-.error-popup-close {
-   background: none;
-   border: none;
-   color: white;
-   font-size: 1.2rem;
-   cursor: pointer;
-}
-
-.error-popup-list {
-   list-style-type: disc;
-   padding-left: 25px;
-   margin: 5px 0;
-}
-
-.error-popup-list li {
-   padding: 3px 0;
 }
