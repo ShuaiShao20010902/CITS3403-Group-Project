@@ -1,3 +1,5 @@
+<<<<<<<<< Temporary merge branch 1
+=========
 /* ===========================
    General Layout & Typography
    =========================== */
@@ -9,6 +11,7 @@ body {
   padding: 0;
 }
 
+>>>>>>>>> Temporary merge branch 2
 .container {
   max-width: 900px;
   margin: 2em auto;
